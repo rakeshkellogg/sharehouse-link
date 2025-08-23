@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, ExternalLink } from "lucide-react";
+import { MapPin, ExternalLink, Share2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { shareLocation, shareLocationViaWhatsApp } from "@/lib/locationShare";
+import { useToast } from "@/hooks/use-toast";
 
 interface MapDisplayProps {
   address: string;
@@ -14,6 +16,7 @@ interface MapDisplayProps {
 const MapDisplay = ({ address, lat, lng, title = "Property Location" }: MapDisplayProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const { toast } = useToast();
   const apiKey = localStorage.getItem('googleMapsApiKey') || '';
 
   useEffect(() => {
@@ -97,6 +100,39 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location" }: MapDispl
     }
   };
 
+  const handleShareLocation = async () => {
+    const success = await shareLocation({
+      address,
+      lat,
+      lng,
+      title,
+      message: `📍 Location: ${title}`
+    });
+
+    if (success) {
+      toast({
+        title: "Location shared!",
+        description: "Location copied to clipboard or shared successfully."
+      });
+    } else {
+      toast({
+        title: "Failed to share",
+        description: "Unable to share location. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    shareLocationViaWhatsApp({
+      address,
+      lat,
+      lng,
+      title,
+      message: `📍 Check out this location: ${title}`
+    });
+  };
+
   if (!apiKey) {
     return (
       <Card className="bg-gradient-card">
@@ -109,10 +145,20 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location" }: MapDispl
                 <p className="text-sm text-real-estate-neutral/70">{address}</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={openInGoogleMaps}>
-              <ExternalLink className="w-4 h-4 mr-1" />
-              View on Maps
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleShareLocation}>
+                <Share2 className="w-4 h-4 mr-1" />
+                Share
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleWhatsAppShare}>
+                <MessageCircle className="w-4 h-4 mr-1" />
+                WhatsApp
+              </Button>
+              <Button variant="outline" size="sm" onClick={openInGoogleMaps}>
+                <ExternalLink className="w-4 h-4 mr-1" />
+                View
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -131,10 +177,20 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location" }: MapDispl
                 <p className="text-sm text-real-estate-neutral/70">{address}</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={openInGoogleMaps}>
-              <ExternalLink className="w-4 h-4 mr-1" />
-              Open in Maps
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleShareLocation}>
+                <Share2 className="w-4 h-4 mr-1" />
+                Share
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleWhatsAppShare}>
+                <MessageCircle className="w-4 h-4 mr-1" />
+                WhatsApp
+              </Button>
+              <Button variant="outline" size="sm" onClick={openInGoogleMaps}>
+                <ExternalLink className="w-4 h-4 mr-1" />
+                Open
+              </Button>
+            </div>
           </div>
           
           <div 

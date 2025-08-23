@@ -2,6 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Share2 } from "lucide-react";
+import { shareLocation, shareLocationViaWhatsApp } from "@/lib/locationShare";
+import { useToast } from "@/hooks/use-toast";
 import MapDisplay from "./MapDisplay";
 import sampleProperty from "@/assets/sample-property.jpg";
 
@@ -32,6 +34,41 @@ const PropertyCard = ({
   ownerName,
   image = sampleProperty
 }: PropertyCardProps) => {
+  const { toast } = useToast();
+
+  const handleShareLocation = async () => {
+    const success = await shareLocation({
+      address: location,
+      lat,
+      lng,
+      title: `${title} - ${price}`,
+      message: `Check out this property: ${title} for ${price} in ${location}`
+    });
+
+    if (success) {
+      toast({
+        title: "Location shared!",
+        description: "Property location copied to clipboard or shared successfully."
+      });
+    } else {
+      toast({
+        title: "Failed to share",
+        description: "Unable to share location. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    shareLocationViaWhatsApp({
+      address: location,
+      lat,
+      lng,
+      title: `${title} - ${price}`,
+      message: `🏡 Check out this property!\n\n${title}\n${price}\n${location}`
+    });
+  };
+
   return (
     <Card className="bg-gradient-card shadow-card border-0 overflow-hidden">
       {/* Property Image */}
@@ -47,9 +84,9 @@ const PropertyCard = ({
           </Badge>
         </div>
         <div className="absolute top-4 left-4">
-          <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm">
+          <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm" onClick={handleShareLocation}>
             <Share2 className="w-4 h-4 mr-1" />
-            Share
+            Share Location
           </Button>
         </div>
       </div>
@@ -104,7 +141,7 @@ const PropertyCard = ({
           </p>
           
           <div className="flex gap-3">
-            <Button className="flex-1 bg-real-estate-secondary hover:bg-real-estate-secondary/90 text-white">
+            <Button className="flex-1 bg-real-estate-secondary hover:bg-real-estate-secondary/90 text-white" onClick={handleWhatsAppShare}>
               <MessageCircle className="w-4 h-4 mr-2" />
               WhatsApp
             </Button>
