@@ -2,12 +2,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Share2 } from "lucide-react";
+import MapDisplay from "./MapDisplay";
 import sampleProperty from "@/assets/sample-property.jpg";
 
 interface PropertyCardProps {
   title: string;
   price: string;
   location: string;
+  lat?: number;
+  lng?: number;
   bedrooms: string;
   bathrooms: string;
   size: string;
@@ -20,6 +23,8 @@ const PropertyCard = ({
   title,
   price,
   location,
+  lat,
+  lng,
   bedrooms,
   bathrooms,
   size,
@@ -81,6 +86,16 @@ const PropertyCard = ({
         <p className="text-real-estate-neutral/80 mb-6 leading-relaxed">
           {description}
         </p>
+
+        {/* Map Location */}
+        <div className="mb-6">
+          <MapDisplay 
+            address={location}
+            lat={lat}
+            lng={lng}
+            title="Property Location"
+          />
+        </div>
 
         {/* Contact Section */}
         <div className="border-t pt-4">

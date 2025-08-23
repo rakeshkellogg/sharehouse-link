@@ -30,6 +30,8 @@ const SampleListing = () => {
           title="Beautiful Modern 2BR Apartment"
           price="$2,800/month"
           location="Downtown, San Francisco, CA"
+          lat={37.7749}
+          lng={-122.4194}
           bedrooms="2"
           bathrooms="2"
           size="1,200"

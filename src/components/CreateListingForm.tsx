@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import MapLocationPicker from "./MapLocationPicker";
 
 const CreateListingForm = () => {
   const { toast } = useToast();
@@ -18,6 +19,7 @@ const CreateListingForm = () => {
     bathrooms: "",
     size: "",
     location: "",
+    locationCoords: { lat: 0, lng: 0 },
     mediaLinks: "",
     ownerName: "",
     ownerPhone: "",
@@ -34,6 +36,14 @@ const CreateListingForm = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLocationChange = (locationData: { lat: number; lng: number; address: string }) => {
+    setFormData(prev => ({
+      ...prev,
+      location: locationData.address,
+      locationCoords: { lat: locationData.lat, lng: locationData.lng }
+    }));
   };
 
   return (
@@ -136,20 +146,11 @@ const CreateListingForm = () => {
                 </div>
               </div>
 
-              {/* Location */}
-              <div className="space-y-2">
-                <Label htmlFor="location" className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  Location *
-                </Label>
-                <Input
-                  id="location"
-                  placeholder="Enter address or neighborhood"
-                  value={formData.location}
-                  onChange={(e) => handleInputChange("location", e.target.value)}
-                  className="h-12"
-                />
-              </div>
+              {/* Location with Map */}
+              <MapLocationPicker 
+                onLocationChange={handleLocationChange}
+                initialLocation={formData.location}
+              />
 
               {/* Description */}
               <div className="space-y-2">
