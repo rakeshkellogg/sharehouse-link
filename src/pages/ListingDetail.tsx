@@ -15,13 +15,18 @@ import {
   MessageCircle, 
   ExternalLink,
   ArrowLeft,
-  DollarSign
+  DollarSign,
+  Play
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import YouTubeEmbed from "@/components/YouTubeEmbed";
+import MessageOwner from "@/components/MessageOwner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Listing {
   id: string;
+  user_id: string;
   title: string;
   price: number;
   bedrooms: string | null;
@@ -31,6 +36,8 @@ interface Listing {
   location_address: string | null;
   google_maps_link: string | null;
   media_links: string[];
+  youtube_url: string | null;
+  cover_image_url: string | null;
   owner_name: string;
   owner_phone: string | null;
   owner_whatsapp: string | null;
@@ -40,6 +47,7 @@ interface Listing {
 const ListingDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,6 +179,39 @@ const ListingDetail = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Cover Photo */}
+            {listing.cover_image_url && (
+              <Card className="bg-gradient-card shadow-card border-0 overflow-hidden">
+                <div className="aspect-video bg-muted">
+                  <img 
+                    src={listing.cover_image_url} 
+                    alt={`Cover photo for ${listing.title}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = 
+                        '<div class="w-full h-full flex items-center justify-center text-muted-foreground">Failed to load image</div>';
+                    }}
+                  />
+                </div>
+              </Card>
+            )}
+
+            {/* YouTube Video */}
+            {listing.youtube_url && (
+              <Card className="bg-gradient-card shadow-card border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Play className="w-5 h-5" />
+                    Property Video
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <YouTubeEmbed url={listing.youtube_url} title={`Video tour of ${listing.title}`} />
+                </CardContent>
+              </Card>
+            )}
+
             {/* Property Features */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
@@ -253,6 +294,13 @@ const ListingDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Message Owner */}
+            <MessageOwner 
+              listingId={listing.id}
+              ownerUserId={listing.user_id}
+              listingTitle={listing.title}
+            />
+
             {/* Contact Information */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>

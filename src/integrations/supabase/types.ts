@@ -18,7 +18,9 @@ export type Database = {
         Row: {
           bathrooms: string | null
           bedrooms: string | null
+          cover_image_url: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           google_maps_link: string | null
           id: string
@@ -35,11 +37,14 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          youtube_url: string | null
         }
         Insert: {
           bathrooms?: string | null
           bedrooms?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           google_maps_link?: string | null
           id?: string
@@ -56,11 +61,14 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          youtube_url?: string | null
         }
         Update: {
           bathrooms?: string | null
           bedrooms?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           google_maps_link?: string | null
           id?: string
@@ -77,8 +85,47 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          youtube_url?: string | null
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          listing_id: string
+          owner_user_id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          listing_id: string
+          owner_user_id: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          listing_id?: string
+          owner_user_id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

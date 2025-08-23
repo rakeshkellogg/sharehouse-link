@@ -12,11 +12,25 @@ import {
   Eye,
   Calendar,
   DollarSign,
-  MapPin
+  MapPin,
+  Edit3,
+  Trash2,
+  MessageCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Listing {
   id: string;
@@ -95,6 +109,32 @@ const MyListings = () => {
     window.open(`/listing/${listingId}`, '_blank');
   };
 
+  const deleteListing = async (listingId: string, title: string) => {
+    try {
+      const { error } = await supabase
+        .from('listings')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', listingId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setListings(prev => prev.filter(listing => listing.id !== listingId));
+
+      toast({
+        title: "Listing Deleted",
+        description: `"${title}" has been deleted and is no longer public.`,
+      });
+    } catch (error) {
+      console.error('Error deleting listing:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete listing. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-real-estate-light py-12">
@@ -121,12 +161,20 @@ const MyListings = () => {
               Manage and share your property listings
             </p>
           </div>
-          <Link to="/create">
-            <Button className="bg-gradient-hero text-white shadow-hero mt-4 md:mt-0">
-              <Plus className="w-4 h-4 mr-2" />
-              Create New Listing
-            </Button>
-          </Link>
+          <div className="flex gap-2 mt-4 md:mt-0">
+            <Link to="/inbox">
+              <Button variant="outline" className="shadow-hero">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Inbox
+              </Button>
+            </Link>
+            <Link to="/create">
+              <Button className="bg-gradient-hero text-white shadow-hero">
+                <Plus className="w-4 h-4 mr-2" />
+                Create New Listing
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Listings Grid */}
@@ -220,6 +268,51 @@ const MyListings = () => {
                       <ExternalLink className="w-4 h-4 mr-1" />
                       View
                     </Button>
+                  </div>
+
+                  {/* Edit/Delete Actions */}
+                  <div className="flex gap-2 pt-2">
+                    <Link to={`/edit/${listing.id}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                      >
+                        <Edit3 className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                    </Link>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this listing?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently remove "{listing.title}" from public view. 
+                            This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteListing(listing.id, listing.title)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete Listing
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardContent>
               </Card>

@@ -9,9 +9,11 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import CreateListing from "./pages/CreateListing";
+import EditListing from "./pages/EditListing";
 import SampleListing from "./pages/SampleListing";
 import ListingDetail from "./pages/ListingDetail";
 import MyListings from "./pages/MyListings";
+import Inbox from "./pages/Inbox";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -33,12 +35,22 @@ const App: React.FC = () => {
                   <CreateListing />
                 </ProtectedRoute>
               } />
-              <Route path="/my-listings" element={
+            <Route path="/edit/:id" element={
+              <ProtectedRoute>
+                <EditListing />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-listings" element={
                 <ProtectedRoute>
                   <MyListings />
                 </ProtectedRoute>
               } />
-              <Route path="/listing/:id" element={<ListingDetail />} />
+            <Route path="/inbox" element={
+              <ProtectedRoute>
+                <Inbox />
+              </ProtectedRoute>
+            } />
+            <Route path="/listing/:id" element={<ListingDetail />} />
               <Route path="/sample" element={<SampleListing />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

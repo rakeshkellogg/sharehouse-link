@@ -1,28 +1,25 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle, Copy, Share2, ExternalLink } from "lucide-react";
+import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import MapLocationPicker from "./MapLocationPicker";
+import MapLocationPicker from "@/components/MapLocationPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-const CreateListingForm = () => {
+const EditListing = () => {
+  const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [shareDialog, setShareDialog] = useState<{ open: boolean; listingId: string; shareUrl: string }>({
-    open: false,
-    listingId: "",
-    shareUrl: ""
-  });
+  const [loading, setLoading] = useState(true);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -41,13 +38,64 @@ const CreateListingForm = () => {
     ownerWhatsApp: ""
   });
 
+  useEffect(() => {
+    const fetchListing = async () => {
+      if (!id || !user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('listings')
+          .select('*')
+          .eq('id', id)
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setFormData({
+            title: data.title || "",
+            price: data.price?.toString() || "",
+            description: data.description || "",
+            bedrooms: data.bedrooms || "",
+            bathrooms: data.bathrooms || "",
+            size: data.size || "",
+            location: data.location_address || data.google_maps_link || "",
+            locationCoords: { 
+              lat: data.latitude || 0, 
+              lng: data.longitude || 0 
+            },
+            mediaLinks: data.media_links?.join('\n') || "",
+            youtubeUrl: data.youtube_url || "",
+            coverImageUrl: data.cover_image_url || "",
+            ownerName: data.owner_name || "",
+            ownerPhone: data.owner_phone || "",
+            ownerWhatsApp: data.owner_whatsapp || ""
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load listing for editing.",
+          variant: "destructive"
+        });
+        navigate('/my-listings');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListing();
+  }, [id, user, toast, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) {
+    if (!user || !id) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to create a listing.",
+        description: "Please sign in to edit this listing.",
         variant: "destructive"
       });
       return;
@@ -71,14 +119,13 @@ const CreateListingForm = () => {
         .map(link => link.trim())
         .filter(link => link.length > 0);
 
-      // Parse price to integer (remove any non-numeric characters except for digits)
+      // Parse price to integer
       const priceValue = parseInt(formData.price.replace(/[^\d]/g, ''));
       if (isNaN(priceValue)) {
         throw new Error("Please enter a valid price");
       }
 
-      const listingData = {
-        user_id: user.id,
+      const updateData = {
         title: formData.title,
         price: priceValue,
         bedrooms: formData.bedrooms || null,
@@ -95,47 +142,28 @@ const CreateListingForm = () => {
         owner_name: formData.ownerName,
         owner_phone: formData.ownerPhone || null,
         owner_whatsapp: formData.ownerWhatsApp || null,
-        is_public: true
+        updated_at: new Date().toISOString()
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('listings')
-        .insert([listingData])
-        .select('id')
-        .single();
+        .update(updateData)
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      const shareUrl = `${window.location.origin}/listing/${data.id}`;
-      
-      setShareDialog({
-        open: true,
-        listingId: data.id,
-        shareUrl
+      toast({
+        title: "Listing Updated",
+        description: "Your listing has been successfully updated.",
       });
 
-      // Reset form
-      setFormData({
-        title: "",
-        price: "",
-        description: "",
-        bedrooms: "",
-        bathrooms: "",
-        size: "",
-        location: "",
-        locationCoords: { lat: 0, lng: 0 },
-        mediaLinks: "",
-        youtubeUrl: "",
-        coverImageUrl: "",
-        ownerName: "",
-        ownerPhone: "",
-        ownerWhatsApp: ""
-      });
+      navigate('/my-listings');
 
     } catch (error) {
-      console.error('Error creating listing:', error);
+      console.error('Error updating listing:', error);
       toast({
-        title: "Error Creating Listing",
+        title: "Error Updating Listing",
         description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
         variant: "destructive"
       });
@@ -157,7 +185,6 @@ const CreateListingForm = () => {
   };
 
   const handleGoogleMapsLink = (link: string) => {
-    // Extract coordinates and address from Google Maps link if possible
     const coordsMatch = link.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
     if (coordsMatch) {
       const lat = parseFloat(coordsMatch[1]);
@@ -172,49 +199,37 @@ const CreateListingForm = () => {
     }
   };
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast({
-        title: "Copied!",
-        description: "Share link copied to clipboard",
-      });
-    } catch (error) {
-      console.error('Failed to copy:', error);
-      toast({
-        title: "Copy Failed",
-        description: "Please copy the link manually",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleShare = async (url: string) => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: formData.title,
-          text: `Check out this property listing: ${formData.title}`,
-          url
-        });
-      } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          copyToClipboard(url);
-        }
-      }
-    } else {
-      copyToClipboard(url);
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-real-estate-light py-12">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-real-estate-primary mx-auto"></div>
+            <p className="mt-4 text-real-estate-neutral/70">Loading listing...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-real-estate-light py-12">
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="text-center mb-8">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mb-4"
+            onClick={() => navigate('/my-listings')}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to My Listings
+          </Button>
+          
           <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-4">
-            Create Your Property Listing
+            Edit Property Listing
           </h1>
-          <p className="text-real-estate-neutral/70">Fill out the details below to create a shareable listing</p>
+          <p className="text-real-estate-neutral/70">Update your property details</p>
         </div>
 
         <Card className="bg-gradient-card shadow-card border-0">
@@ -262,7 +277,7 @@ const CreateListingForm = () => {
                     <Bed className="w-4 h-4" />
                     Bedrooms
                   </Label>
-                  <Select onValueChange={(value) => handleInputChange("bedrooms", value)}>
+                  <Select value={formData.bedrooms} onValueChange={(value) => handleInputChange("bedrooms", value)}>
                     <SelectTrigger className="h-12">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
@@ -281,7 +296,7 @@ const CreateListingForm = () => {
                     <Bath className="w-4 h-4" />
                     Bathrooms
                   </Label>
-                  <Select onValueChange={(value) => handleInputChange("bathrooms", value)}>
+                  <Select value={formData.bathrooms} onValueChange={(value) => handleInputChange("bathrooms", value)}>
                     <SelectTrigger className="h-12">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
@@ -450,64 +465,14 @@ const CreateListingForm = () => {
                 className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Creating Listing..." : "Create Listing & Get Share Link"}
+                {isSubmitting ? "Updating Listing..." : "Update Listing"}
               </Button>
             </form>
           </CardContent>
         </Card>
-
-        {/* Share Dialog */}
-        <Dialog open={shareDialog.open} onOpenChange={(open) => setShareDialog(prev => ({ ...prev, open }))}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Home className="w-5 h-5" />
-                Listing Created Successfully!
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Your listing is now live! Share this link with potential renters:
-              </p>
-              
-              <div className="flex items-center space-x-2">
-                <Input
-                  value={shareDialog.shareUrl}
-                  readOnly
-                  className="flex-1"
-                />
-                <Button
-                  size="sm"
-                  onClick={() => copyToClipboard(shareDialog.shareUrl)}
-                  variant="outline"
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handleShare(shareDialog.shareUrl)}
-                  className="flex-1"
-                  variant="outline"
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
-                <Button
-                  onClick={() => window.open(shareDialog.shareUrl, '_blank')}
-                  className="flex-1"
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View Listing
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
 };
 
-export default CreateListingForm;
+export default EditListing;
