@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MapLocationPicker from "./MapLocationPicker";
 
 
 const CreateListingForm = () => {
@@ -19,6 +21,7 @@ const CreateListingForm = () => {
     bathrooms: "",
     size: "",
     location: "",
+    locationCoords: { lat: 0, lng: 0 },
     mediaLinks: "",
     ownerName: "",
     ownerPhone: "",
@@ -35,6 +38,30 @@ const CreateListingForm = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLocationChange = (locationData: { lat: number; lng: number; address: string }) => {
+    setFormData(prev => ({
+      ...prev,
+      location: locationData.address,
+      locationCoords: { lat: locationData.lat, lng: locationData.lng }
+    }));
+  };
+
+  const handleGoogleMapsLink = (link: string) => {
+    // Extract coordinates and address from Google Maps link if possible
+    const coordsMatch = link.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (coordsMatch) {
+      const lat = parseFloat(coordsMatch[1]);
+      const lng = parseFloat(coordsMatch[2]);
+      setFormData(prev => ({
+        ...prev,
+        location: link,
+        locationCoords: { lat, lng }
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, location: link }));
+    }
   };
 
 
@@ -138,22 +165,38 @@ const CreateListingForm = () => {
                 </div>
               </div>
 
-              {/* Location */}
-              <div className="space-y-2">
-                <Label htmlFor="location" className="flex items-center gap-1">
+              {/* Location Options */}
+              <div className="space-y-4">
+                <Label className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
-                  Property Address *
+                  Property Location *
                 </Label>
-                <Input
-                  id="location"
-                  placeholder="123 Main St, City, State 12345"
-                  value={formData.location}
-                  onChange={(e) => handleInputChange("location", e.target.value)}
-                  className="h-12"
-                />
-                <p className="text-sm text-real-estate-neutral/70">
-                  Enter the full address - this will be used for location sharing
-                </p>
+                <Tabs defaultValue="maps-link" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="maps-link">Google Maps Link</TabsTrigger>
+                    <TabsTrigger value="api-autofill">Autofill Address</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="maps-link" className="space-y-2">
+                    <Input
+                      placeholder="Paste Google Maps location link here"
+                      value={formData.location}
+                      onChange={(e) => handleGoogleMapsLink(e.target.value)}
+                      className="h-12"
+                    />
+                    <p className="text-sm text-real-estate-neutral/70">
+                      Share a Google Maps link from your phone - just paste it here
+                    </p>
+                  </TabsContent>
+                  <TabsContent value="api-autofill" className="space-y-2">
+                    <MapLocationPicker 
+                      onLocationChange={handleLocationChange}
+                      initialLocation={formData.location}
+                    />
+                    <p className="text-sm text-real-estate-neutral/70">
+                      Uses Google API for precise address search and pin placement
+                    </p>
+                  </TabsContent>
+                </Tabs>
               </div>
 
               {/* Description */}
