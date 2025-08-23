@@ -3,8 +3,9 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, AlertCircle } from "lucide-react";
+import { MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MapLocationPickerProps {
   onLocationChange: (location: { lat: number; lng: number; address: string }) => void;
@@ -15,9 +16,45 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
-  const [apiKey, setApiKey] = useState<string>(localStorage.getItem('googleMapsApiKey') || '');
+  const [apiKey, setApiKey] = useState<string>('');
   const [address, setAddress] = useState<string>(initialLocation);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  const fetchApiKey = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        setError('Please log in to use location features');
+        setIsLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('get-maps-api-key');
+      
+      if (error) {
+        throw error;
+      }
+
+      if (data?.apiKey) {
+        setApiKey(data.apiKey);
+        setError('');
+      } else {
+        setError('Google Maps API key not configured');
+      }
+    } catch (err) {
+      console.error('Error fetching API key:', err);
+      setError('Failed to load maps. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchApiKey();
+  }, []);
 
   const initializeMap = async (key: string) => {
     if (!mapRef.current || !key) return;
@@ -114,7 +151,6 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
 
   useEffect(() => {
     if (apiKey) {
-      localStorage.setItem('googleMapsApiKey', apiKey);
       initializeMap(apiKey);
     }
   }, [apiKey]);
@@ -139,40 +175,42 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
     });
   };
 
-  if (!apiKey) {
+  if (isLoading) {
     return (
       <Card className="bg-gradient-card">
         <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-real-estate-primary" />
-              <Label className="text-base font-semibold">Google Maps Setup</Label>
+              <Label className="text-base font-semibold">Property Location</Label>
+            </div>
+            
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-real-estate-primary" />
+              <span className="ml-2 text-real-estate-neutral/70">Loading maps...</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-gradient-card">
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-real-estate-primary" />
+              <Label className="text-base font-semibold">Property Location</Label>
             </div>
             
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                To use location features, please enter your Google Maps API key. 
-                Get one free at <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer" className="text-real-estate-primary underline">Google Cloud Console</a>
+                {error}
               </AlertDescription>
             </Alert>
-
-            <div className="space-y-2">
-              <Label htmlFor="apiKey">Google Maps API Key</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="apiKey"
-                  type="password"
-                  placeholder="Enter your Google Maps API key"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-sm text-real-estate-neutral/60">
-                Your API key is stored locally and only used for map functionality
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>
