@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Home, Users, Share2, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import AuthButton from "@/components/AuthButton";
 import heroImage from "@/assets/hero-real-estate.jpg";
 
 const Hero = () => {
@@ -13,6 +14,11 @@ const Hero = () => {
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-real-estate-primary/80 via-real-estate-primary/70 to-real-estate-secondary/60" />
+      </div>
+
+      {/* Auth Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <AuthButton />
       </div>
 
       {/* Content */}
