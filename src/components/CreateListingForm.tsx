@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import MapLocationPicker from "./MapLocationPicker";
+
 
 const CreateListingForm = () => {
   const { toast } = useToast();
@@ -19,7 +19,6 @@ const CreateListingForm = () => {
     bathrooms: "",
     size: "",
     location: "",
-    locationCoords: { lat: 0, lng: 0 },
     mediaLinks: "",
     ownerName: "",
     ownerPhone: "",
@@ -38,13 +37,6 @@ const CreateListingForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleLocationChange = (locationData: { lat: number; lng: number; address: string }) => {
-    setFormData(prev => ({
-      ...prev,
-      location: locationData.address,
-      locationCoords: { lat: locationData.lat, lng: locationData.lng }
-    }));
-  };
 
   return (
     <div className="min-h-screen bg-real-estate-light py-12">
@@ -146,11 +138,23 @@ const CreateListingForm = () => {
                 </div>
               </div>
 
-              {/* Location with Map */}
-              <MapLocationPicker 
-                onLocationChange={handleLocationChange}
-                initialLocation={formData.location}
-              />
+              {/* Location */}
+              <div className="space-y-2">
+                <Label htmlFor="location" className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  Property Address *
+                </Label>
+                <Input
+                  id="location"
+                  placeholder="123 Main St, City, State 12345"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange("location", e.target.value)}
+                  className="h-12"
+                />
+                <p className="text-sm text-real-estate-neutral/70">
+                  Enter the full address - this will be used for location sharing
+                </p>
+              </div>
 
               {/* Description */}
               <div className="space-y-2">
