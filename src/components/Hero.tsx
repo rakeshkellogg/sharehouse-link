@@ -1,11 +1,15 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Home, Users, Share2, MessageCircle } from "lucide-react";
+import { Home, Users, Share2, MessageCircle, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthButton from "@/components/AuthButton";
+import { useAuth } from "@/contexts/AuthContext";
 import heroImage from "@/assets/hero-real-estate.jpg";
 
 const Hero = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
       {/* Background Image with Overlay */}
@@ -20,6 +24,18 @@ const Hero = () => {
       <div className="absolute top-4 right-4 z-20">
         <AuthButton />
       </div>
+
+      {/* My Listings Button for Authenticated Users */}
+      {user && (
+        <div className="absolute top-4 left-4 z-20">
+          <Link to="/my-listings">
+            <Button variant="outline" className="border-white text-white hover:bg-white/10">
+              <List className="w-4 h-4 mr-2" />
+              My Listings
+            </Button>
+          </Link>
+        </div>
+      )}
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">

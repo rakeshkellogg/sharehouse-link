@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,14 +6,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle } from "lucide-react";
+import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle, Copy, Share2, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MapLocationPicker from "./MapLocationPicker";
-
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CreateListingForm = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shareDialog, setShareDialog] = useState<{ open: boolean; listingId: string; shareUrl: string }>({
+    open: false,
+    listingId: "",
+    shareUrl: ""
+  });
+  
   const [formData, setFormData] = useState({
     title: "",
     price: "",
@@ -28,12 +39,103 @@ const CreateListingForm = () => {
     ownerWhatsApp: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Listing Created!",
-      description: "Your property listing has been created successfully.",
-    });
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to create a listing.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.title || !formData.price || !formData.ownerName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Parse media links into array
+      const mediaLinksArray = formData.mediaLinks
+        .split('\n')
+        .map(link => link.trim())
+        .filter(link => link.length > 0);
+
+      // Parse price to integer (remove any non-numeric characters except for digits)
+      const priceValue = parseInt(formData.price.replace(/[^\d]/g, ''));
+      if (isNaN(priceValue)) {
+        throw new Error("Please enter a valid price");
+      }
+
+      const listingData = {
+        user_id: user.id,
+        title: formData.title,
+        price: priceValue,
+        bedrooms: formData.bedrooms || null,
+        bathrooms: formData.bathrooms || null,
+        size: formData.size || null,
+        description: formData.description || null,
+        location_address: formData.location || null,
+        latitude: formData.locationCoords.lat || null,
+        longitude: formData.locationCoords.lng || null,
+        google_maps_link: formData.location.startsWith('http') ? formData.location : null,
+        media_links: mediaLinksArray,
+        owner_name: formData.ownerName,
+        owner_phone: formData.ownerPhone || null,
+        owner_whatsapp: formData.ownerWhatsApp || null,
+        is_public: true
+      };
+
+      const { data, error } = await supabase
+        .from('listings')
+        .insert([listingData])
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
+      const shareUrl = `${window.location.origin}/listing/${data.id}`;
+      
+      setShareDialog({
+        open: true,
+        listingId: data.id,
+        shareUrl
+      });
+
+      // Reset form
+      setFormData({
+        title: "",
+        price: "",
+        description: "",
+        bedrooms: "",
+        bathrooms: "",
+        size: "",
+        location: "",
+        locationCoords: { lat: 0, lng: 0 },
+        mediaLinks: "",
+        ownerName: "",
+        ownerPhone: "",
+        ownerWhatsApp: ""
+      });
+
+    } catch (error) {
+      console.error('Error creating listing:', error);
+      toast({
+        title: "Error Creating Listing",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -64,6 +166,40 @@ const CreateListingForm = () => {
     }
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Copied!",
+        description: "Share link copied to clipboard",
+      });
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast({
+        title: "Copy Failed",
+        description: "Please copy the link manually",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleShare = async (url: string) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: formData.title,
+          text: `Check out this property listing: ${formData.title}`,
+          url
+        });
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          copyToClipboard(url);
+        }
+      }
+    } else {
+      copyToClipboard(url);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-real-estate-light py-12">
@@ -94,6 +230,7 @@ const CreateListingForm = () => {
                     value={formData.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
                     className="h-12"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -107,6 +244,7 @@ const CreateListingForm = () => {
                     value={formData.price}
                     onChange={(e) => handleInputChange("price", e.target.value)}
                     className="h-12"
+                    required
                   />
                 </div>
               </div>
@@ -238,6 +376,7 @@ const CreateListingForm = () => {
                       value={formData.ownerName}
                       onChange={(e) => handleInputChange("ownerName", e.target.value)}
                       className="h-12"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -270,12 +409,66 @@ const CreateListingForm = () => {
               </div>
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero">
-                Create Listing & Get Share Link
+              <Button 
+                type="submit" 
+                className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating Listing..." : "Create Listing & Get Share Link"}
               </Button>
             </form>
           </CardContent>
         </Card>
+
+        {/* Share Dialog */}
+        <Dialog open={shareDialog.open} onOpenChange={(open) => setShareDialog(prev => ({ ...prev, open }))}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Home className="w-5 h-5" />
+                Listing Created Successfully!
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Your listing is now live! Share this link with potential renters:
+              </p>
+              
+              <div className="flex items-center space-x-2">
+                <Input
+                  value={shareDialog.shareUrl}
+                  readOnly
+                  className="flex-1"
+                />
+                <Button
+                  size="sm"
+                  onClick={() => copyToClipboard(shareDialog.shareUrl)}
+                  variant="outline"
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handleShare(shareDialog.shareUrl)}
+                  className="flex-1"
+                  variant="outline"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share
+                </Button>
+                <Button
+                  onClick={() => window.open(shareDialog.shareUrl, '_blank')}
+                  className="flex-1"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  View Listing
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

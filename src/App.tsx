@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import CreateListing from "./pages/CreateListing";
 import SampleListing from "./pages/SampleListing";
+import ListingDetail from "./pages/ListingDetail";
+import MyListings from "./pages/MyListings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +31,12 @@ const App = () => (
                 <CreateListing />
               </ProtectedRoute>
             } />
+            <Route path="/my-listings" element={
+              <ProtectedRoute>
+                <MyListings />
+              </ProtectedRoute>
+            } />
+            <Route path="/listing/:id" element={<ListingDetail />} />
             <Route path="/sample" element={<SampleListing />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
