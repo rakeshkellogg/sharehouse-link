@@ -10,6 +10,7 @@ import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MapLocationPicker from "@/components/MapLocationPicker";
+import { ImagePicker } from "@/components/ImagePicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -181,6 +182,14 @@ const EditListing = () => {
       ...prev,
       location: locationData.address,
       locationCoords: { lat: locationData.lat, lng: locationData.lng }
+    }));
+  };
+
+  const handleImagesChange = (coverUrl: string, mediaUrls: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      coverImageUrl: coverUrl,
+      mediaLinks: mediaUrls.join('\n')
     }));
   };
 
@@ -370,20 +379,14 @@ const EditListing = () => {
                 />
               </div>
 
-              {/* Cover Photo */}
-              <div className="space-y-2">
-                <Label htmlFor="coverImageUrl">Cover Photo (optional)</Label>
-                <Input
-                  id="coverImageUrl"
-                  placeholder="Paste a public image link (JPG, PNG, WEBP)"
-                  value={formData.coverImageUrl}
-                  onChange={(e) => handleInputChange("coverImageUrl", e.target.value)}
-                  className="h-12"
-                />
-                <p className="text-sm text-real-estate-neutral/70">
-                  Use a public image link from Google Drive, Instagram, or any image hosting service
-                </p>
-              </div>
+              {/* Photo Upload */}
+              <ImagePicker
+                onImagesChange={handleImagesChange}
+                initialCoverUrl={formData.coverImageUrl}
+                initialMediaUrls={formData.mediaLinks.split('\n').filter(url => url.trim())}
+                listingId={id}
+                userId={user?.id}
+              />
 
               {/* YouTube Video */}
               <div className="space-y-2">

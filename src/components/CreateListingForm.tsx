@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MapLocationPicker from "./MapLocationPicker";
+import { ImagePicker } from "./ImagePicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -153,6 +154,14 @@ const CreateListingForm = () => {
       ...prev,
       location: locationData.address,
       locationCoords: { lat: locationData.lat, lng: locationData.lng }
+    }));
+  };
+
+  const handleImagesChange = (coverUrl: string, mediaUrls: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      coverImageUrl: coverUrl,
+      mediaLinks: mediaUrls.join('\n')
     }));
   };
 
@@ -355,20 +364,12 @@ const CreateListingForm = () => {
                 />
               </div>
 
-              {/* Cover Photo */}
-              <div className="space-y-2">
-                <Label htmlFor="coverImageUrl">Cover Photo (optional)</Label>
-                <Input
-                  id="coverImageUrl"
-                  placeholder="Paste a public image link (JPG, PNG, WEBP)"
-                  value={formData.coverImageUrl}
-                  onChange={(e) => handleInputChange("coverImageUrl", e.target.value)}
-                  className="h-12"
-                />
-                <p className="text-sm text-real-estate-neutral/70">
-                  Use a public image link from Google Drive, Instagram, or any image hosting service
-                </p>
-              </div>
+              {/* Photo Upload */}
+              <ImagePicker
+                onImagesChange={handleImagesChange}
+                listingId={shareDialog.listingId || undefined}
+                userId={user?.id}
+              />
 
               {/* YouTube Video */}
               <div className="space-y-2">

@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import MessageOwner from "@/components/MessageOwner";
+import MapDisplay from "@/components/MapDisplay";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Listing {
@@ -34,6 +35,8 @@ interface Listing {
   size: string | null;
   description: string | null;
   location_address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   google_maps_link: string | null;
   media_links: string[];
   youtube_url: string | null;
@@ -267,25 +270,56 @@ const ListingDetail = () => {
               </Card>
             )}
 
-            {/* Media Links */}
+            {/* Media Links and Image Gallery */}
             {listing.media_links && listing.media_links.length > 0 && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle>Photos & Videos</CardTitle>
+                  <CardTitle>Photos & Media</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {listing.media_links.map((link, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        className="w-full justify-start"
-                        onClick={() => window.open(link, '_blank')}
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View Media {index + 1}
-                      </Button>
-                    ))}
+                  <div className="space-y-4">
+                    {/* Image Gallery for uploaded photos */}
+                    {listing.media_links.some(link => link.includes('supabase')) && (
+                      <div>
+                        <h4 className="font-medium mb-3">Property Photos</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          {listing.media_links
+                            .filter(link => link.includes('supabase'))
+                            .map((imageUrl, index) => (
+                              <div key={index} className="aspect-video overflow-hidden rounded-lg border">
+                                <img 
+                                  src={imageUrl}
+                                  alt={`Property photo ${index + 1}`}
+                                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                                  onClick={() => window.open(imageUrl, '_blank')}
+                                />
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Other media links */}
+                    {listing.media_links.some(link => !link.includes('supabase')) && (
+                      <div>
+                        <h4 className="font-medium mb-3">Additional Media</h4>
+                        <div className="space-y-2">
+                          {listing.media_links
+                            .filter(link => !link.includes('supabase'))
+                            .map((link, index) => (
+                              <Button
+                                key={index}
+                                variant="outline"
+                                className="w-full justify-start"
+                                onClick={() => window.open(link, '_blank')}
+                              >
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                View Media {index + 1}
+                              </Button>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -342,32 +376,13 @@ const ListingDetail = () => {
             </Card>
 
             {/* Location */}
-            {(listing.google_maps_link || listing.location_address) && (
-              <Card className="bg-gradient-card shadow-card border-0">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    Location
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {listing.location_address && (
-                    <p className="text-real-estate-neutral/80 mb-3">
-                      {listing.location_address}
-                    </p>
-                  )}
-                  {listing.google_maps_link && (
-                    <Button
-                      onClick={() => window.open(listing.google_maps_link!, '_blank')}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      View on Google Maps
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
+            {listing.location_address && (
+              <MapDisplay
+                address={listing.location_address}
+                lat={listing.latitude || undefined}
+                lng={listing.longitude || undefined}
+                title="Property Location"
+              />
             )}
 
             {/* Listed Date */}

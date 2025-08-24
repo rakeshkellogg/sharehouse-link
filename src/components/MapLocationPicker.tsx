@@ -14,8 +14,10 @@ interface MapLocationPickerProps {
 
 const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocationPickerProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const addressInputRef = useRef<HTMLInputElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
   const [address, setAddress] = useState<string>(initialLocation);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -128,6 +130,38 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
       setMarker(markerInstance);
       setIsMapLoaded(true);
 
+      // Initialize Google Places Autocomplete
+      if (addressInputRef.current) {
+        const autocompleteInstance = new google.maps.places.Autocomplete(
+          addressInputRef.current,
+          {
+            types: ['address'],
+            fields: ['formatted_address', 'geometry', 'name']
+          }
+        );
+
+        autocompleteInstance.addListener('place_changed', () => {
+          const place = autocompleteInstance.getPlace();
+          
+          if (place.geometry?.location) {
+            const location = place.geometry.location;
+            const newAddress = place.formatted_address || place.name || address;
+            
+            mapInstance.setCenter(location);
+            markerInstance.setPosition(location);
+            setAddress(newAddress);
+            
+            onLocationChange({
+              lat: location.lat(),
+              lng: location.lng(),
+              address: newAddress
+            });
+          }
+        });
+
+        setAutocomplete(autocompleteInstance);
+      }
+
       // If there's an initial address, geocode it
       if (initialLocation) {
         geocoder.geocode({ address: initialLocation }, (results, status) => {
@@ -230,8 +264,9 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
             <Label htmlFor="address">Address</Label>
             <div className="flex gap-2">
               <Input
+                ref={addressInputRef}
                 id="address"
-                placeholder="Enter property address"
+                placeholder="Start typing an address..."
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAddressSearch()}
@@ -245,6 +280,9 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
                 Search
               </button>
             </div>
+            <p className="text-sm text-real-estate-neutral/60">
+              Start typing to see address suggestions from Google Places
+            </p>
           </div>
 
           <div className="space-y-2">
