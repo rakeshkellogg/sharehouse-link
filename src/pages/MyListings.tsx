@@ -272,11 +272,11 @@ const MyListings = () => {
 
                   {/* Edit/Delete Actions */}
                   <div className="flex gap-2 pt-2">
-                    <Link to={`/edit/${listing.id}`}>
+                    <Link to={`/edit/${listing.id}`} className="flex-1">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1"
+                        className="w-full"
                       >
                         <Edit3 className="w-4 h-4 mr-1" />
                         Edit
