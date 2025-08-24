@@ -271,12 +271,12 @@ const MyListings = () => {
                   </div>
 
                   {/* Edit/Delete Actions */}
-                  <div className="flex gap-2 pt-2">
+                  <div className="flex gap-2 pt-2 border-t border-real-estate-light mt-2">
                     <Link to={`/edit/${listing.id}`} className="flex-1">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full"
+                        className="w-full bg-white border-real-estate-primary text-real-estate-primary hover:bg-real-estate-primary hover:text-white"
                       >
                         <Edit3 className="w-4 h-4 mr-1" />
                         Edit
@@ -288,7 +288,7 @@ const MyListings = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                          className="flex-1 bg-white border-red-500 text-red-600 hover:bg-red-500 hover:text-white"
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
                           Delete
