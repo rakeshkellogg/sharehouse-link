@@ -267,6 +267,16 @@ export const ImagePicker = ({
         Property Photos (up to 4)
       </Label>
       
+      {/* Test Storage Connection Button */}
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={testStorageConnection}
+        className="w-full h-10 mb-2"
+      >
+        🔍 Test Storage Connection
+      </Button>
+
       {/* Upload Button */}
       <Button
         type="button"
