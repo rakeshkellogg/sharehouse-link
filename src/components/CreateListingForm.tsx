@@ -160,7 +160,7 @@ const CreateListingForm = () => {
           .from('listings')
           .update({
             cover_image_url: coverUrl || null,
-            media_links: [...mediaUrls, ...formData.mediaLinks.split('\n').filter(link => link.trim() && !link.includes('supabase'))]
+            media_links: [...mediaUrls, ...formData.mediaLinks.split('\n').filter(link => link.trim() && !mediaUrls.includes(link))]
           })
           .eq('id', shareDialog.listingId);
 
