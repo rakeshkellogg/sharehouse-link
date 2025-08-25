@@ -294,14 +294,22 @@ const ListingDetail = () => {
                         title="Property Photos"
                       />
                     )}
-                    
-                    {/* Other media links */}
-                    {listing.media_links.some(link => !link.includes('storage.googleapis.com') && !link.includes('supabase.co') && !/\.(jpg|jpeg|png|gif|webp)$/i.test(link)) && (
+                     
+                    {/* Non-image media links only */}
+                    {listing.media_links.some(link => 
+                      !link.includes('storage.googleapis.com') && 
+                      !link.includes('supabase.co') && 
+                      !/\.(jpg|jpeg|png|gif|webp)$/i.test(link)
+                    ) && (
                       <div>
                         <h4 className="font-medium mb-3">Additional Media</h4>
                         <div className="space-y-2">
                           {listing.media_links
-                            .filter(link => !link.includes('storage.googleapis.com') && !link.includes('supabase.co') && !/\.(jpg|jpeg|png|gif|webp)$/i.test(link))
+                            .filter(link => 
+                              !link.includes('storage.googleapis.com') && 
+                              !link.includes('supabase.co') && 
+                              !/\.(jpg|jpeg|png|gif|webp)$/i.test(link)
+                            )
                             .map((link, index) => (
                               <Button
                                 key={index}
