@@ -282,24 +282,57 @@ const ListingDetail = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {/* Swipeable Image Carousel for uploaded photos */}
-                    {(listing.media_links.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) ||
-                      listing.media_links.some(link => /\.(jpg|jpeg|png|gif|webp)$/i.test(link))) && (
+                    {/* Debug Info - Remove after fixing */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <h4 className="font-medium text-blue-800 mb-2">🔍 Debug Info</h4>
+                      <div className="text-sm text-blue-700 space-y-1">
+                        <div>Total media links: {listing.media_links?.length || 0}</div>
+                        <div>Media links: {JSON.stringify(listing.media_links)}</div>
+                        <div>Has Supabase images: {listing.media_links?.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) ? 'Yes' : 'No'}</div>
+                        <div>Has image files: {listing.media_links?.some(link => /\.(jpg|jpeg|png|gif|webp)$/i.test(link)) ? 'Yes' : 'No'}</div>
+                        <div>Has data URLs: {listing.media_links?.some(link => link.startsWith('data:image/')) ? 'Yes' : 'No'}</div>
+                        <div>Has HTTP URLs: {listing.media_links?.some(link => link.startsWith('http')) ? 'Yes' : 'No'}</div>
+                      </div>
+                    </div>
+
+                    {/* Swipeable Image Carousel - Show for ANY images */}
+                    {listing.media_links.length > 0 && (
                       <ImageCarousel
                         images={listing.media_links.filter(link => 
+                          // Include ALL possible image formats
                           link.includes('storage.googleapis.com') || 
                           link.includes('supabase.co') ||
-                          /\.(jpg|jpeg|png|gif|webp)$/i.test(link)
+                          /\.(jpg|jpeg|png|gif|webp)$/i.test(link) ||
+                          link.startsWith('data:image/') ||
+                          link.startsWith('http') // Include all http URLs as potential images
                         )}
                         title="Property Photos"
                       />
                     )}
+
+                    {/* Test fallback - show sample images if no media links */}
+                    {(!listing.media_links || listing.media_links.length === 0) && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h4 className="font-medium text-yellow-800 mb-2">🧪 Test ImageCarousel</h4>
+                        <p className="text-sm text-yellow-700 mb-3">No images found in media_links. Showing sample images to test the carousel:</p>
+                        <ImageCarousel
+                          images={[
+                            'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop',
+                            'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop',
+                            'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop'
+                          ]}
+                          title="Sample Property Photos"
+                        />
+                      </div>
+                    )}
                      
-                    {/* Non-image media links only */}
+                    {/* Only show Additional Media for truly non-image links */}
                     {listing.media_links.some(link => 
                       !link.includes('storage.googleapis.com') && 
                       !link.includes('supabase.co') && 
-                      !/\.(jpg|jpeg|png|gif|webp)$/i.test(link)
+                      !/\.(jpg|jpeg|png|gif|webp)$/i.test(link) &&
+                      !link.startsWith('data:image/') &&
+                      !link.startsWith('http') // Exclude http URLs from Additional Media
                     ) && (
                       <div>
                         <h4 className="font-medium mb-3">Additional Media</h4>
@@ -308,7 +341,9 @@ const ListingDetail = () => {
                             .filter(link => 
                               !link.includes('storage.googleapis.com') && 
                               !link.includes('supabase.co') && 
-                              !/\.(jpg|jpeg|png|gif|webp)$/i.test(link)
+                              !/\.(jpg|jpeg|png|gif|webp)$/i.test(link) &&
+                              !link.startsWith('data:image/') &&
+                              !link.startsWith('http')
                             )
                             .map((link, index) => (
                               <Button
