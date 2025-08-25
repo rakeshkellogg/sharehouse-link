@@ -160,11 +160,20 @@ export const ImagePicker = ({
           description: `${newUrls.length} photo${newUrls.length > 1 ? 's' : ''} uploaded successfully!`,
         });
       } else {
-        console.warn('⚠️ Missing required data for upload:', { listingId, userId });
+        console.log('📝 Processing images locally - will upload after listing creation');
+        // Store images locally for now, they'll be uploaded when listingId becomes available
+        const localUrls = newImages.map((img, index) => img.url);
+        
+        // Set cover to first image if none selected
+        const newCoverUrl = coverUrl || localUrls[0] || "";
+        setCoverUrl(newCoverUrl);
+        
+        // Update parent with local URLs for now
+        onImagesChange(newCoverUrl, localUrls);
+        
         toast({
-          title: "Upload Info Missing",
-          description: "Listing ID or User ID not available. Photos will be processed locally only.",
-          variant: "destructive"
+          title: "Images Ready",
+          description: "Images processed! They'll be uploaded when you create the listing.",
         });
       }
 
