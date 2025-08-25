@@ -78,7 +78,8 @@ const CreateListingForm = () => {
         throw new Error("Please enter a valid price");
       }
 
-      const listingData = {
+      // First create the listing without images to get an ID
+      const initialListingData = {
         user_id: user.id,
         title: formData.title,
         price: priceValue,
@@ -92,7 +93,7 @@ const CreateListingForm = () => {
         google_maps_link: formData.location.startsWith('http') ? formData.location : null,
         media_links: mediaLinksArray,
         youtube_url: formData.youtubeUrl || null,
-        cover_image_url: formData.coverImageUrl || null,
+        cover_image_url: null, // Will be updated after image upload
         owner_name: formData.ownerName,
         owner_phone: formData.ownerPhone || null,
         owner_whatsapp: formData.ownerWhatsApp || null,
@@ -101,7 +102,7 @@ const CreateListingForm = () => {
 
       const { data, error } = await supabase
         .from('listings')
-        .insert([listingData])
+        .insert([initialListingData])
         .select('id')
         .single();
 
@@ -115,22 +116,10 @@ const CreateListingForm = () => {
         shareUrl
       });
 
-      // Reset form
-      setFormData({
-        title: "",
-        price: "",
-        description: "",
-        bedrooms: "",
-        bathrooms: "",
-        size: "",
-        location: "",
-        locationCoords: { lat: 0, lng: 0 },
-        mediaLinks: "",
-        youtubeUrl: "",
-        coverImageUrl: "",
-        ownerName: "",
-        ownerPhone: "",
-        ownerWhatsApp: ""
+      // Don't reset form immediately - let user upload photos first
+      toast({
+        title: "Listing created!",
+        description: "You can now upload photos for your listing below.",
       });
 
     } catch (error) {
@@ -157,12 +146,41 @@ const CreateListingForm = () => {
     }));
   };
 
-  const handleImagesChange = (coverUrl: string, mediaUrls: string[]) => {
+  const handleImagesChange = async (coverUrl: string, mediaUrls: string[]) => {
     setFormData(prev => ({
       ...prev,
       coverImageUrl: coverUrl,
       mediaLinks: mediaUrls.join('\n')
     }));
+
+    // If we have a listing ID (after form submission), update the listing with image URLs
+    if (shareDialog.listingId && (coverUrl || mediaUrls.length > 0)) {
+      try {
+        const { error } = await supabase
+          .from('listings')
+          .update({
+            cover_image_url: coverUrl || null,
+            media_links: [...mediaUrls, ...formData.mediaLinks.split('\n').filter(link => link.trim() && !link.includes('supabase'))]
+          })
+          .eq('id', shareDialog.listingId);
+
+        if (error) {
+          console.error('Error updating listing with images:', error);
+          toast({
+            title: "Image update failed",
+            description: "Photos uploaded but couldn't update the listing. Please try refreshing.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Photos updated!",
+            description: "Your property photos have been added to the listing."
+          });
+        }
+      } catch (error) {
+        console.error('Error updating listing:', error);
+      }
+    }
   };
 
   const handleGoogleMapsLink = (link: string) => {
@@ -364,12 +382,18 @@ const CreateListingForm = () => {
                 />
               </div>
 
-              {/* Photo Upload */}
-              <ImagePicker
-                onImagesChange={handleImagesChange}
-                listingId={shareDialog.listingId || undefined}
-                userId={user?.id}
-              />
+               {/* Photo Upload - Show message if listing is created */}
+               {shareDialog.listingId && (
+                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                   <p className="text-green-800 font-medium">✅ Listing created successfully!</p>
+                   <p className="text-green-700 text-sm">You can now upload photos for your property below:</p>
+                 </div>
+               )}
+               <ImagePicker
+                 onImagesChange={handleImagesChange}
+                 listingId={shareDialog.listingId || undefined}
+                 userId={user?.id}
+               />
 
               {/* YouTube Video */}
               <div className="space-y-2">
@@ -445,14 +469,36 @@ const CreateListingForm = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <Button 
-                type="submit" 
-                className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Creating Listing..." : "Create Listing & Get Share Link"}
-              </Button>
+               {/* Submit Button */}
+               {!shareDialog.listingId ? (
+                 <Button 
+                   type="submit" 
+                   className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero"
+                   disabled={isSubmitting}
+                 >
+                   {isSubmitting ? "Creating Listing..." : "Create Listing & Get Share Link"}
+                 </Button>
+               ) : (
+                 <div className="space-y-3">
+                   <Button 
+                     type="button"
+                     onClick={() => window.open(shareDialog.shareUrl, '_blank')}
+                     className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero"
+                   >
+                     <ExternalLink className="w-4 h-4 mr-2" />
+                     View Your Listing
+                   </Button>
+                   <Button 
+                     type="button"
+                     onClick={() => copyToClipboard(shareDialog.shareUrl)}
+                     variant="outline"
+                     className="w-full h-12"
+                   >
+                     <Copy className="w-4 h-4 mr-2" />
+                     Copy Share Link
+                   </Button>
+                 </div>
+               )}
             </form>
           </CardContent>
         </Card>
