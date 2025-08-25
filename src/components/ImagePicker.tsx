@@ -31,10 +31,64 @@ export const ImagePicker = ({
   const [uploadedUrls, setUploadedUrls] = useState<string[]>(initialMediaUrls);
   const [coverUrl, setCoverUrl] = useState(initialCoverUrl);
 
+  // Storage bucket detection and auto-creation
+  const testStorageConnection = async () => {
+    console.log('🔍 Testing storage connection...');
+    
+    try {
+      // Lists available buckets
+      const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+      
+      if (listError) {
+        console.error('❌ Failed to list buckets:', listError);
+        return false;
+      }
+      
+      console.log('📦 Available buckets:', buckets.map(b => b.name));
+      
+      // Check if listing-photos bucket exists
+      const bucketExists = buckets.some(bucket => bucket.name === 'listing-photos');
+      
+      if (!bucketExists) {
+        console.log('⚠️ listing-photos bucket not found, attempting to create...');
+        
+        // Creates 'listing-photos' bucket if missing
+        const { data: newBucket, error: createError } = await supabase.storage.createBucket('listing-photos', {
+          public: true,
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+          fileSizeLimit: 10485760 // 10MB
+        });
+        
+        if (createError) {
+          console.error('❌ Failed to create bucket:', createError);
+          toast({
+            title: "Storage Error",
+            description: "Could not create photo storage bucket. Please try again.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        
+        console.log('✅ Created listing-photos bucket:', newBucket);
+      } else {
+        console.log('✅ listing-photos bucket exists');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('💥 Storage connection test failed:', error);
+      return false;
+    }
+  };
+
+  // Enhanced upload process with debugging
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('📸 Starting file selection process...');
     const files = Array.from(event.target.files || []);
+    console.log(`📁 Selected ${files.length} files:`, files.map(f => ({ name: f.name, size: f.size, type: f.type })));
     
     if (files.length + images.length > 4) {
+      console.warn('⚠️ Too many images selected');
       toast({
         title: "Too many images",
         description: "You can upload up to 4 images maximum.",
@@ -44,55 +98,117 @@ export const ImagePicker = ({
     }
 
     setUploading(true);
+    console.log('🔄 Starting upload process...');
 
     try {
+      // Test storage connection first
+      console.log('🧪 Testing storage connection...');
+      const storageReady = await testStorageConnection();
+      if (!storageReady) {
+        throw new Error('Storage connection failed');
+      }
+
+      console.log('🗜️ Compressing images...');
       const compressedImages = await Promise.all(
-        files.map(file => compressImage(file))
+        files.map(async (file, index) => {
+          console.log(`📦 Compressing file ${index + 1}/${files.length}: ${file.name}`);
+          const compressed = await compressImage(file);
+          console.log(`✅ Compressed ${file.name}: ${file.size} → ${compressed.file.size} bytes`);
+          return compressed;
+        })
       );
       
       const newImages = [...images, ...compressedImages].slice(0, 4);
       setImages(newImages);
-      
+      console.log(`🖼️ Total images after compression: ${newImages.length}`);
+
       // Upload to Supabase Storage if we have listing and user info
       if (listingId && userId) {
+        console.log(`🚀 Starting upload to Supabase Storage (listingId: ${listingId}, userId: ${userId})`);
+        
         const uploadPromises = compressedImages.map(async (img, index) => {
           const fileName = `${Date.now()}-${images.length + index}.jpg`;
           const filePath = `${userId}/${listingId}/${fileName}`;
           
+          console.log(`⬆️ Uploading file ${index + 1}/${compressedImages.length}: ${fileName}`);
+          console.log(`📍 Upload path: ${filePath}`);
+
           const { data, error } = await supabase.storage
             .from('listing-photos')
             .upload(filePath, img.file);
-          
-          if (error) throw error;
-          
-    const { data: urlData } = supabase.storage
-      .from('listing-photos')
-      .getPublicUrl(filePath);
 
-    console.log('Generated public URL:', urlData.publicUrl);
-    return urlData.publicUrl;
+          if (error) {
+            console.error(`❌ Upload failed for ${fileName}:`, error);
+            throw error;
+          }
+
+          console.log(`✅ Upload successful for ${fileName}:`, data);
+
+          const { data: urlData } = supabase.storage
+            .from('listing-photos')
+            .getPublicUrl(filePath);
+
+          console.log(`🔗 Generated public URL for ${fileName}:`, urlData.publicUrl);
+          return urlData.publicUrl;
         });
-        
+
+        console.log('⏳ Waiting for all uploads to complete...');
         const newUrls = await Promise.all(uploadPromises);
         const allUrls = [...uploadedUrls, ...newUrls];
-        setUploadedUrls(allUrls);
         
+        console.log('🎉 All uploads completed successfully!');
+        console.log('📊 Upload summary:', {
+          newUrls: newUrls.length,
+          totalUrls: allUrls.length,
+          urls: allUrls
+        });
+
+        setUploadedUrls(allUrls);
+
         // Set cover photo to first image if none selected
         const newCoverUrl = coverUrl || allUrls[0] || "";
         setCoverUrl(newCoverUrl);
-        
+        console.log(`🖼️ Cover image set to: ${newCoverUrl}`);
+
         onImagesChange(newCoverUrl, allUrls);
+        
+        // Success notification
+        toast({
+          title: "Upload Successful",
+          description: `${newUrls.length} photo${newUrls.length > 1 ? 's' : ''} uploaded successfully!`,
+        });
+      } else {
+        console.warn('⚠️ Missing required data for upload:', { listingId, userId });
+        toast({
+          title: "Upload Info Missing",
+          description: "Listing ID or User ID not available. Photos will be processed locally only.",
+          variant: "destructive"
+        });
       }
 
     } catch (error) {
-      console.error('Error processing images:', error);
+      console.error('💥 Error during upload process:', error);
+      
+      // Specific error messages
+      let errorMessage = "Failed to process images. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes('Storage')) {
+          errorMessage = "Storage connection failed. Please check your internet connection.";
+        } else if (error.message.includes('upload')) {
+          errorMessage = "Upload failed. Please try smaller images or check your connection.";
+        } else if (error.message.includes('compress')) {
+          errorMessage = "Image compression failed. Please try different images.";
+        }
+      }
+      
       toast({
-        title: "Upload failed",
-        description: "Failed to process images. Please try again.",
+        title: "Upload Failed",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
       setUploading(false);
+      console.log('🏁 Upload process completed');
     }
   };
 
