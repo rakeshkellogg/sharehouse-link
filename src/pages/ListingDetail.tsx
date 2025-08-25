@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import YouTubeEmbed from "@/components/YouTubeEmbed";
 import MessageOwner from "@/components/MessageOwner";
 import MapDisplay from "@/components/MapDisplay";
+import { ImageCarousel } from "@/components/ImageCarousel";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Listing {
@@ -273,63 +274,25 @@ const ListingDetail = () => {
               </Card>
             )}
 
-            {/* Media Links and Image Gallery */}
+            {/* Property Photos Carousel */}
             {listing.media_links && listing.media_links.length > 0 && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
                   <CardTitle>Photos & Media</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {/* Image Gallery for uploaded photos */}
-                    {listing.media_links.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) && (
-                      <div>
-                        <h4 className="font-medium mb-3">Property Photos</h4>
-                        <div className="grid grid-cols-2 gap-3">
-                          {listing.media_links
-                            .filter(link => link.includes('storage.googleapis.com') || link.includes('supabase.co'))
-                            .map((imageUrl, index) => (
-                              <div key={index} className="aspect-video overflow-hidden rounded-lg border">
-                                <img 
-                                  src={imageUrl}
-                                  alt={`Property photo ${index + 1}`}
-                                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
-                                  onClick={() => window.open(imageUrl, '_blank')}
-                                  onError={(e) => {
-                                    console.log('Failed to load image:', imageUrl);
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Fallback: Show all media links as images if they look like image URLs */}
-                    {!listing.media_links.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) && 
-                     listing.media_links.some(link => /\.(jpg|jpeg|png|gif|webp)$/i.test(link)) && (
-                      <div>
-                        <h4 className="font-medium mb-3">Property Photos</h4>
-                        <div className="grid grid-cols-2 gap-3">
-                          {listing.media_links
-                            .filter(link => /\.(jpg|jpeg|png|gif|webp)$/i.test(link))
-                            .map((imageUrl, index) => (
-                              <div key={index} className="aspect-video overflow-hidden rounded-lg border">
-                                <img 
-                                  src={imageUrl}
-                                  alt={`Property photo ${index + 1}`}
-                                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
-                                  onClick={() => window.open(imageUrl, '_blank')}
-                                  onError={(e) => {
-                                    console.log('Failed to load image:', imageUrl);
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
-                              </div>
-                            ))}
-                        </div>
-                      </div>
+                  <div className="space-y-6">
+                    {/* Swipeable Image Carousel for uploaded photos */}
+                    {(listing.media_links.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) ||
+                      listing.media_links.some(link => /\.(jpg|jpeg|png|gif|webp)$/i.test(link))) && (
+                      <ImageCarousel
+                        images={listing.media_links.filter(link => 
+                          link.includes('storage.googleapis.com') || 
+                          link.includes('supabase.co') ||
+                          /\.(jpg|jpeg|png|gif|webp)$/i.test(link)
+                        )}
+                        title="Property Photos"
+                      />
                     )}
                     
                     {/* Other media links */}
