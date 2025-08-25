@@ -65,11 +65,12 @@ export const ImagePicker = ({
           
           if (error) throw error;
           
-          const { data: urlData } = supabase.storage
-            .from('listing-photos')
-            .getPublicUrl(filePath);
-          
-          return urlData.publicUrl;
+    const { data: urlData } = supabase.storage
+      .from('listing-photos')
+      .getPublicUrl(filePath);
+
+    console.log('Generated public URL:', urlData.publicUrl);
+    return urlData.publicUrl;
         });
         
         const newUrls = await Promise.all(uploadPromises);

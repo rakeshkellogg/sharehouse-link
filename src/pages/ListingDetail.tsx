@@ -77,6 +77,8 @@ const ListingDetail = () => {
           setError("Listing not found or not publicly available");
         } else {
           setListing(data);
+          console.log('Listing data:', data);
+          console.log('Media links:', data.media_links);
         }
       } catch (error) {
         console.error('Error fetching listing:', error);
@@ -183,7 +185,7 @@ const ListingDetail = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Cover Photo */}
-            {listing.cover_image_url && (
+            {listing.cover_image_url && !listing.media_links.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) && (
               <Card className="bg-gradient-card shadow-card border-0 overflow-hidden">
                 <div className="aspect-video bg-muted">
                   <img 
@@ -191,6 +193,7 @@ const ListingDetail = () => {
                     alt={`Cover photo for ${listing.title}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
+                      console.log('Failed to load image:', listing.cover_image_url);
                       e.currentTarget.style.display = 'none';
                       e.currentTarget.parentElement!.innerHTML = 
                         '<div class="w-full h-full flex items-center justify-center text-muted-foreground">Failed to load image</div>';
@@ -279,12 +282,12 @@ const ListingDetail = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {/* Image Gallery for uploaded photos */}
-                    {listing.media_links.some(link => link.includes('supabase')) && (
+                    {listing.media_links.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) && (
                       <div>
                         <h4 className="font-medium mb-3">Property Photos</h4>
                         <div className="grid grid-cols-2 gap-3">
                           {listing.media_links
-                            .filter(link => link.includes('supabase'))
+                            .filter(link => link.includes('storage.googleapis.com') || link.includes('supabase.co'))
                             .map((imageUrl, index) => (
                               <div key={index} className="aspect-video overflow-hidden rounded-lg border">
                                 <img 
@@ -292,6 +295,36 @@ const ListingDetail = () => {
                                   alt={`Property photo ${index + 1}`}
                                   className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
                                   onClick={() => window.open(imageUrl, '_blank')}
+                                  onError={(e) => {
+                                    console.log('Failed to load image:', imageUrl);
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fallback: Show all media links as images if they look like image URLs */}
+                    {!listing.media_links.some(link => link.includes('storage.googleapis.com') || link.includes('supabase.co')) && 
+                     listing.media_links.some(link => /\.(jpg|jpeg|png|gif|webp)$/i.test(link)) && (
+                      <div>
+                        <h4 className="font-medium mb-3">Property Photos</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          {listing.media_links
+                            .filter(link => /\.(jpg|jpeg|png|gif|webp)$/i.test(link))
+                            .map((imageUrl, index) => (
+                              <div key={index} className="aspect-video overflow-hidden rounded-lg border">
+                                <img 
+                                  src={imageUrl}
+                                  alt={`Property photo ${index + 1}`}
+                                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                                  onClick={() => window.open(imageUrl, '_blank')}
+                                  onError={(e) => {
+                                    console.log('Failed to load image:', imageUrl);
+                                    e.currentTarget.style.display = 'none';
+                                  }}
                                 />
                               </div>
                             ))}
@@ -300,12 +333,12 @@ const ListingDetail = () => {
                     )}
                     
                     {/* Other media links */}
-                    {listing.media_links.some(link => !link.includes('supabase')) && (
+                    {listing.media_links.some(link => !link.includes('storage.googleapis.com') && !link.includes('supabase.co') && !/\.(jpg|jpeg|png|gif|webp)$/i.test(link)) && (
                       <div>
                         <h4 className="font-medium mb-3">Additional Media</h4>
                         <div className="space-y-2">
                           {listing.media_links
-                            .filter(link => !link.includes('supabase'))
+                            .filter(link => !link.includes('storage.googleapis.com') && !link.includes('supabase.co') && !/\.(jpg|jpeg|png|gif|webp)$/i.test(link))
                             .map((link, index) => (
                               <Button
                                 key={index}
