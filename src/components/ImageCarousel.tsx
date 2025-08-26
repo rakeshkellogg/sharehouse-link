@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ZoomIn, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { CarouselApi } from "@/components/ui/carousel";
 
 interface ImageCarouselProps {
   images: string[];
@@ -20,6 +21,19 @@ interface ImageCarouselProps {
 
 export const ImageCarousel = ({ images, title = "Property Photos", className = "" }: ImageCarouselProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+
+  // Track current slide
+  useEffect(() => {
+    if (!api) return;
+
+    setCurrent(api.selectedScrollSnap());
+    
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   if (!images || images.length === 0) {
     return null;
@@ -39,14 +53,14 @@ export const ImageCarousel = ({ images, title = "Property Photos", className = "
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">{title}</h3>
           <Badge variant="outline" className="ml-2">
-            {images.length} photo{images.length > 1 ? 's' : ''}
+            {current + 1} / {images.length}
           </Badge>
         </div>
 
-        <Carousel className="w-full">
+        <Carousel className="w-full" setApi={setApi}>
           <CarouselContent>
             {images.map((imageUrl, index) => (
-              <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
+              <CarouselItem key={index} className="basis-full">
                 <Card className="overflow-hidden bg-gradient-card shadow-card border-0 group cursor-pointer">
                   <div className="relative aspect-video">
                     <img 
@@ -69,10 +83,18 @@ export const ImageCarousel = ({ images, title = "Property Photos", className = "
                       <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
 
-                    {/* Image counter */}
-                    <Badge className="absolute bottom-2 right-2 bg-black/70 text-white">
-                      {index + 1} / {images.length}
-                    </Badge>
+                    {/* Copy link button - similar to video */}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 bg-black/70 text-white hover:bg-black/60 border-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(imageUrl);
+                      }}
+                    >
+                      Copy link
+                    </Button>
                   </div>
                 </Card>
               </CarouselItem>
