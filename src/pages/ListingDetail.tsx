@@ -348,25 +348,25 @@ const ListingDetail = () => {
             {/* Contact Information */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold">Contact Owner</CardTitle>
+                <CardTitle className="text-3xl font-bold">Contact Owner</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
-                  <div className="font-bold text-xl text-real-estate-neutral mb-1">
+                  <div className="font-bold text-2xl text-real-estate-neutral mb-2">
                     {listing.owner_name}
                   </div>
-                  <div className="text-base text-real-estate-neutral/70">Property Owner</div>
+                  <div className="text-lg text-real-estate-neutral/70">Property Owner</div>
                 </div>
 
                 <Separator />
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {listing.owner_whatsapp && (
                     <Button
                       onClick={() => handleWhatsAppContact(listing.owner_whatsapp!)}
-                      className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
+                      className="w-full bg-green-600 hover:bg-green-700 text-xl py-8"
                     >
-                      <MessageCircle className="w-5 h-5 mr-2" />
+                      <MessageCircle className="w-6 h-6 mr-3" />
                       WhatsApp
                     </Button>
                   )}
@@ -375,9 +375,9 @@ const ListingDetail = () => {
                     <Button
                       onClick={() => handlePhoneCall(listing.owner_phone!)}
                       variant="outline"
-                      className="w-full text-lg py-6"
+                      className="w-full text-xl py-8"
                     >
-                      <Phone className="w-5 h-5 mr-2" />
+                      <Phone className="w-6 h-6 mr-3" />
                       Call {listing.owner_phone}
                     </Button>
                   )}
