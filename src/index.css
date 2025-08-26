@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Responsive font scaling for Zillow-like experience */
+html {
+  font-size: clamp(16px, 2vw, 18px);
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

@@ -18,6 +18,15 @@ export default {
 			}
 		},
 		extend: {
+			fontSize: {
+				sm: ['0.95rem', { lineHeight: '1.4rem' }],   // ~15px
+				base: ['1.05rem', { lineHeight: '1.6rem' }], // ~17px (Zillow body text)
+				lg: ['1.25rem', { lineHeight: '1.8rem' }],   // ~20px (property info)
+				xl: ['1.5rem', { lineHeight: '2rem' }],      // ~24px (section headers)
+				'2xl': ['1.75rem', { lineHeight: '2.2rem' }],// ~28px
+				'3xl': ['2rem', { lineHeight: '2.4rem' }],   // ~32px
+				'4xl': ['2.5rem', { lineHeight: '2.8rem' }], // ~40px (hero titles)
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
