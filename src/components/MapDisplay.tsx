@@ -159,20 +159,20 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location", className 
               <div className="flex items-center gap-3">
                 <MapPin className="w-7 h-7 text-real-estate-primary" />
                 <div>
-                  <p className="font-bold text-2xl text-real-estate-neutral">{title}</p>
-                  <p className="text-lg text-real-estate-neutral/70">{address}</p>
+                  <p className="font-bold text-3xl md:text-2xl text-real-estate-neutral">{title}</p>
+                  <p className="text-xl md:text-lg text-real-estate-neutral/70">{address}</p>
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-base py-3 px-4">
+                <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-lg md:text-base py-3 px-4">
                   <Share2 className="w-5 h-5 mr-2" />
                   Share
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-base py-3 px-4">
+                <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-lg md:text-base py-3 px-4">
                   <MessageCircle className="w-5 h-5 mr-2" />
                   WhatsApp
                 </Button>
-                <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-base py-3 px-4">
+                <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-lg md:text-base py-3 px-4">
                   <ExternalLink className="w-5 h-5 mr-2" />
                   Open
                 </Button>
@@ -207,20 +207,20 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location", className 
             <div className="flex items-center gap-3">
               <MapPin className="w-7 h-7 text-real-estate-primary" />
               <div>
-                <p className="font-bold text-2xl text-real-estate-neutral">{title}</p>
-                <p className="text-lg text-real-estate-neutral/70">{address}</p>
+                <p className="font-bold text-3xl md:text-2xl text-real-estate-neutral">{title}</p>
+                <p className="text-xl md:text-lg text-real-estate-neutral/70">{address}</p>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-base py-3 px-4">
+              <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-lg md:text-base py-3 px-4">
                 <Share2 className="w-5 h-5 mr-2" />
                 Share
               </Button>
-              <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-base py-3 px-4">
+              <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-lg md:text-base py-3 px-4">
                 <MessageCircle className="w-5 h-5 mr-2" />
                 WhatsApp
               </Button>
-              <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-base py-3 px-4">
+              <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-lg md:text-base py-3 px-4">
                 <ExternalLink className="w-5 h-5 mr-2" />
                 Open
               </Button>
