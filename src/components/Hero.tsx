@@ -23,12 +23,7 @@ const Hero = () => {
       {/* Navigation Bar */}
       <nav className="relative z-20 bg-white/10 backdrop-blur-sm border-b border-white/20">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo/Brand */}
-            <Link to="/" className="flex items-center">
-              <h2 className="text-2xl font-bold text-white">ShareHouse</h2>
-            </Link>
-            
+          <div className="flex items-center justify-end">
             {/* Navigation Links */}
             <div className="flex items-center gap-4">
               {/* My Listings Button for Authenticated Users */}

@@ -42,7 +42,7 @@ const AuthButton = () => {
   if (!user) {
     return (
       <Link to="/auth">
-        <Button variant="outline" className="border-white text-white hover:bg-white/10">
+        <Button className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero">
           <LogIn className="w-4 h-4 mr-2" />
           Sign In
         </Button>
