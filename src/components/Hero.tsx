@@ -20,22 +20,33 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-real-estate-primary/80 via-real-estate-primary/70 to-real-estate-secondary/60" />
       </div>
 
-      {/* Auth Button */}
-      <div className="absolute top-4 right-4 z-20">
-        <AuthButton />
-      </div>
-
-      {/* My Listings Button for Authenticated Users */}
-      {user && (
-        <div className="absolute top-4 left-4 z-20">
-          <Link to="/my-listings">
-            <Button variant="outline" className="border-white text-white hover:bg-white/10">
-              <List className="w-4 h-4 mr-2" />
-              My Listings
-            </Button>
-          </Link>
+      {/* Navigation Bar */}
+      <nav className="relative z-20 bg-white/10 backdrop-blur-sm border-b border-white/20">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo/Brand */}
+            <Link to="/" className="flex items-center">
+              <h2 className="text-2xl font-bold text-white">ShareHouse</h2>
+            </Link>
+            
+            {/* Navigation Links */}
+            <div className="flex items-center gap-4">
+              {/* My Listings Button for Authenticated Users */}
+              {user && (
+                <Link to="/my-listings">
+                  <Button className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero">
+                    <List className="w-4 h-4 mr-2" />
+                    My Listings
+                  </Button>
+                </Link>
+              )}
+              
+              {/* Auth Button */}
+              <AuthButton />
+            </div>
+          </div>
         </div>
-      )}
+      </nav>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
@@ -59,7 +70,7 @@ const Hero = () => {
               </Button>
             </Link>
             <Link to="/sample">
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10 px-8 py-4 text-lg">
+              <Button size="lg" className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero px-8 py-4 text-lg font-semibold">
                 View Sample Listing
               </Button>
             </Link>

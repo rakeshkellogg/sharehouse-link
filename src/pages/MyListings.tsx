@@ -180,6 +180,12 @@ const MyListings = () => {
             </p>
           </div>
           <div className="flex gap-2 mt-4 md:mt-0">
+            <Link to="/">
+              <Button variant="outline" className="shadow-hero">
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
+            </Link>
             <Link to="/inbox">
               <Button variant="outline" className="shadow-hero">
                 <MessageCircle className="w-4 h-4 mr-2" />
