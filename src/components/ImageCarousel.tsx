@@ -69,7 +69,6 @@ export const ImageCarousel = ({ images, title = "Property Photos", className = "
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onClick={() => openLightbox(imageUrl)}
                       onError={(e) => {
-                        console.log('Failed to load image:', imageUrl);
                         e.currentTarget.style.display = 'none';
                         const parent = e.currentTarget.parentElement;
                         if (parent) {
@@ -136,7 +135,6 @@ export const ImageCarousel = ({ images, title = "Property Photos", className = "
                 alt="Property photo enlarged"
                 className="max-w-full max-h-full object-contain"
                 onError={(e) => {
-                  console.log('Failed to load image in lightbox:', selectedImage);
                   e.currentTarget.style.display = 'none';
                 }}
               />

@@ -78,11 +78,8 @@ const ListingDetail = () => {
           setError("Listing not found or not publicly available");
         } else {
           setListing(data);
-          console.log('Listing data:', data);
-          console.log('Media links:', data.media_links);
         }
       } catch (error) {
-        console.error('Error fetching listing:', error);
         setError("Failed to load listing");
       } finally {
         setLoading(false);
@@ -162,22 +159,22 @@ const ListingDetail = () => {
           
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-5xl md:text-5xl font-bold text-real-estate-neutral mb-2">
+              <h1 className="text-6xl md:text-5xl font-bold text-real-estate-neutral mb-2">
                 {listing.title}
               </h1>
               {listing.location_address && (
-                <div className="flex items-center text-real-estate-neutral/70 text-xl md:text-lg">
+                <div className="flex items-center text-real-estate-neutral/70 text-2xl md:text-lg">
                   <MapPin className="w-5 h-5 mr-2" />
                   {listing.location_address}
                 </div>
               )}
             </div>
             <div className="text-right">
-              <div className="text-5xl md:text-5xl font-bold text-real-estate-primary flex items-center md:justify-end">
+              <div className="text-6xl md:text-5xl font-bold text-real-estate-primary flex items-center md:justify-end">
                 <DollarSign className="w-10 h-10" />
                 {formatPrice(listing.price)}
               </div>
-              <div className="text-lg md:text-base text-real-estate-neutral/70">per month</div>
+              <div className="text-2xl md:text-base text-real-estate-neutral/70">per month</div>
             </div>
           </div>
         </div>
@@ -194,7 +191,6 @@ const ListingDetail = () => {
                     alt={`Cover photo for ${listing.title}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      console.log('Failed to load image:', listing.cover_image_url);
                       e.currentTarget.style.display = 'none';
                       e.currentTarget.parentElement!.innerHTML = 
                         '<div class="w-full h-full flex items-center justify-center text-muted-foreground">Failed to load image</div>';
@@ -222,7 +218,7 @@ const ListingDetail = () => {
             {/* Property Features */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-3xl md:text-2xl font-bold">
+                <CardTitle className="flex items-center gap-2 text-4xl md:text-2xl font-bold">
                   <Home className="w-7 h-7" />
                   Property Features
                 </CardTitle>
@@ -230,30 +226,30 @@ const ListingDetail = () => {
               <CardContent>
                 <div className="grid grid-cols-3 gap-6">
                   {listing.bedrooms && (
-                    <div className="text-center">
+                      <div className="text-center">
                       <div className="flex items-center justify-center mb-3">
-                        <Bed className="w-12 h-12 text-real-estate-primary" />
+                        <Bed className="w-14 h-14 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-5xl md:text-4xl text-real-estate-neutral">{listing.bedrooms}</div>
-                      <div className="text-xl md:text-lg text-muted-foreground font-medium">Bedrooms</div>
+                      <div className="font-bold text-6xl md:text-4xl text-real-estate-neutral">{listing.bedrooms}</div>
+                      <div className="text-2xl md:text-lg text-muted-foreground font-medium">Bedrooms</div>
                     </div>
                   )}
                   {listing.bathrooms && (
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-3">
-                        <Bath className="w-12 h-12 text-real-estate-primary" />
+                        <Bath className="w-14 h-14 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-5xl md:text-4xl text-real-estate-neutral">{listing.bathrooms}</div>
-                      <div className="text-xl md:text-lg text-muted-foreground font-medium">Bathrooms</div>
+                      <div className="font-bold text-6xl md:text-4xl text-real-estate-neutral">{listing.bathrooms}</div>
+                      <div className="text-2xl md:text-lg text-muted-foreground font-medium">Bathrooms</div>
                     </div>
                   )}
                   {listing.size && (
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-3">
-                        <Square className="w-12 h-12 text-real-estate-primary" />
+                        <Square className="w-14 h-14 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-5xl md:text-4xl text-real-estate-neutral">{listing.size}</div>
-                      <div className="text-xl md:text-lg text-muted-foreground font-medium">Sq Ft</div>
+                      <div className="font-bold text-6xl md:text-4xl text-real-estate-neutral">{listing.size}</div>
+                      <div className="text-2xl md:text-lg text-muted-foreground font-medium">Sq Ft</div>
                     </div>
                   )}
                 </div>
@@ -264,10 +260,10 @@ const ListingDetail = () => {
             {listing.description && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-3xl md:text-2xl font-bold">About This Property</CardTitle>
+                  <CardTitle className="text-4xl md:text-2xl font-bold">About This Property</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-xl md:text-lg text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-2xl md:text-lg text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
                     {listing.description}
                   </p>
                 </CardContent>
@@ -278,7 +274,7 @@ const ListingDetail = () => {
             {listing.media_links && listing.media_links.length > 0 && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-3xl md:text-2xl font-bold">Photos & Media</CardTitle>
+                  <CardTitle className="text-4xl md:text-2xl font-bold">Photos & Media</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
@@ -348,11 +344,11 @@ const ListingDetail = () => {
             {/* Contact Information */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
-                <CardTitle className="text-4xl md:text-3xl font-bold">Contact Owner</CardTitle>
+                <CardTitle className="text-5xl md:text-3xl font-bold">Contact Owner</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <div className="font-bold text-3xl md:text-2xl text-real-estate-neutral mb-2">
+                  <div className="font-bold text-4xl md:text-2xl text-real-estate-neutral mb-2">
                     {listing.owner_name}
                   </div>
                   <div className="text-xl md:text-lg text-real-estate-neutral/70">Property Owner</div>
@@ -364,9 +360,9 @@ const ListingDetail = () => {
                   {listing.owner_whatsapp && (
                     <Button
                       onClick={() => handleWhatsAppContact(listing.owner_whatsapp!)}
-                      className="w-full bg-green-600 hover:bg-green-700 text-xl py-8"
+                      className="w-full bg-green-600 hover:bg-green-700 text-2xl py-10"
                     >
-                      <MessageCircle className="w-6 h-6 mr-3" />
+                      <MessageCircle className="w-8 h-8 mr-3" />
                       WhatsApp
                     </Button>
                   )}
@@ -375,9 +371,9 @@ const ListingDetail = () => {
                     <Button
                       onClick={() => handlePhoneCall(listing.owner_phone!)}
                       variant="outline"
-                      className="w-full text-xl py-8"
+                      className="w-full text-2xl py-10"
                     >
-                      <Phone className="w-6 h-6 mr-3" />
+                      <Phone className="w-8 h-8 mr-3" />
                       Call {listing.owner_phone}
                     </Button>
                   )}
