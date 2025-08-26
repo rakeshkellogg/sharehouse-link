@@ -16,10 +16,10 @@ const SampleListing = () => {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-real-estate-neutral">
+            <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral">
               Sample Property Listing
             </h1>
-            <p className="text-real-estate-neutral/70">
+            <p className="text-lg md:text-xl text-real-estate-neutral/70">
               This is how your listings will look when shared
             </p>
           </div>
@@ -42,10 +42,10 @@ const SampleListing = () => {
         {/* CTA Section */}
         <div className="mt-8 text-center">
           <div className="bg-white rounded-lg p-6 shadow-card">
-            <h3 className="text-xl font-semibold text-real-estate-neutral mb-2">
+            <h3 className="text-2xl md:text-3xl font-semibold text-real-estate-neutral mb-2">
               Ready to create your own listing?
             </h3>
-            <p className="text-real-estate-neutral/70 mb-4">
+            <p className="text-lg text-real-estate-neutral/70 mb-4">
               Get started in under 2 minutes and share across all your social platforms
             </p>
             <Link to="/create">

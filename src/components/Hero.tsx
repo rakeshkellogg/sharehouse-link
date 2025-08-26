@@ -78,8 +78,8 @@ const Hero = () => {
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <Home className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2">Quick Setup</h3>
-                <p className="text-sm text-real-estate-neutral/70">Create listings in under 2 minutes with our mobile-optimized form</p>
+                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Quick Setup</h3>
+                <p className="text-base text-real-estate-neutral/70">Create listings in under 2 minutes with our mobile-optimized form</p>
               </div>
             </Card>
 
@@ -88,8 +88,8 @@ const Hero = () => {
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <Share2 className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2">Share Anywhere</h3>
-                <p className="text-sm text-real-estate-neutral/70">Perfect for Facebook groups, WhatsApp, and social platforms</p>
+                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Share Anywhere</h3>
+                <p className="text-base text-real-estate-neutral/70">Perfect for Facebook groups, WhatsApp, and social platforms</p>
               </div>
             </Card>
 
@@ -98,8 +98,8 @@ const Hero = () => {
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <MessageCircle className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2">Direct Contact</h3>
-                <p className="text-sm text-real-estate-neutral/70">WhatsApp buttons and direct messaging built in</p>
+                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Direct Contact</h3>
+                <p className="text-base text-real-estate-neutral/70">WhatsApp buttons and direct messaging built in</p>
               </div>
             </Card>
 
@@ -108,8 +108,8 @@ const Hero = () => {
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2">Peer-to-Peer</h3>
-                <p className="text-sm text-real-estate-neutral/70">Connect directly with property owners and renters</p>
+                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Peer-to-Peer</h3>
+                <p className="text-base text-real-estate-neutral/70">Connect directly with property owners and renters</p>
               </div>
             </Card>
           </div>

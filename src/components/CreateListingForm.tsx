@@ -238,16 +238,16 @@ const CreateListingForm = () => {
     <div className="min-h-screen bg-real-estate-light py-12">
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-real-estate-neutral mb-4">
             Create Your Property Listing
           </h1>
-          <p className="text-real-estate-neutral/70">Fill out the details below to create a shareable listing</p>
+          <p className="text-lg md:text-xl text-real-estate-neutral/70">Fill out the details below to create a shareable listing</p>
         </div>
 
         <Card className="bg-gradient-card shadow-card border-0">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-real-estate-neutral">
-              <Home className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-real-estate-neutral text-2xl">
+              <Home className="w-6 h-6" />
               Property Details
             </CardTitle>
           </CardHeader>

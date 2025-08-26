@@ -235,16 +235,16 @@ const EditListing = () => {
             Back to My Listings
           </Button>
           
-          <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-real-estate-neutral mb-4">
             Edit Property Listing
           </h1>
-          <p className="text-real-estate-neutral/70">Update your property details</p>
+          <p className="text-lg md:text-xl text-real-estate-neutral/70">Update your property details</p>
         </div>
 
         <Card className="bg-gradient-card shadow-card border-0">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-real-estate-neutral">
-              <Home className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-real-estate-neutral text-2xl">
+              <Home className="w-6 h-6" />
               Property Details
             </CardTitle>
           </CardHeader>
@@ -253,19 +253,19 @@ const EditListing = () => {
               {/* Title and Price */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Property Title *</Label>
+                  <Label htmlFor="title" className="text-lg">Property Title *</Label>
                   <Input
                     id="title"
                     placeholder="Beautiful 2BR Apartment"
                     value={formData.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="h-12"
+                    className="h-14 text-lg"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="price" className="flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
+                  <Label htmlFor="price" className="flex items-center gap-1 text-lg">
+                    <DollarSign className="w-5 h-5" />
                     Price *
                   </Label>
                   <Input
@@ -273,7 +273,7 @@ const EditListing = () => {
                     placeholder="$2,500/month"
                     value={formData.price}
                     onChange={(e) => handleInputChange("price", e.target.value)}
-                    className="h-12"
+                    className="h-14 text-lg"
                     required
                   />
                 </div>

@@ -144,10 +144,10 @@ const Inbox = () => {
               </Button>
             </Link>
             
-            <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-2">
+            <h1 className="text-4xl md:text-5xl font-bold text-real-estate-neutral mb-2">
               Message Inbox
             </h1>
-            <p className="text-real-estate-neutral/70">
+            <p className="text-lg md:text-xl text-real-estate-neutral/70">
               Messages from potential renters about your properties
             </p>
             {unreadCount > 0 && (
@@ -162,10 +162,10 @@ const Inbox = () => {
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <MessageCircle className="w-16 h-16 text-real-estate-neutral/50 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-real-estate-neutral mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-2">
               No Messages Yet
             </h2>
-            <p className="text-real-estate-neutral/70 mb-6">
+            <p className="text-lg md:text-xl text-real-estate-neutral/70 mb-6">
               When potential renters message you about your listings, they'll appear here.
             </p>
             <Link to="/my-listings">
@@ -183,8 +183,8 @@ const Inbox = () => {
               }`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <MessageCircle className="w-5 h-5" />
+                    <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                      <MessageCircle className="w-6 h-6" />
                       Re: {message.listing.title}
                       {!message.read_at && (
                         <Badge variant="destructive" className="text-xs">
@@ -197,7 +197,7 @@ const Inbox = () => {
                 <CardContent className="space-y-4">
                   {/* Message Content */}
                   <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-real-estate-neutral leading-relaxed whitespace-pre-wrap">
+                    <p className="text-real-estate-neutral leading-relaxed whitespace-pre-wrap text-lg">
                       {message.body}
                     </p>
                   </div>
