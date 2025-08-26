@@ -114,11 +114,11 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
         <CardContent className="pt-6">
           <div className="text-center">
             <MessageCircle className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-            <h3 className="font-bold text-3xl md:text-2xl mb-4">Message the Owner</h3>
-            <p className="text-muted-foreground text-xl md:text-lg mb-6">
+            <h3 className="font-bold text-4xl md:text-xl mb-4">Message the Owner</h3>
+            <p className="text-muted-foreground text-2xl md:text-base mb-6">
               Sign in to send a message to the property owner
             </p>
-            <Button variant="outline" onClick={() => window.location.href = '/auth'} className="text-xl md:text-lg py-6 px-8">
+            <Button variant="outline" onClick={() => window.location.href = '/auth'} className="text-2xl md:text-base py-4 px-6">
               Sign In to Message
             </Button>
           </div>
@@ -140,8 +140,8 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
   return (
     <Card className="bg-gradient-card shadow-card border-0">
       <CardHeader>
-        <CardTitle className="flex items-center gap-3 text-4xl md:text-3xl font-bold">
-          <MessageCircle className="w-8 h-8" />
+        <CardTitle className="flex items-center gap-3 text-5xl md:text-xl font-bold">
+          <MessageCircle className="w-6 h-6" />
           Message Owner
         </CardTitle>
       </CardHeader>
@@ -151,10 +151,10 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
             placeholder={`Send a message about "${listingTitle}"...`}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="min-h-24 text-xl md:text-lg"
+            className="min-h-24 text-2xl md:text-base"
             disabled={isSending}
           />
-          <div className="flex justify-between items-center mt-3 text-lg md:text-base">
+          <div className="flex justify-between items-center mt-3 text-xl md:text-sm">
             <span className={`${isOverWordLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
               {wordCount}/50 words
             </span>
@@ -163,7 +163,7 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
             </span>
           </div>
           {(isOverWordLimit || isOverCharLimit) && (
-            <p className="text-destructive text-lg md:text-base mt-2">
+            <p className="text-destructive text-xl md:text-sm mt-2">
               {isOverWordLimit && "Message exceeds 50 word limit. "}
               {isOverCharLimit && "Message exceeds 300 character limit."}
             </p>
@@ -173,13 +173,13 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
         <Button
           onClick={handleSendMessage}
           disabled={!canSend || isSending}
-          className="w-full text-2xl md:text-xl py-8"
+          className="w-full text-3xl md:text-base py-6"
         >
-          <Send className="w-6 h-6 mr-3" />
+          <Send className="w-5 h-5 mr-3" />
           {isSending ? "Sending..." : "Send Message"}
         </Button>
 
-        <p className="text-lg md:text-base text-muted-foreground">
+        <p className="text-xl md:text-sm text-muted-foreground">
           Keep messages respectful and relevant to the property listing.
         </p>
       </CardContent>

@@ -157,23 +157,23 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location", className 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <MapPin className="w-7 h-7 text-real-estate-primary" />
+                <MapPin className="w-6 h-6 text-real-estate-primary" />
                 <div>
-                  <p className="font-bold text-3xl md:text-2xl text-real-estate-neutral">{title}</p>
-                  <p className="text-xl md:text-lg text-real-estate-neutral/70">{address}</p>
+                  <p className="font-bold text-4xl md:text-lg text-real-estate-neutral">{title}</p>
+                  <p className="text-2xl md:text-sm text-real-estate-neutral/70">{address}</p>
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-lg md:text-base py-3 px-4">
-                  <Share2 className="w-5 h-5 mr-2" />
+                <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-xl md:text-sm py-2 px-3">
+                  <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-lg md:text-base py-3 px-4">
-                  <MessageCircle className="w-5 h-5 mr-2" />
+                <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-xl md:text-sm py-2 px-3">
+                  <MessageCircle className="w-4 h-4 mr-2" />
                   WhatsApp
                 </Button>
-                <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-lg md:text-base py-3 px-4">
-                  <ExternalLink className="w-5 h-5 mr-2" />
+                <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-xl md:text-sm py-2 px-3">
+                  <ExternalLink className="w-4 h-4 mr-2" />
                   Open
                 </Button>
               </div>
@@ -205,23 +205,23 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location", className 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <MapPin className="w-7 h-7 text-real-estate-primary" />
+              <MapPin className="w-6 h-6 text-real-estate-primary" />
               <div>
-                <p className="font-bold text-3xl md:text-2xl text-real-estate-neutral">{title}</p>
-                <p className="text-xl md:text-lg text-real-estate-neutral/70">{address}</p>
+                <p className="font-bold text-4xl md:text-lg text-real-estate-neutral">{title}</p>
+                <p className="text-2xl md:text-sm text-real-estate-neutral/70">{address}</p>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-lg md:text-base py-3 px-4">
-                <Share2 className="w-5 h-5 mr-2" />
+              <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-xl md:text-sm py-2 px-3">
+                <Share2 className="w-4 h-4 mr-2" />
                 Share
               </Button>
-              <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-lg md:text-base py-3 px-4">
-                <MessageCircle className="w-5 h-5 mr-2" />
+              <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-xl md:text-sm py-2 px-3">
+                <MessageCircle className="w-4 h-4 mr-2" />
                 WhatsApp
               </Button>
-              <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-lg md:text-base py-3 px-4">
-                <ExternalLink className="w-5 h-5 mr-2" />
+              <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-xl md:text-sm py-2 px-3">
+                <ExternalLink className="w-4 h-4 mr-2" />
                 Open
               </Button>
             </div>
