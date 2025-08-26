@@ -162,22 +162,22 @@ const ListingDetail = () => {
           
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-2">
+              <h1 className="text-4xl md:text-5xl font-bold text-real-estate-neutral mb-2">
                 {listing.title}
               </h1>
               {listing.location_address && (
-                <div className="flex items-center text-real-estate-neutral/70">
-                  <MapPin className="w-4 h-4 mr-1" />
+                <div className="flex items-center text-real-estate-neutral/70 text-lg">
+                  <MapPin className="w-5 h-5 mr-2" />
                   {listing.location_address}
                 </div>
               )}
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold text-real-estate-primary flex items-center md:justify-end">
-                <DollarSign className="w-8 h-8" />
+              <div className="text-4xl md:text-5xl font-bold text-real-estate-primary flex items-center md:justify-end">
+                <DollarSign className="w-10 h-10" />
                 {formatPrice(listing.price)}
               </div>
-              <div className="text-sm text-real-estate-neutral/70">per month</div>
+              <div className="text-base text-real-estate-neutral/70">per month</div>
             </div>
           </div>
         </div>
@@ -232,28 +232,28 @@ const ListingDetail = () => {
                   {listing.bedrooms && (
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-2">
-                        <Bed className="w-6 h-6 text-real-estate-primary" />
+                        <Bed className="w-8 h-8 text-real-estate-primary" />
                       </div>
-                      <div className="font-semibold">{listing.bedrooms}</div>
-                      <div className="text-sm text-muted-foreground">Bedrooms</div>
+                      <div className="font-bold text-xl">{listing.bedrooms}</div>
+                      <div className="text-base text-muted-foreground">Bedrooms</div>
                     </div>
                   )}
                   {listing.bathrooms && (
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-2">
-                        <Bath className="w-6 h-6 text-real-estate-primary" />
+                        <Bath className="w-8 h-8 text-real-estate-primary" />
                       </div>
-                      <div className="font-semibold">{listing.bathrooms}</div>
-                      <div className="text-sm text-muted-foreground">Bathrooms</div>
+                      <div className="font-bold text-xl">{listing.bathrooms}</div>
+                      <div className="text-base text-muted-foreground">Bathrooms</div>
                     </div>
                   )}
                   {listing.size && (
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-2">
-                        <Square className="w-6 h-6 text-real-estate-primary" />
+                        <Square className="w-8 h-8 text-real-estate-primary" />
                       </div>
-                      <div className="font-semibold">{listing.size}</div>
-                      <div className="text-sm text-muted-foreground">Sq Ft</div>
+                      <div className="font-bold text-xl">{listing.size}</div>
+                      <div className="text-base text-muted-foreground">Sq Ft</div>
                     </div>
                   )}
                 </div>
