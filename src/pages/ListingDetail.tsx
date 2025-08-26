@@ -222,38 +222,38 @@ const ListingDetail = () => {
             {/* Property Features */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Home className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+                  <Home className="w-7 h-7" />
                   Property Features
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-6">
                   {listing.bedrooms && (
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        <Bed className="w-8 h-8 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-3">
+                        <Bed className="w-12 h-12 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-xl">{listing.bedrooms}</div>
-                      <div className="text-base text-muted-foreground">Bedrooms</div>
+                      <div className="font-bold text-4xl text-real-estate-neutral">{listing.bedrooms}</div>
+                      <div className="text-lg text-muted-foreground font-medium">Bedrooms</div>
                     </div>
                   )}
                   {listing.bathrooms && (
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        <Bath className="w-8 h-8 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-3">
+                        <Bath className="w-12 h-12 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-xl">{listing.bathrooms}</div>
-                      <div className="text-base text-muted-foreground">Bathrooms</div>
+                      <div className="font-bold text-4xl text-real-estate-neutral">{listing.bathrooms}</div>
+                      <div className="text-lg text-muted-foreground font-medium">Bathrooms</div>
                     </div>
                   )}
                   {listing.size && (
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        <Square className="w-8 h-8 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-3">
+                        <Square className="w-12 h-12 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-xl">{listing.size}</div>
-                      <div className="text-base text-muted-foreground">Sq Ft</div>
+                      <div className="font-bold text-4xl text-real-estate-neutral">{listing.size}</div>
+                      <div className="text-lg text-muted-foreground font-medium">Sq Ft</div>
                     </div>
                   )}
                 </div>
@@ -264,10 +264,10 @@ const ListingDetail = () => {
             {listing.description && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle>About This Property</CardTitle>
+                  <CardTitle className="text-2xl font-bold">About This Property</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-lg text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
                     {listing.description}
                   </p>
                 </CardContent>
@@ -278,7 +278,7 @@ const ListingDetail = () => {
             {listing.media_links && listing.media_links.length > 0 && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle>Photos & Media</CardTitle>
+                  <CardTitle className="text-2xl font-bold">Photos & Media</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
@@ -348,14 +348,14 @@ const ListingDetail = () => {
             {/* Contact Information */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
-                <CardTitle>Contact Owner</CardTitle>
+                <CardTitle className="text-2xl font-bold">Contact Owner</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <div className="font-semibold text-real-estate-neutral mb-1">
+                  <div className="font-bold text-xl text-real-estate-neutral mb-1">
                     {listing.owner_name}
                   </div>
-                  <div className="text-sm text-real-estate-neutral/70">Property Owner</div>
+                  <div className="text-base text-real-estate-neutral/70">Property Owner</div>
                 </div>
 
                 <Separator />
@@ -364,9 +364,9 @@ const ListingDetail = () => {
                   {listing.owner_whatsapp && (
                     <Button
                       onClick={() => handleWhatsAppContact(listing.owner_whatsapp!)}
-                      className="w-full bg-green-600 hover:bg-green-700"
+                      className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
                     >
-                      <MessageCircle className="w-4 h-4 mr-2" />
+                      <MessageCircle className="w-5 h-5 mr-2" />
                       WhatsApp
                     </Button>
                   )}
@@ -375,9 +375,9 @@ const ListingDetail = () => {
                     <Button
                       onClick={() => handlePhoneCall(listing.owner_phone!)}
                       variant="outline"
-                      className="w-full"
+                      className="w-full text-lg py-6"
                     >
-                      <Phone className="w-4 h-4 mr-2" />
+                      <Phone className="w-5 h-5 mr-2" />
                       Call {listing.owner_phone}
                     </Button>
                   )}
