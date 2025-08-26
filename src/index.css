@@ -122,3 +122,10 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile font size boost */
+@media (max-width: 767px) {
+  html {
+    font-size: 18px;
+  }
+}
