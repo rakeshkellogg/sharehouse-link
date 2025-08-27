@@ -15,7 +15,8 @@ import ListingDetail from "./pages/ListingDetail";
 import MyListings from "./pages/MyListings";
 import Inbox from "./pages/Inbox";
 import Auth from "./pages/Auth";
-import SavedListings from "./pages/SavedListings";
+import SavedListings from "@/pages/SavedListings";
+import SearchProperties from "@/pages/SearchProperties";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,8 +57,8 @@ const App: React.FC = () => {
                 <SavedListings />
               </ProtectedRoute>
             } />
+            <Route path="/search" element={<SearchProperties />} />
             <Route path="/listing/:id" element={<ListingDetail />} />
-              <Route path="/sample" element={<SampleListing />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -13,12 +13,16 @@ interface PropertyCardProps {
   location: string;
   lat?: number;
   lng?: number;
-  bedrooms: string;
-  bathrooms: string;
-  size: string;
+  bedrooms?: string;
+  bathrooms?: string;
+  size?: string;
   description: string;
   ownerName: string;
+  coverImageUrl?: string;
   image?: string;
+  propertyType?: string;
+  transactionType?: string;
+  onClick?: () => void;
 }
 
 const PropertyCard = ({
@@ -32,7 +36,11 @@ const PropertyCard = ({
   size,
   description,
   ownerName,
-  image = sampleProperty
+  coverImageUrl,
+  image,
+  propertyType,
+  transactionType,
+  onClick
 }: PropertyCardProps) => {
   const { toast } = useToast();
 
@@ -70,11 +78,11 @@ const PropertyCard = ({
   };
 
   return (
-    <Card className="bg-gradient-card shadow-card border-0 overflow-hidden">
+    <Card className="bg-gradient-card shadow-card border-0 overflow-hidden cursor-pointer" onClick={onClick}>
       {/* Property Image */}
       <div className="relative h-64 md:h-80">
         <img 
-          src={image} 
+          src={coverImageUrl || image || sampleProperty} 
           alt={title}
           className="w-full h-full object-cover"
         />
@@ -83,8 +91,20 @@ const PropertyCard = ({
             {price}
           </Badge>
         </div>
-        <div className="absolute top-4 left-4">
-          <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm" onClick={handleShareLocation}>
+        <div className="absolute top-4 left-4 flex gap-2">
+          {propertyType && (
+            <Badge className="bg-real-estate-primary text-white">
+              {propertyType === 'house' ? 'House' : 'Land'}
+            </Badge>
+          )}
+          {transactionType && (
+            <Badge className="bg-real-estate-secondary text-white">
+              {transactionType === 'sale' ? 'For Sale' : 'For Rent'}
+            </Badge>
+          )}
+        </div>
+        <div className="absolute bottom-4 left-4">
+          <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); handleShareLocation(); }}>
             <Share2 className="w-4 h-4 mr-1" />
             Share Location
           </Button>
@@ -104,20 +124,28 @@ const PropertyCard = ({
         </div>
 
         {/* Property Features */}
-        <div className="flex gap-6 mb-4">
-          <div className="flex items-center gap-2 text-real-estate-neutral/70">
-            <Bed className="w-5 h-5" />
-            <span className="text-base font-medium">{bedrooms} bed</span>
+        {(bedrooms || bathrooms || size) && (
+          <div className="flex gap-6 mb-4">
+            {bedrooms && (
+              <div className="flex items-center gap-2 text-real-estate-neutral/70">
+                <Bed className="w-5 h-5" />
+                <span className="text-base font-medium">{bedrooms} bed</span>
+              </div>
+            )}
+            {bathrooms && (
+              <div className="flex items-center gap-2 text-real-estate-neutral/70">
+                <Bath className="w-5 h-5" />
+                <span className="text-base font-medium">{bathrooms} bath</span>
+              </div>
+            )}
+            {size && (
+              <div className="flex items-center gap-2 text-real-estate-neutral/70">
+                <Square className="w-5 h-5" />
+                <span className="text-base font-medium">{size} sq ft</span>
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2 text-real-estate-neutral/70">
-            <Bath className="w-5 h-5" />
-            <span className="text-base font-medium">{bathrooms} bath</span>
-          </div>
-          <div className="flex items-center gap-2 text-real-estate-neutral/70">
-            <Square className="w-5 h-5" />
-            <span className="text-base font-medium">{size} sq ft</span>
-          </div>
-        </div>
+        )}
 
         {/* Description */}
         <p className="text-real-estate-neutral/80 mb-6 leading-relaxed">
@@ -141,11 +169,11 @@ const PropertyCard = ({
           </p>
           
           <div className="flex gap-3">
-            <Button className="flex-1 bg-real-estate-secondary hover:bg-real-estate-secondary/90 text-white" onClick={handleWhatsAppShare}>
+            <Button className="flex-1 bg-real-estate-secondary hover:bg-real-estate-secondary/90 text-white" onClick={(e) => { e.stopPropagation(); handleWhatsAppShare(); }}>
               <MessageCircle className="w-4 h-4 mr-2" />
               WhatsApp
             </Button>
-            <Button variant="outline" className="flex-1 border-real-estate-primary text-real-estate-primary hover:bg-real-estate-primary/10">
+            <Button variant="outline" className="flex-1 border-real-estate-primary text-real-estate-primary hover:bg-real-estate-primary/10" onClick={(e) => { e.stopPropagation(); }}>
               <Phone className="w-4 h-4 mr-2" />
               Call
             </Button>

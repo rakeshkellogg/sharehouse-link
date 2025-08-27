@@ -64,9 +64,9 @@ const Hero = () => {
                 Create Your First Listing
               </Button>
             </Link>
-            <Link to="/sample">
+            <Link to="/search">
               <Button size="lg" className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero px-8 py-4 text-lg font-semibold">
-                View Sample Listing
+                Search Properties
               </Button>
             </Link>
           </div>

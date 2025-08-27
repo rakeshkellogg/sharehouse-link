@@ -38,7 +38,9 @@ const CreateListingForm = () => {
     mediaLinks: "",
     youtubeUrl: "",
     coverImageUrl: "",
-    ownerName: ""
+    ownerName: "",
+    propertyType: "house",
+    transactionType: "sale"
   });
 
   // Check if user is returning from YouTube video creation
@@ -117,6 +119,8 @@ const CreateListingForm = () => {
         owner_name: formData.ownerName,
         owner_phone: null,
         owner_whatsapp: null,
+        property_type: formData.propertyType,
+        transaction_type: formData.transactionType,
         is_public: true
       };
 
@@ -304,6 +308,34 @@ const CreateListingForm = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Property Type and Transaction Type */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="propertyType">Property Type *</Label>
+                  <Select onValueChange={(value) => handleInputChange("propertyType", value)} defaultValue="house">
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Select property type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="house">House</SelectItem>
+                      <SelectItem value="land">Land</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="transactionType">Transaction Type *</Label>
+                  <Select onValueChange={(value) => handleInputChange("transactionType", value)} defaultValue="sale">
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Select transaction type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sale">For Sale</SelectItem>
+                      <SelectItem value="rent">For Rent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               {/* Title and Price */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">

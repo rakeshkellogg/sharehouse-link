@@ -33,8 +33,10 @@ export type Database = {
           owner_phone: string | null
           owner_whatsapp: string | null
           price: number
+          property_type: string | null
           size: string | null
           title: string
+          transaction_type: string | null
           updated_at: string
           user_id: string
           youtube_url: string | null
@@ -57,8 +59,10 @@ export type Database = {
           owner_phone?: string | null
           owner_whatsapp?: string | null
           price: number
+          property_type?: string | null
           size?: string | null
           title: string
+          transaction_type?: string | null
           updated_at?: string
           user_id: string
           youtube_url?: string | null
@@ -81,8 +85,10 @@ export type Database = {
           owner_phone?: string | null
           owner_whatsapp?: string | null
           price?: number
+          property_type?: string | null
           size?: string | null
           title?: string
+          transaction_type?: string | null
           updated_at?: string
           user_id?: string
           youtube_url?: string | null
