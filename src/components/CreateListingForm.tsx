@@ -1,12 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink } from "lucide-react";
+import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink, Clipboard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -24,6 +24,7 @@ const CreateListingForm = () => {
     listingId: "",
     shareUrl: ""
   });
+  const [showYouTubeHelper, setShowYouTubeHelper] = useState(false);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -39,6 +40,27 @@ const CreateListingForm = () => {
     coverImageUrl: "",
     ownerName: ""
   });
+
+  // Check if user is returning from YouTube video creation
+  useEffect(() => {
+    const checkYouTubeReturn = () => {
+      const wasCreatingVideo = localStorage.getItem('creating-youtube-video');
+      if (wasCreatingVideo) {
+        setShowYouTubeHelper(true);
+        localStorage.removeItem('creating-youtube-video');
+      }
+    };
+
+    checkYouTubeReturn();
+    
+    // Check when window regains focus (user returns from YouTube)
+    const handleFocus = () => {
+      setTimeout(checkYouTubeReturn, 500); // Small delay to ensure localStorage is updated
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,6 +254,37 @@ const CreateListingForm = () => {
     }
   };
 
+  const handleCreateVideo = () => {
+    localStorage.setItem('creating-youtube-video', 'true');
+    window.open('https://www.youtube.com/upload', '_blank');
+  };
+
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text && (text.includes('youtube.com') || text.includes('youtu.be'))) {
+        handleInputChange("youtubeUrl", text);
+        setShowYouTubeHelper(false);
+        toast({
+          title: "YouTube URL Added!",
+          description: "Video link pasted successfully",
+        });
+      } else {
+        toast({
+          title: "No YouTube URL Found",
+          description: "Please copy a YouTube video URL first",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Clipboard Access Failed",
+        description: "Please paste the YouTube URL manually",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-real-estate-light py-12">
       <div className="container mx-auto px-4 max-w-2xl">
@@ -396,22 +449,47 @@ const CreateListingForm = () => {
               {/* YouTube Video */}
               <div className="space-y-2">
                 <Label htmlFor="youtubeUrl">Video (optional): Paste a YouTube link</Label>
+                
+                {/* Helper message when returning from YouTube */}
+                {showYouTubeHelper && !formData.youtubeUrl && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                    <p className="text-blue-800 font-medium text-sm">✨ Ready to add your YouTube video?</p>
+                    <p className="text-blue-700 text-xs">Copy your new video URL and click "Paste URL" below, or paste it manually.</p>
+                  </div>
+                )}
+                
                 <div className="flex gap-2">
                   <Input
                     id="youtubeUrl"
                     placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
                     value={formData.youtubeUrl}
-                    onChange={(e) => handleInputChange("youtubeUrl", e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange("youtubeUrl", e.target.value);
+                      if (e.target.value) setShowYouTubeHelper(false);
+                    }}
                     className="h-12 flex-1"
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => window.open('https://www.youtube.com/upload', '_blank')}
-                    className="h-12 px-4"
-                  >
-                    Create Video
-                  </Button>
+                  
+                  {showYouTubeHelper && !formData.youtubeUrl ? (
+                    <Button
+                      type="button"
+                      variant="default"
+                      onClick={handlePasteFromClipboard}
+                      className="h-12 px-4"
+                    >
+                      <Clipboard className="w-4 h-4 mr-1" />
+                      Paste URL
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCreateVideo}
+                      className="h-12 px-4"
+                    >
+                      Create Video
+                    </Button>
+                  )}
                 </div>
                 <p className="text-sm text-real-estate-neutral/70">
                   Supports YouTube watch, shorts, and youtu.be links. Click "Create Video" to make a new YouTube video.
