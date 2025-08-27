@@ -127,6 +127,35 @@ export type Database = {
           },
         ]
       }
+      saved_listings: {
+        Row: {
+          id: string
+          listing_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          listing_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          listing_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

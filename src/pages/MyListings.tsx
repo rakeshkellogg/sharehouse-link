@@ -14,7 +14,8 @@ import {
   MapPin,
   Edit3,
   Trash2,
-  MessageCircle
+  MessageCircle,
+  Heart
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -190,6 +191,12 @@ const MyListings = () => {
               <Button variant="outline" className="shadow-hero">
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Inbox
+              </Button>
+            </Link>
+            <Link to="/saved">
+              <Button variant="outline" className="shadow-hero">
+                <Heart className="w-4 h-4 mr-2" />
+                Saved
               </Button>
             </Link>
             <Link to="/create">

@@ -15,6 +15,7 @@ import ListingDetail from "./pages/ListingDetail";
 import MyListings from "./pages/MyListings";
 import Inbox from "./pages/Inbox";
 import Auth from "./pages/Auth";
+import SavedListings from "./pages/SavedListings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,11 @@ const App: React.FC = () => {
             <Route path="/inbox" element={
               <ProtectedRoute>
                 <Inbox />
+              </ProtectedRoute>
+            } />
+            <Route path="/saved" element={
+              <ProtectedRoute>
+                <SavedListings />
               </ProtectedRoute>
             } />
             <Route path="/listing/:id" element={<ListingDetail />} />

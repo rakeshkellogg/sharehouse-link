@@ -11,12 +11,13 @@ import {
   Bath, 
   Square, 
   MapPin, 
-  Phone, 
   MessageCircle, 
   ExternalLink,
   ArrowLeft,
   DollarSign,
-  Play
+  Play,
+  Heart,
+  HeartOff
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -55,6 +56,8 @@ const ListingDetail = () => {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingListing, setSavingListing] = useState(false);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -78,6 +81,18 @@ const ListingDetail = () => {
           setError("Listing not found or not publicly available");
         } else {
           setListing(data);
+          
+          // Check if user has saved this listing
+          if (user) {
+            const { data: savedData } = await supabase
+              .from('saved_listings')
+              .select('id')
+              .eq('user_id', user.id)
+              .eq('listing_id', data.id)
+              .maybeSingle();
+            
+            setIsSaved(!!savedData);
+          }
         }
       } catch (error) {
         setError("Failed to load listing");
@@ -87,7 +102,7 @@ const ListingDetail = () => {
     };
 
     fetchListing();
-  }, [id]);
+  }, [id, user]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -98,14 +113,62 @@ const ListingDetail = () => {
     }).format(price);
   };
 
-  const handleWhatsAppContact = (phone: string) => {
-    const cleanPhone = phone.replace(/[^\d+]/g, '');
-    const message = encodeURIComponent(`Hi! I'm interested in your property listing: ${listing?.title}`);
-    window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
-  };
+  const handleSaveListing = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to save listings.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  const handlePhoneCall = (phone: string) => {
-    window.open(`tel:${phone}`, '_self');
+    if (!listing) return;
+
+    setSavingListing(true);
+    try {
+      if (isSaved) {
+        // Remove from saved listings
+        const { error } = await supabase
+          .from('saved_listings')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('listing_id', listing.id);
+
+        if (error) throw error;
+        
+        setIsSaved(false);
+        toast({
+          title: "Listing Removed",
+          description: "Property removed from your saved listings."
+        });
+      } else {
+        // Add to saved listings
+        const { error } = await supabase
+          .from('saved_listings')
+          .insert({
+            user_id: user.id,
+            listing_id: listing.id
+          });
+
+        if (error) throw error;
+        
+        setIsSaved(true);
+        toast({
+          title: "Listing Saved",
+          description: "Property added to your saved listings."
+        });
+      }
+    } catch (error) {
+      console.error('Error saving/unsaving listing:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update saved status. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSavingListing(false);
+    }
   };
 
   if (loading) {
@@ -175,6 +238,30 @@ const ListingDetail = () => {
                 {formatPrice(listing.price)}
               </div>
               <div className="text-2xl md:text-sm text-real-estate-neutral/70">per month</div>
+              
+              {/* Save Button */}
+              {user && (
+                <Button
+                  onClick={handleSaveListing}
+                  disabled={savingListing}
+                  variant={isSaved ? "default" : "outline"}
+                  className="mt-3 md:mt-2"
+                >
+                  {savingListing ? (
+                    "Saving..."
+                  ) : isSaved ? (
+                    <>
+                      <Heart className="w-4 h-4 mr-2 fill-current" />
+                      Saved
+                    </>
+                  ) : (
+                    <>
+                      <HeartOff className="w-4 h-4 mr-2" />
+                      Save
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -341,45 +428,30 @@ const ListingDetail = () => {
               listingTitle={listing.title}
             />
 
-            {/* Contact Information */}
-            <Card className="bg-gradient-card shadow-card border-0">
-              <CardHeader>
-                <CardTitle className="text-5xl md:text-xl font-bold">Contact Owner</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <div className="font-bold text-4xl md:text-lg text-real-estate-neutral mb-2">
-                    {listing.owner_name}
+            {/* Contact Information - Remove phone/WhatsApp functionality */}
+            {listing.owner_name && (
+              <Card className="bg-gradient-card shadow-card border-0">
+                <CardHeader>
+                  <CardTitle className="text-5xl md:text-xl font-bold">Contact Owner</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="font-bold text-4xl md:text-lg text-real-estate-neutral mb-2">
+                      {listing.owner_name}
+                    </div>
+                    <div className="text-xl md:text-sm text-real-estate-neutral/70">Property Owner</div>
                   </div>
-                  <div className="text-xl md:text-sm text-real-estate-neutral/70">Property Owner</div>
-                </div>
 
-                <Separator />
+                  <Separator />
 
-                <div className="space-y-4">
-                  {listing.owner_whatsapp && (
-                    <Button
-                      onClick={() => handleWhatsAppContact(listing.owner_whatsapp!)}
-                      className="w-full bg-green-600 hover:bg-green-700 text-2xl py-6"
-                    >
-                      <MessageCircle className="w-6 h-6 mr-3" />
-                      WhatsApp
-                    </Button>
-                  )}
-                  
-                  {listing.owner_phone && (
-                    <Button
-                      onClick={() => handlePhoneCall(listing.owner_phone!)}
-                      variant="outline"
-                      className="w-full text-2xl py-6"
-                    >
-                      <Phone className="w-6 h-6 mr-3" />
-                      Call {listing.owner_phone}
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="text-center py-4">
+                    <p className="text-real-estate-neutral/70 mb-4">
+                      Contact this owner using the secure messaging system below for privacy protection.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Location */}
             {listing.location_address && (

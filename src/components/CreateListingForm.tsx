@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Phone, MessageCircle, Copy, Share2, ExternalLink } from "lucide-react";
+import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -37,9 +37,7 @@ const CreateListingForm = () => {
     mediaLinks: "",
     youtubeUrl: "",
     coverImageUrl: "",
-    ownerName: "",
-    ownerPhone: "",
-    ownerWhatsApp: ""
+    ownerName: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,8 +93,8 @@ const CreateListingForm = () => {
         youtube_url: formData.youtubeUrl || null,
         cover_image_url: null, // Will be updated after image upload
         owner_name: formData.ownerName,
-        owner_phone: formData.ownerPhone || null,
-        owner_whatsapp: formData.ownerWhatsApp || null,
+        owner_phone: null,
+        owner_whatsapp: null,
         is_public: true
       };
 
@@ -398,15 +396,25 @@ const CreateListingForm = () => {
               {/* YouTube Video */}
               <div className="space-y-2">
                 <Label htmlFor="youtubeUrl">Video (optional): Paste a YouTube link</Label>
-                <Input
-                  id="youtubeUrl"
-                  placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
-                  value={formData.youtubeUrl}
-                  onChange={(e) => handleInputChange("youtubeUrl", e.target.value)}
-                  className="h-12"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="youtubeUrl"
+                    placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                    value={formData.youtubeUrl}
+                    onChange={(e) => handleInputChange("youtubeUrl", e.target.value)}
+                    className="h-12 flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.open('https://www.youtube.com/upload', '_blank')}
+                    className="h-12 px-4"
+                  >
+                    Create Video
+                  </Button>
+                </div>
                 <p className="text-sm text-real-estate-neutral/70">
-                  Supports YouTube watch, shorts, and youtu.be links
+                  Supports YouTube watch, shorts, and youtu.be links. Click "Create Video" to make a new YouTube video.
                 </p>
               </div>
 
@@ -428,44 +436,19 @@ const CreateListingForm = () => {
               {/* Contact Information */}
               <div className="border-t pt-6">
                 <h3 className="font-semibold text-real-estate-neutral mb-4">Contact Information</h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="ownerName">Your Name *</Label>
-                    <Input
-                      id="ownerName"
-                      placeholder="John Doe"
-                      value={formData.ownerName}
-                      onChange={(e) => handleInputChange("ownerName", e.target.value)}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="ownerPhone" className="flex items-center gap-1">
-                      <Phone className="w-4 h-4" />
-                      Phone Number
-                    </Label>
-                    <Input
-                      id="ownerPhone"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.ownerPhone}
-                      onChange={(e) => handleInputChange("ownerPhone", e.target.value)}
-                      className="h-12"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="ownerWhatsApp" className="flex items-center gap-1">
-                      <MessageCircle className="w-4 h-4" />
-                      WhatsApp
-                    </Label>
-                    <Input
-                      id="ownerWhatsApp"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.ownerWhatsApp}
-                      onChange={(e) => handleInputChange("ownerWhatsApp", e.target.value)}
-                      className="h-12"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ownerName">Your Name *</Label>
+                  <Input
+                    id="ownerName"
+                    placeholder="John Doe"
+                    value={formData.ownerName}
+                    onChange={(e) => handleInputChange("ownerName", e.target.value)}
+                    className="h-12"
+                    required
+                  />
+                  <p className="text-sm text-real-estate-neutral/70">
+                    Visitors will contact you through the built-in messaging system for privacy.
+                  </p>
                 </div>
               </div>
 
