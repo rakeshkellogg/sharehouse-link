@@ -68,7 +68,7 @@ const Hero = () => {
               <button className="btn btn-white btn-xl">Create Your First Listing</button>
             </Link>
             <Link to="/search">
-              <button className="btn btn-white btn-xl">View Sample Listing</button>
+              <button className="btn btn-white btn-xl">Search Properties</button>
             </Link>
           </div>
 
