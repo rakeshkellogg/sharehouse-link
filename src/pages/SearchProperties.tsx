@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,63 +9,8 @@ import PropertyCard from "@/components/PropertyCard";
 
 const SearchProperties = () => {
   const [searchLocation, setSearchLocation] = useState("");
-  const [propertyType, setPropertyType] = useState("all");
-  const [transactionType, setTransactionType] = useState("all");
   const [listings, setListings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Initialize Google Places Autocomplete
-  useEffect(() => {
-    if (window.google && inputRef.current) {
-      autocompleteRef.current = new window.google.maps.places.Autocomplete(
-        inputRef.current,
-        {
-          types: ['(regions)'],
-          fields: ['formatted_address', 'geometry', 'name']
-        }
-      );
-
-      autocompleteRef.current.addListener('place_changed', () => {
-        const place = autocompleteRef.current?.getPlace();
-        if (place?.formatted_address) {
-          setSearchLocation(place.formatted_address);
-        }
-      });
-    }
-  }, []);
-
-  // Load Google Maps API if not loaded
-  useEffect(() => {
-    if (!window.google) {
-      const script = document.createElement('script');
-      const apiKey = localStorage.getItem('googleMapsApiKey') || '';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        // Re-initialize autocomplete after script loads
-        if (inputRef.current) {
-          autocompleteRef.current = new window.google.maps.places.Autocomplete(
-            inputRef.current,
-            {
-              types: ['(regions)'],
-              fields: ['formatted_address', 'geometry', 'name']
-            }
-          );
-
-          autocompleteRef.current.addListener('place_changed', () => {
-            const place = autocompleteRef.current?.getPlace();
-            if (place?.formatted_address) {
-              setSearchLocation(place.formatted_address);
-            }
-          });
-        }
-      };
-      document.head.appendChild(script);
-    }
-  }, []);
 
   const handleSearch = async () => {
     const trimmedLocation = searchLocation.trim();
@@ -143,7 +88,6 @@ const SearchProperties = () => {
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  ref={inputRef}
                   type="text"
                   id="location"
                   value={searchLocation}
