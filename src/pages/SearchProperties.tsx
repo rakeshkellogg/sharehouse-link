@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,79 @@ const SearchProperties = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [listings, setListings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Fetch address suggestions from database
+  const fetchSuggestions = async (query: string) => {
+    if (query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('listings')
+        .select('location_address')
+        .eq('is_public', true)
+        .is('deleted_at', null)
+        .ilike('location_address', `%${query}%`)
+        .limit(5);
+
+      if (error) {
+        console.error('Error fetching suggestions:', error);
+        return;
+      }
+
+      // Get unique addresses
+      const uniqueAddresses = [...new Set(data?.map(item => item.location_address).filter(Boolean))] as string[];
+      setSuggestions(uniqueAddresses);
+      setShowSuggestions(uniqueAddresses.length > 0);
+    } catch (error) {
+      console.error('Suggestion fetch error:', error);
+    }
+  };
+
+  // Debounced suggestion fetch
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchLocation.trim()) {
+        fetchSuggestions(searchLocation.trim());
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchLocation]);
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchLocation(suggestion);
+    setShowSuggestions(false);
+    // Auto-search when suggestion is selected
+    setTimeout(() => {
+      handleSearch();
+    }, 100);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchLocation(e.target.value);
+  };
+
+  const handleInputFocus = () => {
+    if (suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleInputBlur = () => {
+    // Delay hiding suggestions to allow clicking on them
+    setTimeout(() => {
+      setShowSuggestions(false);
+    }, 200);
+  };
 
   const handleSearch = async () => {
     const trimmedLocation = searchLocation.trim();
@@ -86,16 +159,34 @@ const SearchProperties = () => {
                 Location
               </label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 z-10" />
                 <Input
                   type="text"
                   id="location"
                   value={searchLocation}
-                  onChange={(e) => setSearchLocation(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
                   className="pl-10"
                   placeholder="Enter city, state, or address (e.g., San Francisco, CA)"
                 />
+                
+                {/* Suggestions Dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg z-20 mt-1 max-h-48 overflow-y-auto">
+                    {suggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-sm"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="text-real-estate-neutral">{suggestion}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
