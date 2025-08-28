@@ -5,7 +5,7 @@ import { Home, Users, Share2, MessageCircle, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthButton from "@/components/AuthButton";
 import { useAuth } from "@/contexts/AuthContext";
-import heroImage from "@/assets/hero-residential.jpg";
+import heroImage from "@/assets/hero-residential-clear.jpg";
 
 const Hero = () => {
   const { user } = useAuth();
