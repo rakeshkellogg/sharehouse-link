@@ -40,14 +40,41 @@ const SearchProperties = () => {
   useEffect(() => {
     if (!window.google) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+      const apiKey = localStorage.getItem('googleMapsApiKey') || '';
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
       script.async = true;
       script.defer = true;
+      script.onload = () => {
+        // Re-initialize autocomplete after script loads
+        if (inputRef.current) {
+          autocompleteRef.current = new window.google.maps.places.Autocomplete(
+            inputRef.current,
+            {
+              types: ['(regions)'],
+              fields: ['formatted_address', 'geometry', 'name']
+            }
+          );
+
+          autocompleteRef.current.addListener('place_changed', () => {
+            const place = autocompleteRef.current?.getPlace();
+            if (place?.formatted_address) {
+              setSearchLocation(place.formatted_address);
+            }
+          });
+        }
+      };
       document.head.appendChild(script);
     }
   }, []);
 
   const handleSearch = async () => {
+    const trimmedLocation = searchLocation.trim();
+    
+    // Only search if location is provided
+    if (!trimmedLocation) {
+      return;
+    }
+
     setIsLoading(true);
     try {
       let query = supabase
@@ -56,30 +83,32 @@ const SearchProperties = () => {
         .eq('is_public', true)
         .is('deleted_at', null);
 
-      if (propertyType !== 'all') {
-        query = query.eq('property_type', propertyType);
-      }
-
-      if (transactionType !== 'all') {
-        query = query.eq('transaction_type', transactionType);
-      }
-
-      if (searchLocation) {
-        query = query.ilike('location_address', `%${searchLocation}%`);
+      // Focus on location search only
+      if (trimmedLocation) {
+        query = query.ilike('location_address', `%${trimmedLocation}%`);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error searching listings:', error);
+        setListings([]);
         return;
       }
 
       setListings(data || []);
     } catch (error) {
       console.error('Search error:', error);
+      setListings([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle Enter key press for search
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -104,62 +133,33 @@ const SearchProperties = () => {
           </div>
         </div>
 
-        {/* Search Filters */}
+        {/* Search Filters - Simplified */}
         <Card className="bg-white rounded-lg p-6 shadow-card mb-8">
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="location" className="block text-sm font-medium text-real-estate-neutral mb-2">
-                  Location
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    ref={inputRef}
-                    type="text"
-                    id="location"
-                    value={searchLocation}
-                    onChange={(e) => setSearchLocation(e.target.value)}
-                    className="pl-10"
-                    placeholder="Enter city, state, or address"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="propertyType" className="block text-sm font-medium text-real-estate-neutral mb-2">
-                  Property Type
-                </label>
-                <select
-                  id="propertyType"
-                  value={propertyType}
-                  onChange={(e) => setPropertyType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-real-estate-primary"
-                >
-                  <option value="all">All Types</option>
-                  <option value="house">House</option>
-                  <option value="land">Land</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="transactionType" className="block text-sm font-medium text-real-estate-neutral mb-2">
-                  Transaction Type
-                </label>
-                <select
-                  id="transactionType"
-                  value={transactionType}
-                  onChange={(e) => setTransactionType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-real-estate-primary"
-                >
-                  <option value="all">All Types</option>
-                  <option value="sale">For Sale</option>
-                  <option value="rent">For Rent</option>
-                </select>
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium text-real-estate-neutral mb-2">
+                Location
+              </label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  id="location"
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="pl-10"
+                  placeholder="Enter city, state, or address (e.g., San Francisco, CA)"
+                />
               </div>
             </div>
 
-            <Button onClick={handleSearch} disabled={isLoading} className="bg-gradient-hero text-white shadow-hero">
+            <Button 
+              onClick={handleSearch} 
+              disabled={isLoading || !searchLocation.trim()} 
+              className="bg-gradient-hero text-white shadow-hero"
+            >
               <Search className="w-4 h-4 mr-2" />
               {isLoading ? 'Searching...' : 'Search Properties'}
             </Button>
@@ -178,7 +178,7 @@ const SearchProperties = () => {
                   <PropertyCard
                     key={listing.id}
                     title={listing.title}
-                    price={`$${listing.price.toLocaleString()}${listing.transaction_type === 'rent' ? '/month' : ''}`}
+                    price={`$${listing.price.toLocaleString()}${(listing.transaction_type || 'rent') === 'rent' ? '/month' : ''}`}
                     location={listing.location_address}
                     lat={listing.latitude}
                     lng={listing.longitude}
@@ -188,8 +188,8 @@ const SearchProperties = () => {
                     description={listing.description}
                     ownerName={listing.owner_name}
                     coverImageUrl={listing.cover_image_url}
-                    propertyType={listing.property_type}
-                    transactionType={listing.transaction_type}
+                    propertyType={listing.property_type || 'house'}
+                    transactionType={listing.transaction_type || 'rent'}
                     onClick={() => window.open(`/listing/${listing.id}`, '_self')}
                   />
                 ))}
