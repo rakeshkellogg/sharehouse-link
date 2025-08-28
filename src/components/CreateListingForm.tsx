@@ -290,30 +290,30 @@ const CreateListingForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-real-estate-light py-12">
+    <div className="min-h-screen bg-real-estate-light py-8 md:py-12">
       <div className="container mx-auto px-4 max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-real-estate-neutral mb-4">
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-real-estate-neutral mb-4">
             Create Your Property Listing
           </h1>
-          <p className="text-lg md:text-xl text-real-estate-neutral/70">Fill out the details below to create a shareable listing</p>
+          <p className="text-base md:text-lg lg:text-xl text-real-estate-neutral/70">Fill out the details below to create a shareable listing</p>
         </div>
 
         <Card className="bg-gradient-card shadow-card border-0">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-real-estate-neutral text-2xl">
-              <Home className="w-6 h-6" />
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-real-estate-neutral text-xl md:text-2xl">
+              <Home className="w-5 h-5 md:w-6 md:h-6" />
               Property Details
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="p-4 md:p-6">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
               {/* Property Type and Transaction Type */}
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="propertyType">Property Type *</Label>
+                  <Label htmlFor="propertyType" className="text-base md:text-sm">Property Type *</Label>
                   <Select onValueChange={(value) => handleInputChange("propertyType", value)} defaultValue="house">
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-12 text-base">
                       <SelectValue placeholder="Select property type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -323,9 +323,9 @@ const CreateListingForm = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="transactionType">Transaction Type *</Label>
+                  <Label htmlFor="transactionType" className="text-base md:text-sm">Transaction Type *</Label>
                   <Select onValueChange={(value) => handleInputChange("transactionType", value)} defaultValue="sale">
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-12 text-base">
                       <SelectValue placeholder="Select transaction type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -337,20 +337,20 @@ const CreateListingForm = () => {
               </div>
 
               {/* Title and Price */}
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Property Title *</Label>
+                  <Label htmlFor="title" className="text-base md:text-sm">Property Title *</Label>
                   <Input
                     id="title"
                     placeholder="Beautiful 2BR Apartment"
                     value={formData.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="h-12"
+                    className="h-12 text-base"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="price" className="flex items-center gap-1">
+                  <Label htmlFor="price" className="flex items-center gap-1 text-base md:text-sm">
                     <DollarSign className="w-4 h-4" />
                     Price *
                   </Label>
@@ -359,21 +359,21 @@ const CreateListingForm = () => {
                     placeholder="$2,500/month"
                     value={formData.price}
                     onChange={(e) => handleInputChange("price", e.target.value)}
-                    className="h-12"
+                    className="h-12 text-base"
                     required
                   />
                 </div>
               </div>
 
               {/* Property Features */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1">
+                  <Label className="flex items-center gap-1 text-base md:text-sm">
                     <Bed className="w-4 h-4" />
                     Bedrooms
                   </Label>
                   <Select onValueChange={(value) => handleInputChange("bedrooms", value)}>
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-12 text-base">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -387,12 +387,12 @@ const CreateListingForm = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1">
+                  <Label className="flex items-center gap-1 text-base md:text-sm">
                     <Bath className="w-4 h-4" />
                     Bathrooms
                   </Label>
                   <Select onValueChange={(value) => handleInputChange("bathrooms", value)}>
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-12 text-base">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -406,7 +406,7 @@ const CreateListingForm = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1">
+                  <Label className="flex items-center gap-1 text-base md:text-sm">
                     <Square className="w-4 h-4" />
                     Size (sq ft)
                   </Label>
@@ -414,30 +414,30 @@ const CreateListingForm = () => {
                     placeholder="1,200"
                     value={formData.size}
                     onChange={(e) => handleInputChange("size", e.target.value)}
-                    className="h-12"
+                    className="h-12 text-base"
                   />
                 </div>
               </div>
 
               {/* Location Options */}
               <div className="space-y-4">
-                <Label className="flex items-center gap-1">
+                <Label className="flex items-center gap-1 text-base md:text-sm">
                   <MapPin className="w-4 h-4" />
                   Property Location *
                 </Label>
                 <Tabs defaultValue="maps-link" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="maps-link">Google Maps Link</TabsTrigger>
-                    <TabsTrigger value="api-autofill">Autofill Address</TabsTrigger>
+                    <TabsTrigger value="maps-link" className="text-sm md:text-base">Google Maps Link</TabsTrigger>
+                    <TabsTrigger value="api-autofill" className="text-sm md:text-base">Autofill Address</TabsTrigger>
                   </TabsList>
                   <TabsContent value="maps-link" className="space-y-2">
                     <Input
                       placeholder="Paste Google Maps location link here"
                       value={formData.location}
                       onChange={(e) => handleGoogleMapsLink(e.target.value)}
-                      className="h-12"
+                      className="h-12 text-base"
                     />
-                    <p className="text-sm text-real-estate-neutral/70">
+                    <p className="text-sm md:text-xs text-real-estate-neutral/70">
                       Share a Google Maps link from your phone - just paste it here
                     </p>
                   </TabsContent>
@@ -446,7 +446,7 @@ const CreateListingForm = () => {
                       onLocationChange={handleLocationChange}
                       initialLocation={formData.location}
                     />
-                    <p className="text-sm text-real-estate-neutral/70">
+                    <p className="text-sm md:text-xs text-real-estate-neutral/70">
                       Uses Google API for precise address search and pin placement
                     </p>
                   </TabsContent>
@@ -455,13 +455,13 @@ const CreateListingForm = () => {
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description" className="text-base md:text-sm">Description</Label>
                 <Textarea
                   id="description"
                   placeholder="Describe your property... (amenities, features, nearby attractions)"
                   value={formData.description}
                   onChange={(e) => handleInputChange("description", e.target.value)}
-                  className="min-h-24"
+                  className="min-h-24 text-base"
                 />
               </div>
 
@@ -480,17 +480,17 @@ const CreateListingForm = () => {
 
               {/* YouTube Video */}
               <div className="space-y-2">
-                <Label htmlFor="youtubeUrl">Video (optional): Paste a YouTube link</Label>
+                <Label htmlFor="youtubeUrl" className="text-base md:text-sm">Video (optional): Paste a YouTube link</Label>
                 
                 {/* Helper message when returning from YouTube */}
                 {showYouTubeHelper && !formData.youtubeUrl && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3 md:mb-2">
                     <p className="text-blue-800 font-medium text-sm">✨ Ready to add your YouTube video?</p>
                     <p className="text-blue-700 text-xs">Copy your new video URL and click "Paste URL" below, or paste it manually.</p>
                   </div>
                 )}
                 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="youtubeUrl"
                     placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
@@ -499,7 +499,7 @@ const CreateListingForm = () => {
                       handleInputChange("youtubeUrl", e.target.value);
                       if (e.target.value) setShowYouTubeHelper(false);
                     }}
-                    className="h-12 flex-1"
+                    className="h-12 flex-1 text-base"
                   />
                   
                   {showYouTubeHelper && !formData.youtubeUrl ? (
@@ -507,7 +507,7 @@ const CreateListingForm = () => {
                       type="button"
                       variant="default"
                       onClick={handlePasteFromClipboard}
-                      className="h-12 px-4"
+                      className="h-12 px-4 text-base"
                     >
                       <Clipboard className="w-4 h-4 mr-1" />
                       Paste URL
@@ -517,20 +517,20 @@ const CreateListingForm = () => {
                       type="button"
                       variant="outline"
                       onClick={handleCreateVideo}
-                      className="h-12 px-4"
+                      className="h-12 px-4 text-base"
                     >
                       Create Video
                     </Button>
                   )}
                 </div>
-                <p className="text-sm text-real-estate-neutral/70">
+                <p className="text-sm md:text-xs text-real-estate-neutral/70">
                   Supports YouTube watch, shorts, and youtu.be links. Click "Create Video" to make a new YouTube video.
                 </p>
               </div>
 
               {/* Additional Media Links */}
               <div className="space-y-2">
-                <Label htmlFor="mediaLinks" className="flex items-center gap-1">
+                <Label htmlFor="mediaLinks" className="flex items-center gap-1 text-base md:text-sm">
                   <Link className="w-4 h-4" />
                   Additional Media Links
                 </Label>
@@ -539,24 +539,24 @@ const CreateListingForm = () => {
                   placeholder="Paste additional photo/video links (Instagram, Google Drive, etc.) - one per line"
                   value={formData.mediaLinks}
                   onChange={(e) => handleInputChange("mediaLinks", e.target.value)}
-                  className="min-h-20"
+                  className="min-h-20 text-base"
                 />
               </div>
 
               {/* Contact Information */}
               <div className="border-t pt-6">
-                <h3 className="font-semibold text-real-estate-neutral mb-4">Contact Information</h3>
+                <h3 className="font-semibold text-real-estate-neutral mb-3 md:mb-4 text-lg md:text-base">Contact Information</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="ownerName">Your Name *</Label>
+                  <Label htmlFor="ownerName" className="text-base md:text-sm">Your Name *</Label>
                   <Input
                     id="ownerName"
                     placeholder="John Doe"
                     value={formData.ownerName}
                     onChange={(e) => handleInputChange("ownerName", e.target.value)}
-                    className="h-12"
+                    className="h-12 text-base"
                     required
                   />
-                  <p className="text-sm text-real-estate-neutral/70">
+                  <p className="text-sm md:text-xs text-real-estate-neutral/70">
                     Visitors will contact you through the built-in messaging system for privacy.
                   </p>
                 </div>
@@ -566,7 +566,7 @@ const CreateListingForm = () => {
                {!shareDialog.listingId ? (
                  <Button 
                    type="submit" 
-                   className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero"
+                   className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero text-base"
                    disabled={isSubmitting}
                  >
                    {isSubmitting ? "Creating Listing..." : "Create Listing & Get Share Link"}
@@ -576,7 +576,7 @@ const CreateListingForm = () => {
                    <Button 
                      type="button"
                      onClick={() => window.open(shareDialog.shareUrl, '_blank')}
-                     className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero"
+                     className="w-full h-12 bg-gradient-hero text-white font-semibold shadow-hero text-base"
                    >
                      <ExternalLink className="w-4 h-4 mr-2" />
                      View Your Listing
@@ -585,7 +585,7 @@ const CreateListingForm = () => {
                      type="button"
                      onClick={() => copyToClipboard(shareDialog.shareUrl)}
                      variant="outline"
-                     className="w-full h-12"
+                     className="w-full h-12 text-base"
                    >
                      <Copy className="w-4 h-4 mr-2" />
                      Copy Share Link
@@ -600,13 +600,13 @@ const CreateListingForm = () => {
         <Dialog open={shareDialog.open} onOpenChange={(open) => setShareDialog(prev => ({ ...prev, open }))}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Home className="w-5 h-5" />
+              <DialogTitle className="flex items-center gap-2 text-base md:text-lg">
+                <Home className="w-5 h-5 md:w-6 md:h-6" />
                 Listing Created Successfully!
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm md:text-xs text-muted-foreground">
                 Your listing is now live! Share this link with potential renters:
               </p>
               
@@ -614,7 +614,7 @@ const CreateListingForm = () => {
                 <Input
                   value={shareDialog.shareUrl}
                   readOnly
-                  className="flex-1"
+                  className="flex-1 text-base"
                 />
                 <Button
                   size="sm"
@@ -628,7 +628,7 @@ const CreateListingForm = () => {
               <div className="flex gap-2">
                 <Button
                   onClick={() => handleShare(shareDialog.shareUrl)}
-                  className="flex-1"
+                  className="flex-1 text-base"
                   variant="outline"
                 >
                   <Share2 className="w-4 h-4 mr-2" />
@@ -636,7 +636,7 @@ const CreateListingForm = () => {
                 </Button>
                 <Button
                   onClick={() => window.open(shareDialog.shareUrl, '_blank')}
-                  className="flex-1"
+                  className="flex-1 text-base"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View Listing
