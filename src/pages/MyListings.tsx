@@ -173,10 +173,10 @@ const MyListings = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-real-estate-neutral mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-real-estate-neutral mb-2">
               My Listings
             </h1>
-            <p className="text-lg md:text-xl text-real-estate-neutral/70">
+            <p className="text-sm md:text-base text-real-estate-neutral/70">
               Manage and share your property listings
             </p>
           </div>
@@ -242,11 +242,11 @@ const MyListings = () => {
         {/* Listings Grid */}
         {listings.length === 0 ? (
           <div className="text-center py-12">
-            <Home className="w-16 h-16 text-real-estate-neutral/50 mx-auto mb-4" />
-            <h2 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-2">
+            <Home className="w-12 h-12 text-real-estate-neutral/50 mx-auto mb-4" />
+            <h2 className="text-xl md:text-2xl font-bold text-real-estate-neutral mb-2">
               No Listings Yet
             </h2>
-            <p className="text-lg md:text-xl text-real-estate-neutral/70 mb-6">
+            <p className="text-sm md:text-base text-real-estate-neutral/70 mb-6">
               Create your first property listing to get started sharing with potential renters.
             </p>
             <Link to="/create">
@@ -264,7 +264,7 @@ const MyListings = () => {
                 <Card key={listing.id} className="bg-gradient-card shadow-card border-0 hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
-                      <CardTitle className="text-xl md:text-2xl line-clamp-2 flex-1 mr-2">
+                      <CardTitle className="text-lg md:text-xl line-clamp-2 flex-1 mr-2">
                         {listing.title}
                       </CardTitle>
                       <Badge variant={listing.is_public ? "default" : "secondary"}>
@@ -274,16 +274,16 @@ const MyListings = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Price */}
-                    <div className="flex items-center text-2xl md:text-3xl font-bold text-real-estate-primary">
-                      <DollarSign className="w-6 h-6 mr-1" />
+                    <div className="flex items-center text-xl md:text-2xl font-bold text-real-estate-primary">
+                      <DollarSign className="w-5 h-5 mr-1" />
                       {formatPrice(listing.price)}
-                      <span className="text-lg font-normal text-real-estate-neutral/70 ml-1">
+                      <span className="text-sm font-normal text-real-estate-neutral/70 ml-1">
                         /month
                       </span>
                     </div>
 
                     {/* Property Details */}
-                    <div className="flex gap-4 text-base md:text-lg text-real-estate-neutral/70">
+                    <div className="flex gap-4 text-sm md:text-base text-real-estate-neutral/70">
                       {listing.bedrooms && (
                         <span>{listing.bedrooms} bed</span>
                       )}
