@@ -69,9 +69,7 @@ const Hero = () => {
         >
           <div className="text-center text-white max-w-3xl px-4">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Agents. Tours.
-              <br />
-              Loans. Homes.
+              List, Share, Connect — Real Estate Made Simple
             </h1>
             
             {/* Search Bar */}
