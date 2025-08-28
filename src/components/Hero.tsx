@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Home, Users, Share2, MessageCircle, List } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Home, Search, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthButton from "@/components/AuthButton";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,101 +17,92 @@ const Hero = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-real-estate-primary/80 via-real-estate-primary/70 to-real-estate-secondary/60" />
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
       {/* Navigation Bar */}
-      <nav className="relative z-20 bg-white/10 backdrop-blur-sm border-b border-white/20">
+      <nav className="relative z-20 bg-transparent">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="text-2xl font-bold text-blue-600">
+              PropertyShare
+            </div>
+            
             {/* Navigation Links */}
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="#" className="text-white hover:text-gray-200 font-medium">
+                Buy
+              </Link>
+              <Link to="#" className="text-white hover:text-gray-200 font-medium">
+                Rent
+              </Link>
+              <Link to="#" className="text-white hover:text-gray-200 font-medium">
+                Sell
+              </Link>
+            </div>
+
+            {/* Right side */}
             <div className="flex items-center gap-4">
-              {/* My Listings Button for Authenticated Users */}
               {user && (
                 <Link to="/my-listings">
-                  <Button className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero">
+                  <Button variant="ghost" className="text-white hover:bg-white/10">
                     <List className="w-4 h-4 mr-2" />
                     My Listings
                   </Button>
                 </Link>
               )}
-              
-              {/* Auth Button */}
               <AuthButton />
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto px-4 py-16 md:py-24">
         <div className="text-center max-w-4xl mx-auto">
           {/* Main Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Share Properties
-            <br />
-            <span className="text-real-estate-accent">Effortlessly</span>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-12 leading-tight">
+            List, Share, Connect —<br />
+            Real Estate Made Simple
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Create beautiful property listings in under 2 minutes and share them across Facebook, WhatsApp, and beyond.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link to="/create">
-              <Button size="lg" className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero px-8 py-4 text-lg font-semibold">
-                Create Your First Listing
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto mb-16">
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="Enter an address, neighborhood, city, or ZIP code"
+                className="w-full px-6 py-4 text-lg rounded-full border-0 shadow-lg"
+              />
+              <Button 
+                size="lg" 
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-blue-600 hover:bg-blue-700 px-6"
+              >
+                <Search className="w-5 h-5" />
               </Button>
-            </Link>
-            <Link to="/search">
-              <Button size="lg" className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero px-8 py-4 text-lg font-semibold">
-                Search Properties
-              </Button>
-            </Link>
+            </div>
           </div>
+        </div>
+      </div>
 
-          {/* Feature Cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
-                  <Home className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Quick Setup</h3>
-                <p className="text-base text-real-estate-neutral/70">Create listings in under 2 minutes with our mobile-optimized form</p>
+      {/* Bottom Action Buttons */}
+      <div className="relative z-10 pb-16">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center gap-8 md:gap-16">
+            <Link to="/create" className="flex flex-col items-center group">
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-full mb-4 group-hover:bg-white/20 transition-colors">
+                <Home className="w-8 h-8 text-white" />
               </div>
-            </Card>
-
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
-                  <Share2 className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Share Anywhere</h3>
-                <p className="text-base text-real-estate-neutral/70">Perfect for Facebook groups, WhatsApp, and social platforms</p>
+              <span className="text-white font-semibold text-lg">Create Listing</span>
+            </Link>
+            
+            <Link to="/search" className="flex flex-col items-center group">
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-full mb-4 group-hover:bg-white/20 transition-colors">
+                <Search className="w-8 h-8 text-white" />
               </div>
-            </Card>
-
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
-                  <MessageCircle className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Direct Contact</h3>
-                <p className="text-base text-real-estate-neutral/70">WhatsApp buttons and direct messaging built in</p>
-              </div>
-            </Card>
-
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-real-estate-neutral mb-2 text-lg">Peer-to-Peer</h3>
-                <p className="text-base text-real-estate-neutral/70">Connect directly with property owners and renters</p>
-              </div>
-            </Card>
+              <span className="text-white font-semibold text-lg">Search Properties</span>
+            </Link>
           </div>
         </div>
       </div>
