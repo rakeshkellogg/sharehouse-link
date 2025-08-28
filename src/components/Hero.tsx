@@ -23,7 +23,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* Top Navigation */}
       <nav className="bg-white border-b shadow-sm">
         <div className="container mx-auto px-4">
