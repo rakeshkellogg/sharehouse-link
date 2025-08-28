@@ -87,98 +87,65 @@ const PropertyCard = ({
           className="w-full h-full object-cover"
         />
         <div className="absolute top-4 right-4">
-          <Badge className="bg-real-estate-accent text-white font-bold text-lg px-4 py-2">
+          <Badge className="bg-real-estate-accent text-white font-bold text-lg md:text-sm px-4 py-2 md:px-2 md:py-1">
             {price}
           </Badge>
         </div>
         <div className="absolute top-4 left-4 flex gap-2">
           {propertyType && (
-            <Badge className="bg-real-estate-primary text-white">
+            <Badge className="bg-real-estate-primary text-white text-sm md:text-xs">
               {propertyType === 'house' ? 'House' : 'Land'}
             </Badge>
           )}
           {transactionType && (
-            <Badge className="bg-real-estate-secondary text-white">
+            <Badge className="bg-real-estate-secondary text-white text-sm md:text-xs">
               {transactionType === 'sale' ? 'For Sale' : 'For Rent'}
             </Badge>
           )}
         </div>
         <div className="absolute bottom-4 left-4">
-          <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); handleShareLocation(); }}>
-            <Share2 className="w-4 h-4 mr-1" />
+          <Button size="sm" variant="secondary" className="bg-white/90 backdrop-blur-sm text-sm md:text-xs" onClick={(e) => { e.stopPropagation(); handleShareLocation(); }}>
+            <Share2 className="w-4 h-4 md:w-3 md:h-3 mr-1" />
             Share Location
           </Button>
         </div>
       </div>
 
-      <CardContent className="p-6">
-        {/* Title and Location */}
-        <div className="mb-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-real-estate-neutral mb-2">
+      <CardContent className="p-6 md:p-3">
+        {/* Title */}
+        <div className="mb-4 md:mb-2">
+          <h2 className="text-2xl md:text-lg font-bold text-real-estate-neutral mb-2 md:mb-1">
             {title}
           </h2>
-          <div className="flex items-center text-real-estate-neutral/70 mb-3 text-base">
-            <MapPin className="w-5 h-5 mr-1" />
+          <div className="flex items-center text-real-estate-neutral/70 mb-3 md:mb-2 text-base md:text-sm">
+            <MapPin className="w-5 h-5 md:w-4 md:h-4 mr-1" />
             <span>{location}</span>
           </div>
         </div>
 
         {/* Property Features */}
         {(bedrooms || bathrooms || size) && (
-          <div className="flex gap-6 mb-4">
+          <div className="flex gap-6 md:gap-3">
             {bedrooms && (
-              <div className="flex items-center gap-2 text-real-estate-neutral/70">
-                <Bed className="w-5 h-5" />
-                <span className="text-base font-medium">{bedrooms} bed</span>
+              <div className="flex items-center gap-2 md:gap-1 text-real-estate-neutral/70">
+                <Bed className="w-5 h-5 md:w-4 md:h-4" />
+                <span className="text-base md:text-sm font-medium">{bedrooms} bed</span>
               </div>
             )}
             {bathrooms && (
-              <div className="flex items-center gap-2 text-real-estate-neutral/70">
-                <Bath className="w-5 h-5" />
-                <span className="text-base font-medium">{bathrooms} bath</span>
+              <div className="flex items-center gap-2 md:gap-1 text-real-estate-neutral/70">
+                <Bath className="w-5 h-5 md:w-4 md:h-4" />
+                <span className="text-base md:text-sm font-medium">{bathrooms} bath</span>
               </div>
             )}
             {size && (
-              <div className="flex items-center gap-2 text-real-estate-neutral/70">
-                <Square className="w-5 h-5" />
-                <span className="text-base font-medium">{size} sq ft</span>
+              <div className="flex items-center gap-2 md:gap-1 text-real-estate-neutral/70">
+                <Square className="w-5 h-5 md:w-4 md:h-4" />
+                <span className="text-base md:text-sm font-medium">{size} sq ft</span>
               </div>
             )}
           </div>
         )}
-
-        {/* Description */}
-        <p className="text-real-estate-neutral/80 mb-6 leading-relaxed">
-          {description}
-        </p>
-
-        {/* Map Location */}
-        <div className="mb-6">
-          <MapDisplay 
-            address={location}
-            lat={lat}
-            lng={lng}
-            title="Property Location"
-          />
-        </div>
-
-        {/* Contact Section */}
-        <div className="border-t pt-4">
-          <p className="text-sm text-real-estate-neutral/70 mb-3">
-            Listed by <span className="font-semibold text-real-estate-neutral">{ownerName}</span>
-          </p>
-          
-          <div className="flex gap-3">
-            <Button className="flex-1 bg-real-estate-secondary hover:bg-real-estate-secondary/90 text-white" onClick={(e) => { e.stopPropagation(); handleWhatsAppShare(); }}>
-              <MessageCircle className="w-4 h-4 mr-2" />
-              WhatsApp
-            </Button>
-            <Button variant="outline" className="flex-1 border-real-estate-primary text-real-estate-primary hover:bg-real-estate-primary/10" onClick={(e) => { e.stopPropagation(); }}>
-              <Phone className="w-4 h-4 mr-2" />
-              Call
-            </Button>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );

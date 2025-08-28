@@ -69,10 +69,10 @@ const SearchProperties = () => {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral">
+            <h1 className="text-3xl md:text-2xl font-bold text-real-estate-neutral">
               Search Properties
             </h1>
-            <p className="text-lg md:text-xl text-real-estate-neutral/70">
+            <p className="text-lg md:text-base text-real-estate-neutral/70">
               Find your perfect house or land for sale or rent
             </p>
           </div>
@@ -114,7 +114,7 @@ const SearchProperties = () => {
         <div className="space-y-6">
           {listings.length > 0 && (
             <div>
-              <h2 className="text-2xl font-semibold text-real-estate-neutral mb-4">
+              <h2 className="text-2xl md:text-xl font-semibold text-real-estate-neutral mb-4">
                 Found {listings.length} {listings.length === 1 ? 'property' : 'properties'}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -146,10 +146,10 @@ const SearchProperties = () => {
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-xl font-semibold text-real-estate-neutral mb-2">
+              <h3 className="text-xl md:text-lg font-semibold text-real-estate-neutral mb-2">
                 No properties found
               </h3>
-              <p className="text-real-estate-neutral/70">
+              <p className="text-base md:text-sm text-real-estate-neutral/70">
                 Try adjusting your search filters to find more properties
               </p>
             </div>
