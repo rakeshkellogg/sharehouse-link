@@ -5,7 +5,7 @@ import { Home, Users, Share2, MessageCircle, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthButton from "@/components/AuthButton";
 import { useAuth } from "@/contexts/AuthContext";
-import heroImage from "@/assets/hero-real-estate.jpg";
+import heroImage from "@/assets/hero-residential.jpg";
 
 const Hero = () => {
   const { user } = useAuth();
@@ -48,9 +48,9 @@ const Hero = () => {
         <div className="text-center max-w-4xl mx-auto">
           {/* Main Heading */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Share Properties
+            List, share, connect —
             <br />
-            <span className="text-real-estate-accent">Effortlessly</span>
+            <span className="text-real-estate-accent">real estate made simple</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
