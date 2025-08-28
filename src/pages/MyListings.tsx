@@ -168,7 +168,7 @@ const MyListings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-real-estate-light py-12">
+    <div className="min-h-screen bg-real-estate-light py-12 overflow-x-hidden">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -180,27 +180,27 @@ const MyListings = () => {
               Manage and share your property listings
             </p>
           </div>
-          <div className="flex gap-2 mt-4 md:mt-0">
+          <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
             <Link to="/">
-              <Button variant="outline" className="shadow-hero">
+              <Button variant="outline" className="w-full sm:w-auto shadow-hero">
                 <Home className="w-4 h-4 mr-2" />
                 Home
               </Button>
             </Link>
             <Link to="/inbox">
-              <Button variant="outline" className="shadow-hero">
+              <Button variant="outline" className="w-full sm:w-auto shadow-hero">
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Inbox
               </Button>
             </Link>
             <Link to="/saved">
-              <Button variant="outline" className="shadow-hero">
+              <Button variant="outline" className="w-full sm:w-auto shadow-hero">
                 <Heart className="w-4 h-4 mr-2" />
                 Saved
               </Button>
             </Link>
             <Link to="/create">
-              <Button className="bg-gradient-hero text-white shadow-hero">
+              <Button className="w-full sm:w-auto bg-gradient-hero text-white shadow-hero">
                 <Plus className="w-4 h-4 mr-2" />
                 Create New Listing
               </Button>
