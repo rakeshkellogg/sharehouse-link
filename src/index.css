@@ -134,3 +134,47 @@ All colors MUST be HSL.
     font-size: 18px;
   }
 }
+
+/* === Zillow-style look (UI-only) ====================================== */
+
+/* 1) Buttons: pill, chunky, crisp */
+.btn {
+  @apply inline-flex items-center justify-center font-semibold rounded-full
+         transition-colors select-none
+         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2
+         disabled:opacity-50 disabled:pointer-events-none;
+}
+.btn-primary { @apply bg-blue-600 text-white shadow-lg hover:bg-blue-700 active:bg-blue-800; }
+.btn-white   { @apply bg-white text-gray-900 border border-gray-200 shadow-md hover:bg-gray-100 active:bg-gray-200; }
+.btn-outline { @apply bg-white text-gray-900 border border-gray-300 hover:bg-gray-50; }
+.btn-ghost   { @apply bg-transparent text-blue-700 hover:bg-blue-50; }
+
+.btn-sm { @apply h-9 px-4 text-sm; }
+.btn-md { @apply h-11 px-5 text-base; }
+.btn-lg { @apply h-14 px-7 text-base; }
+.btn-xl { @apply h-[3.75rem] px-8 text-lg; }
+
+/* 2) Navbar: white chrome with thin divider */
+.nav-z { @apply bg-white/95 border-b; }
+
+/* 3) Hero overlay: neutral (remove blue/fog) */
+.hero-overlay { @apply absolute inset-0 bg-black/30 md:bg-black/25; }
+
+/* 4) Search bar pill (Zillow-style) */
+.searchbar-z { @apply mx-auto max-w-2xl flex items-center gap-3 bg-white rounded-full shadow-lg px-5 h-14 sm:h-16; }
+.searchbar-input { @apply flex-1 bg-transparent outline-none text-base sm:text-lg placeholder-gray-500; }
+
+/* 5) Cards: crisp white, no glass/blur */
+.card-z { @apply bg-white border rounded-2xl shadow-md; }
+
+/* 6) Messages (chat) */
+.chat-wrap   { @apply mx-auto max-w-3xl h-[calc(100vh-8rem)] flex flex-col border rounded-2xl overflow-hidden bg-white; }
+.chat-header { @apply h-14 flex items-center justify-between px-4 border-b bg-white; }
+.chat-body   { @apply flex-1 overflow-y-auto px-4 py-5 space-y-4 bg-gray-50; }
+.bubble-other{ @apply max-w-[75vw] md:max-w-[520px] rounded-2xl rounded-tl-sm bg-gray-100 text-gray-900 px-4 py-2 shadow-sm; }
+.bubble-me   { @apply max-w-[75vw] md:max-w-[520px] rounded-2xl rounded-tr-sm bg-blue-600 text-white px-4 py-2 shadow-md; }
+.chat-input  { @apply flex-1 h-12 px-4 rounded-full border border-gray-300 bg-white
+                      focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2; }
+
+/* 7) Mobile-first typography bump (optional but recommended) */
+html { font-size: clamp(16px, 2vw, 18px); }

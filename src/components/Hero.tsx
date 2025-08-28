@@ -17,11 +17,11 @@ const Hero = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-real-estate-primary/80 via-real-estate-primary/70 to-real-estate-secondary/60" />
+        <div className="hero-overlay" />
       </div>
 
       {/* Navigation Bar */}
-      <nav className="relative z-20 bg-white/10 backdrop-blur-sm border-b border-white/20">
+      <nav className="relative z-20 nav-z">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-end">
             {/* Navigation Links */}
@@ -47,10 +47,10 @@ const Hero = () => {
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
         <div className="text-center max-w-4xl mx-auto">
           {/* Main Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Share Properties
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+            List. Share. Connect.
             <br />
-            <span className="text-real-estate-accent">Effortlessly</span>
+            <span className="text-white/90 font-semibold">Real estate made simple.</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -58,22 +58,18 @@ const Hero = () => {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
             <Link to="/create">
-              <Button size="lg" className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero px-8 py-4 text-lg font-semibold">
-                Create Your First Listing
-              </Button>
+              <button className="btn btn-white btn-xl">Create Your First Listing</button>
             </Link>
             <Link to="/search">
-              <Button size="lg" className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero px-8 py-4 text-lg font-semibold">
-                Search Properties
-              </Button>
+              <button className="btn btn-white btn-xl">Search Properties</button>
             </Link>
           </div>
 
           {/* Feature Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
+            <Card className="card-z p-6">
               <div className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <Home className="w-6 h-6 text-white" />
@@ -83,7 +79,7 @@ const Hero = () => {
               </div>
             </Card>
 
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
+            <Card className="card-z p-6">
               <div className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <Share2 className="w-6 h-6 text-white" />
@@ -93,7 +89,7 @@ const Hero = () => {
               </div>
             </Card>
 
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
+            <Card className="card-z p-6">
               <div className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <MessageCircle className="w-6 h-6 text-white" />
@@ -103,7 +99,7 @@ const Hero = () => {
               </div>
             </Card>
 
-            <Card className="bg-white/95 backdrop-blur-sm p-6 shadow-card border-0">
+            <Card className="card-z p-6">
               <div className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
                   <Users className="w-6 h-6 text-white" />
