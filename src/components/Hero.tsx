@@ -97,7 +97,7 @@ const Hero = () => {
 
       {/* Quick Actions */}
       <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
           <Link to="/create" className="group text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
               <Home className="w-8 h-8 text-primary" />
@@ -113,22 +113,6 @@ const Hero = () => {
             <h3 className="font-semibold text-neutral-900 mb-2">Search Properties</h3>
             <p className="text-neutral-600 text-sm">Find your perfect home</p>
           </Link>
-
-          <div className="group text-center">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Share2 className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="font-semibold text-neutral-900 mb-2">Share Easily</h3>
-            <p className="text-neutral-600 text-sm">Share on social platforms</p>
-          </div>
-
-          <div className="group text-center">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="font-semibold text-neutral-900 mb-2">Direct Contact</h3>
-            <p className="text-neutral-600 text-sm">Connect with owners</p>
-          </div>
         </div>
       </div>
     </div>
