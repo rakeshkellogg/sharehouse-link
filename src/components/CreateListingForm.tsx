@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink, Clipboard } from "lucide-react";
+import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink, Clipboard, IndianRupee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,6 +14,22 @@ import MapLocationPicker from "./MapLocationPicker";
 import { ImagePicker } from "./ImagePicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { 
+  formatINR, 
+  formatIndianPrice, 
+  calculatePriceRupees, 
+  calculateSizeValue,
+  formatSizeDisplay,
+  validatePincode,
+  indianStates,
+  priceUnitLabels,
+  sizeScaleLabels,
+  sizeUnitLabels,
+  PriceUnit,
+  SizeScale,
+  SizeUnit
+} from "@/lib/indiaHelpers";
+import { lookupPincode } from "@/lib/pincodeService";
 
 const CreateListingForm = () => {
   const { toast } = useToast();
@@ -28,20 +44,92 @@ const CreateListingForm = () => {
   
   const [formData, setFormData] = useState({
     title: "",
-    price: "",
     description: "",
     bedrooms: "",
     bathrooms: "",
-    size: "",
-    location: "",
+    // Location fields
+    pincode: "",
+    city: "",
+    state: "",
     locationCoords: { lat: 0, lng: 0 },
+    // Price fields
+    priceAmount: "",
+    priceUnit: "lakh" as PriceUnit,
+    // Size fields
+    sizeAmount: "",
+    sizeScale: "units" as SizeScale,
+    sizeUnit: "sq_ft" as SizeUnit,
+    // Media fields
     mediaLinks: "",
     youtubeUrl: "",
     coverImageUrl: "",
+    // Contact
     ownerName: "",
     propertyType: "house",
-    transactionType: "sale"
+    transactionType: "sale",
+    // Legacy compatibility
+    price: "",
+    size: "",
+    location: ""
   });
+
+  // Auto-lookup pincode
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pricePreview, setPricePreview] = useState("");
+  const [sizePreview, setSizePreview] = useState("");
+
+  // Update price preview when amount or unit changes
+  useEffect(() => {
+    if (formData.priceAmount && !isNaN(Number(formData.priceAmount))) {
+      const amount = Number(formData.priceAmount);
+      const priceRupees = calculatePriceRupees(amount, formData.priceUnit);
+      setPricePreview(formatIndianPrice(priceRupees, 'short'));
+    } else {
+      setPricePreview("");
+    }
+  }, [formData.priceAmount, formData.priceUnit]);
+
+  // Update size preview when amount, scale, or unit changes
+  useEffect(() => {
+    if (formData.sizeAmount && !isNaN(Number(formData.sizeAmount))) {
+      const amount = Number(formData.sizeAmount);
+      const sizeValue = calculateSizeValue(amount, formData.sizeScale);
+      setSizePreview(formatSizeDisplay(sizeValue, formData.sizeUnit));
+    } else {
+      setSizePreview("");
+    }
+  }, [formData.sizeAmount, formData.sizeScale, formData.sizeUnit]);
+
+  // Handle pincode lookup
+  const handlePincodeChange = async (pincode: string) => {
+    setFormData(prev => ({ ...prev, pincode }));
+    
+    if (pincode.length === 6 && validatePincode(pincode)) {
+      setPincodeLoading(true);
+      try {
+        const pincodeData = await lookupPincode(pincode);
+        if (pincodeData) {
+          setFormData(prev => ({
+            ...prev,
+            city: pincodeData.city,
+            state: pincodeData.state,
+            locationCoords: {
+              lat: pincodeData.lat || 0,
+              lng: pincodeData.lng || 0
+            }
+          }));
+          toast({
+            title: "Location Found!",
+            description: `Auto-filled: ${pincodeData.city}, ${pincodeData.state}`,
+          });
+        }
+      } catch (error) {
+        console.error('Pincode lookup error:', error);
+      } finally {
+        setPincodeLoading(false);
+      }
+    }
+  };
 
   // Check if user is returning from YouTube video creation
   useEffect(() => {
@@ -76,10 +164,32 @@ const CreateListingForm = () => {
       return;
     }
 
-    if (!formData.title || !formData.price || !formData.ownerName) {
+    // Validate required fields
+    if (!formData.title || !formData.priceAmount || !formData.pincode || !formData.city || !formData.state || !formData.ownerName) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields (title, price, location, and your name).",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate pincode format
+    if (!validatePincode(formData.pincode)) {
+      toast({
+        title: "Invalid Pincode",
+        description: "Please enter a valid 6-digit Indian pincode.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate price amount
+    const priceAmount = Number(formData.priceAmount);
+    if (isNaN(priceAmount) || priceAmount <= 0) {
+      toast({
+        title: "Invalid Price",
+        description: "Please enter a valid price amount.",
         variant: "destructive"
       });
       return;
@@ -94,28 +204,45 @@ const CreateListingForm = () => {
         .map(link => link.trim())
         .filter(link => link.length > 0);
 
-      // Parse price to integer (remove any non-numeric characters except for digits)
-      const priceValue = parseInt(formData.price.replace(/[^\d]/g, ''));
-      if (isNaN(priceValue)) {
-        throw new Error("Please enter a valid price");
+      // Calculate price in rupees
+      const priceRupees = calculatePriceRupees(priceAmount, formData.priceUnit);
+      
+      // Calculate size value if provided
+      let sizeValue = null;
+      if (formData.sizeAmount && !isNaN(Number(formData.sizeAmount))) {
+        sizeValue = calculateSizeValue(Number(formData.sizeAmount), formData.sizeScale);
       }
 
-      // First create the listing without images to get an ID
+      // Create listing data with new India-specific fields
       const initialListingData = {
         user_id: user.id,
         title: formData.title,
-        price: priceValue,
+        description: formData.description || null,
         bedrooms: formData.bedrooms || null,
         bathrooms: formData.bathrooms || null,
-        size: formData.size || null,
-        description: formData.description || null,
-        location_address: formData.location || null,
+        // Location fields
+        pincode: formData.pincode,
+        city: formData.city,
+        state: formData.state,
         latitude: formData.locationCoords.lat || null,
         longitude: formData.locationCoords.lng || null,
-        google_maps_link: formData.location.startsWith('http') ? formData.location : null,
+        // Price fields
+        price_rupees: priceRupees,
+        price_amount_raw: priceAmount,
+        price_unit: formData.priceUnit,
+        // Size fields  
+        size_amount_raw: formData.sizeAmount ? Number(formData.sizeAmount) : null,
+        size_scale: formData.sizeAmount ? formData.sizeScale : null,
+        size_unit: formData.sizeAmount ? formData.sizeUnit : null,
+        size_value_canonical: sizeValue,
+        // Legacy fields for compatibility
+        price: priceRupees,
+        size: sizeValue ? `${formatINR(sizeValue)} ${sizeUnitLabels[formData.sizeUnit]}` : null,
+        location_address: `${formData.city}, ${formData.state} - ${formData.pincode}`,
+        // Media and other fields
         media_links: mediaLinksArray,
         youtube_url: formData.youtubeUrl || null,
-        cover_image_url: null, // Will be updated after image upload
+        cover_image_url: null,
         owner_name: formData.ownerName,
         owner_phone: null,
         owner_whatsapp: null,
@@ -336,37 +463,66 @@ const CreateListingForm = () => {
                 </div>
               </div>
 
-              {/* Title and Price */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="text-base md:text-sm">Property Title *</Label>
-                  <Input
-                    id="title"
-                    placeholder="Beautiful 2BR Apartment"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="h-12 text-base"
-                    required
-                  />
+              {/* Title */}
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-base md:text-sm">Property Title *</Label>
+                <Input
+                  id="title"
+                  placeholder="Beautiful 2BR Apartment"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  className="h-12 text-base"
+                  required
+                />
+              </div>
+
+              {/* Price Section - India Specific */}
+              <div className="space-y-4">
+                <Label className="flex items-center gap-1 text-base md:text-sm">
+                  <IndianRupee className="w-4 h-4" />
+                  Price *
+                </Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="priceAmount" className="text-sm text-muted-foreground">Amount</Label>
+                    <Input
+                      id="priceAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="1.2"
+                      value={formData.priceAmount}
+                      onChange={(e) => handleInputChange("priceAmount", e.target.value)}
+                      className="h-12 text-base"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="priceUnit" className="text-sm text-muted-foreground">Unit</Label>
+                    <Select onValueChange={(value) => handleInputChange("priceUnit", value)} defaultValue="lakh">
+                      <SelectTrigger className="h-12 text-base">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="rupees">Rupees</SelectItem>
+                        <SelectItem value="thousand">Thousand</SelectItem>
+                        <SelectItem value="lakh">Lakh</SelectItem>
+                        <SelectItem value="crore">Crore</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="price" className="flex items-center gap-1 text-base md:text-sm">
-                    <DollarSign className="w-4 h-4" />
-                    Price *
-                  </Label>
-                  <Input
-                    id="price"
-                    placeholder="$2,500/month"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    className="h-12 text-base"
-                    required
-                  />
-                </div>
+                {pricePreview && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-blue-800 font-medium text-sm">
+                      Preview: {pricePreview}{formData.transactionType === 'rent' ? '/month' : ''}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Property Features */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1 text-base md:text-sm">
                     <Bed className="w-4 h-4" />
@@ -405,52 +561,131 @@ const CreateListingForm = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-1 text-base md:text-sm">
-                    <Square className="w-4 h-4" />
-                    Size (sq ft)
-                  </Label>
-                  <Input
-                    placeholder="1,200"
-                    value={formData.size}
-                    onChange={(e) => handleInputChange("size", e.target.value)}
-                    className="h-12 text-base"
-                  />
-                </div>
               </div>
 
-              {/* Location Options */}
+              {/* Size Section - India Specific */}
+              <div className="space-y-4">
+                <Label className="flex items-center gap-1 text-base md:text-sm">
+                  <Square className="w-4 h-4" />
+                  Area/Size
+                </Label>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="sizeAmount" className="text-sm text-muted-foreground">Amount</Label>
+                    <Input
+                      id="sizeAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="1.25"
+                      value={formData.sizeAmount}
+                      onChange={(e) => handleInputChange("sizeAmount", e.target.value)}
+                      className="h-12 text-base"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sizeScale" className="text-sm text-muted-foreground">Scale</Label>
+                    <Select onValueChange={(value) => handleInputChange("sizeScale", value)} defaultValue="units">
+                      <SelectTrigger className="h-12 text-base">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="units">Units</SelectItem>
+                        <SelectItem value="thousand">Thousand</SelectItem>
+                        <SelectItem value="lakh">Lakh</SelectItem>
+                        <SelectItem value="crore">Crore</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sizeUnit" className="text-sm text-muted-foreground">Unit</Label>
+                    <Select onValueChange={(value) => handleInputChange("sizeUnit", value)} defaultValue="sq_ft">
+                      <SelectTrigger className="h-12 text-base">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sq_ft">sq ft</SelectItem>
+                        <SelectItem value="sq_yd">sq yd (gaj)</SelectItem>
+                        <SelectItem value="sq_m">sq m</SelectItem>
+                        <SelectItem value="acre">acre</SelectItem>
+                        <SelectItem value="hectare">hectare</SelectItem>
+                        <SelectItem value="cent">cent</SelectItem>
+                        <SelectItem value="guntha">guntha</SelectItem>
+                        <SelectItem value="marla">marla</SelectItem>
+                        <SelectItem value="kanal">kanal</SelectItem>
+                        <SelectItem value="bigha">bigha</SelectItem>
+                        <SelectItem value="cottah">cottah</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {sizePreview && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-green-800 font-medium text-sm">
+                      Preview: {sizePreview}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Location Section - India Specific (Pincode First) */}
               <div className="space-y-4">
                 <Label className="flex items-center gap-1 text-base md:text-sm">
                   <MapPin className="w-4 h-4" />
                   Property Location *
                 </Label>
-                <Tabs defaultValue="maps-link" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="maps-link" className="text-sm md:text-base">Google Maps Link</TabsTrigger>
-                    <TabsTrigger value="api-autofill" className="text-sm md:text-base">Autofill Address</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="maps-link" className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="pincode" className="text-sm text-muted-foreground">Pincode *</Label>
                     <Input
-                      placeholder="Paste Google Maps location link here"
-                      value={formData.location}
-                      onChange={(e) => handleGoogleMapsLink(e.target.value)}
+                      id="pincode"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      placeholder="560102"
+                      value={formData.pincode}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, '');
+                        handlePincodeChange(value);
+                      }}
                       className="h-12 text-base"
+                      required
                     />
-                    <p className="text-sm md:text-xs text-real-estate-neutral/70">
-                      Share a Google Maps link from your phone - just paste it here
-                    </p>
-                  </TabsContent>
-                  <TabsContent value="api-autofill" className="space-y-2">
-                    <MapLocationPicker 
-                      onLocationChange={handleLocationChange}
-                      initialLocation={formData.location}
+                    {formData.pincode && !validatePincode(formData.pincode) && (
+                      <p className="text-red-500 text-xs">Enter a valid 6-digit pincode</p>
+                    )}
+                    {pincodeLoading && (
+                      <p className="text-blue-500 text-xs">Looking up location...</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city" className="text-sm text-muted-foreground">City *</Label>
+                    <Input
+                      id="city"
+                      placeholder="Bengaluru"
+                      value={formData.city}
+                      onChange={(e) => handleInputChange("city", e.target.value)}
+                      className="h-12 text-base"
+                      required
                     />
-                    <p className="text-sm md:text-xs text-real-estate-neutral/70">
-                      Uses Google API for precise address search and pin placement
-                    </p>
-                  </TabsContent>
-                </Tabs>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state" className="text-sm text-muted-foreground">State *</Label>
+                    <Select onValueChange={(value) => handleInputChange("state", value)} value={formData.state}>
+                      <SelectTrigger className="h-12 text-base">
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {indianStates.map(state => (
+                          <SelectItem key={state} value={state}>{state}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <p className="text-sm md:text-xs text-real-estate-neutral/70">
+                  Enter pincode first - city and state will be auto-filled. You can edit them if needed.
+                </p>
               </div>
 
               {/* Description */}
