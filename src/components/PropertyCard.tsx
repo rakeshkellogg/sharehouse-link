@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Share2 } from "lucide-react";
 import { shareLocation, shareLocationViaWhatsApp } from "@/lib/locationShare";
 import { useToast } from "@/hooks/use-toast";
-import { formatIndianPrice } from "@/lib/indiaHelpers";
 import MapDisplay from "./MapDisplay";
 import sampleProperty from "@/assets/sample-property.jpg";
 
@@ -23,13 +22,6 @@ interface PropertyCardProps {
   image?: string;
   propertyType?: string;
   transactionType?: string;
-  // New India-specific fields (optional for backward compatibility)
-  priceRupees?: number;
-  priceAmount?: number;
-  priceUnit?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
   onClick?: () => void;
 }
 
@@ -48,28 +40,14 @@ const PropertyCard = ({
   image,
   propertyType,
   transactionType,
-  priceRupees,
-  priceAmount,
-  priceUnit,
-  city,
-  state,
-  pincode,
   onClick
 }: PropertyCardProps) => {
   const { toast } = useToast();
 
-  // Format price display - prefer India-specific format if available
-  const displayPrice = priceRupees ? formatIndianPrice(priceRupees, 'short') : price;
-  
-  // Format location display - prefer India format if available
-  const displayLocation = city && state && pincode 
-    ? `${city}, ${state} - ${pincode}`
-    : location;
-
   const handleShareLocation = async () => {
-      const success = await shareLocation({
-        address: displayLocation,
-        lat,
+    const success = await shareLocation({
+      address: location,
+      lat,
       lng,
       title: `${title} - ${price}`,
       message: `Check out this property: ${title} for ${price} in ${location}`
@@ -110,7 +88,7 @@ const PropertyCard = ({
         />
         <div className="absolute top-4 right-4">
           <Badge className="bg-real-estate-accent text-white font-bold text-lg md:text-sm px-4 py-2 md:px-2 md:py-1">
-            {displayPrice}{transactionType === 'rent' ? '/month' : ''}
+            {price}
           </Badge>
         </div>
         <div className="absolute top-4 left-4 flex gap-2">
@@ -141,7 +119,7 @@ const PropertyCard = ({
           </h2>
           <div className="flex items-center text-real-estate-neutral/70 mb-3 md:mb-2 text-base md:text-sm">
             <MapPin className="w-5 h-5 md:w-4 md:h-4 mr-1" />
-            <span>{displayLocation}</span>
+            <span>{location}</span>
           </div>
         </div>
 

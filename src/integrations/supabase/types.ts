@@ -18,7 +18,6 @@ export type Database = {
         Row: {
           bathrooms: string | null
           bedrooms: string | null
-          city: string | null
           cover_image_url: string | null
           created_at: string
           deleted_at: string | null
@@ -33,19 +32,9 @@ export type Database = {
           owner_name: string
           owner_phone: string | null
           owner_whatsapp: string | null
-          pincode: string | null
-          place_id: string | null
           price: number
-          price_amount_raw: number | null
-          price_rupees: number | null
-          price_unit: string | null
           property_type: string | null
           size: string | null
-          size_amount_raw: number | null
-          size_scale: string | null
-          size_unit: string | null
-          size_value_canonical: number | null
-          state: string | null
           title: string
           transaction_type: string | null
           updated_at: string
@@ -55,7 +44,6 @@ export type Database = {
         Insert: {
           bathrooms?: string | null
           bedrooms?: string | null
-          city?: string | null
           cover_image_url?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -70,19 +58,9 @@ export type Database = {
           owner_name: string
           owner_phone?: string | null
           owner_whatsapp?: string | null
-          pincode?: string | null
-          place_id?: string | null
           price: number
-          price_amount_raw?: number | null
-          price_rupees?: number | null
-          price_unit?: string | null
           property_type?: string | null
           size?: string | null
-          size_amount_raw?: number | null
-          size_scale?: string | null
-          size_unit?: string | null
-          size_value_canonical?: number | null
-          state?: string | null
           title: string
           transaction_type?: string | null
           updated_at?: string
@@ -92,7 +70,6 @@ export type Database = {
         Update: {
           bathrooms?: string | null
           bedrooms?: string | null
-          city?: string | null
           cover_image_url?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -107,19 +84,9 @@ export type Database = {
           owner_name?: string
           owner_phone?: string | null
           owner_whatsapp?: string | null
-          pincode?: string | null
-          place_id?: string | null
           price?: number
-          price_amount_raw?: number | null
-          price_rupees?: number | null
-          price_unit?: string | null
           property_type?: string | null
           size?: string | null
-          size_amount_raw?: number | null
-          size_scale?: string | null
-          size_unit?: string | null
-          size_value_canonical?: number | null
-          state?: string | null
           title?: string
           transaction_type?: string | null
           updated_at?: string
@@ -165,33 +132,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      pincode_cache: {
-        Row: {
-          city: string
-          lat: number | null
-          lng: number | null
-          pincode: string
-          state: string
-          updated_at: string
-        }
-        Insert: {
-          city: string
-          lat?: number | null
-          lng?: number | null
-          pincode: string
-          state: string
-          updated_at?: string
-        }
-        Update: {
-          city?: string
-          lat?: number | null
-          lng?: number | null
-          pincode?: string
-          state?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       saved_listings: {
         Row: {
