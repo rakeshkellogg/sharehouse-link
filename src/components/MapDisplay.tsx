@@ -155,27 +155,11 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location", className 
       <Card className={`bg-gradient-card ${className}`}>
         <CardContent className="p-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-              <MapPin className="w-8 h-8 text-real-estate-primary" />
-                <div>
-                  <p className="font-bold text-4xl md:text-2xl text-real-estate-neutral">{title}</p>
-                  <p className="text-2xl md:text-lg text-real-estate-neutral/70">{address}</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-xl md:text-base py-4 px-6">
-                  <Share2 className="w-6 h-6 mr-2" />
-                  Share
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-xl md:text-base py-4 px-6">
-                  <MessageCircle className="w-6 h-6 mr-2" />
-                  WhatsApp
-                </Button>
-                <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-xl md:text-base py-4 px-6">
-                  <ExternalLink className="w-6 h-6 mr-2" />
-                  Open
-                </Button>
+            <div className="flex items-center gap-3">
+              <MapPin className="w-5 h-5 text-real-estate-primary" />
+              <div>
+                <p className="font-bold text-lg md:text-xl text-real-estate-neutral">{title}</p>
+                <p className="text-sm md:text-base text-real-estate-neutral/70">{address}</p>
               </div>
             </div>
             
@@ -203,27 +187,11 @@ const MapDisplay = ({ address, lat, lng, title = "Property Location", className 
     <Card className={`bg-gradient-card ${className}`}>
       <CardContent className="p-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <MapPin className="w-8 h-8 text-real-estate-primary" />
-              <div>
-                <p className="font-bold text-4xl md:text-2xl text-real-estate-neutral">{title}</p>
-                <p className="text-2xl md:text-lg text-real-estate-neutral/70">{address}</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleShareLocation} className="text-xl md:text-base py-4 px-6">
-                <Share2 className="w-6 h-6 mr-2" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="text-xl md:text-base py-4 px-6">
-                <MessageCircle className="w-6 h-6 mr-2" />
-                WhatsApp
-              </Button>
-              <Button variant="outline" size="sm" onClick={openInGoogleMaps} className="text-xl md:text-base py-4 px-6">
-                <ExternalLink className="w-6 h-6 mr-2" />
-                Open
-              </Button>
+          <div className="flex items-center gap-3">
+            <MapPin className="w-5 h-5 text-real-estate-primary" />
+            <div>
+              <p className="font-bold text-lg md:text-xl text-real-estate-neutral">{title}</p>
+              <p className="text-sm md:text-base text-real-estate-neutral/70">{address}</p>
             </div>
           </div>
           

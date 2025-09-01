@@ -32,6 +32,9 @@ interface Listing {
   user_id: string;
   title: string;
   price: number;
+  price_rupees: number | null;
+  price_unit: string | null;
+  transaction_type: string | null;
   bedrooms: string | null;
   bathrooms: string | null;
   size: string | null;
@@ -104,13 +107,14 @@ const ListingDetail = () => {
     fetchListing();
   }, [id, user]);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+  const formatPrice = (listing: Listing) => {
+    // Use the structured price data if available (newer listings)
+    if (listing.price_rupees && listing.price_unit) {
+      return `₹${listing.price_rupees} ${listing.price_unit}`;
+    }
+    
+    // Fallback to old price format for backward compatibility
+    return `₹${listing.price?.toLocaleString('en-IN') || 0}`;
   };
 
   const handleSaveListing = async () => {
@@ -222,22 +226,23 @@ const ListingDetail = () => {
           
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-6xl md:text-5xl font-bold text-real-estate-neutral mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-2">
                 {listing.title}
               </h1>
               {listing.location_address && (
-                <div className="flex items-center text-real-estate-neutral/70 text-2xl md:text-lg">
-                  <MapPin className="w-8 h-8 mr-2" />
+                <div className="flex items-center text-real-estate-neutral/70 text-base md:text-lg">
+                  <MapPin className="w-5 h-5 mr-2" />
                   {listing.location_address}
                 </div>
               )}
             </div>
             <div className="text-right">
-              <div className="text-6xl md:text-5xl font-bold text-real-estate-primary flex items-center md:justify-end">
-                <DollarSign className="w-5 h-5" />
-                {formatPrice(listing.price)}
+              <div className="text-2xl md:text-3xl font-bold text-real-estate-primary flex items-center md:justify-end">
+                {formatPrice(listing)}
               </div>
-              <div className="text-2xl md:text-base text-real-estate-neutral/70">per month</div>
+              {(listing.transaction_type || 'rent') === 'rent' && (
+                <div className="text-sm md:text-base text-real-estate-neutral/70">per month</div>
+              )}
               
               {/* Save Button */}
               {user && (
@@ -305,8 +310,8 @@ const ListingDetail = () => {
             {/* Property Features */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-4xl md:text-2xl font-bold">
-                  <Home className="w-7 h-7" />
+                <CardTitle className="flex items-center gap-2 text-xl md:text-2xl font-bold">
+                  <Home className="w-5 h-5" />
                   Property Features
                 </CardTitle>
               </CardHeader>
@@ -314,29 +319,29 @@ const ListingDetail = () => {
                 <div className="grid grid-cols-3 gap-6">
                   {listing.bedrooms && (
                       <div className="text-center">
-                      <div className="flex items-center justify-center mb-3">
-                        <Bed className="w-14 h-14 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-2">
+                        <Bed className="w-8 h-8 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-6xl md:text-4xl text-real-estate-neutral">{listing.bedrooms}</div>
-                      <div className="text-2xl md:text-lg text-muted-foreground font-medium">Bedrooms</div>
+                      <div className="font-bold text-2xl md:text-3xl text-real-estate-neutral">{listing.bedrooms}</div>
+                      <div className="text-sm md:text-base text-muted-foreground font-medium">Bedrooms</div>
                     </div>
                   )}
                   {listing.bathrooms && (
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-3">
-                        <Bath className="w-14 h-14 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-2">
+                        <Bath className="w-8 h-8 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-6xl md:text-4xl text-real-estate-neutral">{listing.bathrooms}</div>
-                      <div className="text-2xl md:text-lg text-muted-foreground font-medium">Bathrooms</div>
+                      <div className="font-bold text-2xl md:text-3xl text-real-estate-neutral">{listing.bathrooms}</div>
+                      <div className="text-sm md:text-base text-muted-foreground font-medium">Bathrooms</div>
                     </div>
                   )}
                   {listing.size && (
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-3">
-                        <Square className="w-14 h-14 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-2">
+                        <Square className="w-8 h-8 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-6xl md:text-4xl text-real-estate-neutral">{listing.size}</div>
-                      <div className="text-2xl md:text-lg text-muted-foreground font-medium">Sq Ft</div>
+                      <div className="font-bold text-2xl md:text-3xl text-real-estate-neutral">{listing.size}</div>
+                      <div className="text-sm md:text-base text-muted-foreground font-medium">sq ft</div>
                     </div>
                   )}
                 </div>
@@ -347,10 +352,10 @@ const ListingDetail = () => {
             {listing.description && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-4xl md:text-2xl font-bold">About This Property</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl font-bold">About This Property</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl md:text-lg text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-base md:text-lg text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
                     {listing.description}
                   </p>
                 </CardContent>
@@ -361,7 +366,7 @@ const ListingDetail = () => {
             {listing.media_links && listing.media_links.length > 0 && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-4xl md:text-2xl font-bold">Photos & Media</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl font-bold">Photos & Media</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
@@ -432,14 +437,14 @@ const ListingDetail = () => {
             {listing.owner_name && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-5xl md:text-3xl font-bold">Contact Owner</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl font-bold">Contact Owner</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4">
                   <div>
-                    <div className="font-bold text-4xl md:text-2xl text-real-estate-neutral mb-2">
+                    <div className="font-bold text-lg md:text-xl text-real-estate-neutral mb-1">
                       {listing.owner_name}
                     </div>
-                    <div className="text-xl md:text-base text-real-estate-neutral/70">Property Owner</div>
+                    <div className="text-sm md:text-base text-real-estate-neutral/70">Property Owner</div>
                   </div>
 
                   <Separator />
