@@ -99,6 +99,11 @@ const CreateListingForm = () => {
     size: "",
     location: "",
     locationCoords: { lat: 0, lng: 0 },
+    sub_area: "",
+    city: "",
+    district: "",
+    state: "",
+    pincode: "",
     mediaLinks: "",
     youtubeUrl: "",
     coverImageUrl: "",
@@ -170,6 +175,11 @@ const CreateListingForm = () => {
       const sizeSqft = (sizeAmount && sizeAmount > 0) ? toSqft(sizeAmount, formData.sizeUnit) : null;
       const sizeDisplay = sizeSqft ? `${formatIN(sizeSqft)} sq ft` : null;
 
+      // Generate sub_area_slug for searching
+      const subAreaSlug = formData.sub_area 
+        ? formData.sub_area.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+        : null;
+
       // First create the listing without images to get an ID
       const initialListingData = {
         user_id: user.id,
@@ -182,6 +192,12 @@ const CreateListingForm = () => {
         location_address: formData.location || null,
         latitude: formData.locationCoords.lat || null,
         longitude: formData.locationCoords.lng || null,
+        sub_area: formData.sub_area || null,
+        sub_area_slug: subAreaSlug,
+        city: formData.city || null,
+        district: formData.district || null,
+        state: formData.state || null,
+        pincode: formData.pincode || null,
         google_maps_link: formData.location.startsWith('http') ? formData.location : null,
         media_links: mediaLinksArray,
         youtube_url: formData.youtubeUrl || null,
@@ -232,11 +248,25 @@ const CreateListingForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleLocationChange = (locationData: { lat: number; lng: number; address: string }) => {
+  const handleLocationChange = (locationData: {
+    lat: number;
+    lng: number;
+    address: string;
+    sub_area?: string;
+    city?: string;
+    district?: string;
+    state?: string;
+    pincode?: string;
+  }) => {
     setFormData(prev => ({
       ...prev,
       location: locationData.address,
-      locationCoords: { lat: locationData.lat, lng: locationData.lng }
+      locationCoords: { lat: locationData.lat, lng: locationData.lng },
+      sub_area: locationData.sub_area || "",
+      city: locationData.city || "",
+      district: locationData.district || "",
+      state: locationData.state || "",
+      pincode: locationData.pincode || ""
     }));
   };
 

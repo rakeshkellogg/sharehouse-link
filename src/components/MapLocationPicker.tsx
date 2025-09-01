@@ -7,8 +7,19 @@ import { MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 
+interface LocationData {
+  lat: number;
+  lng: number;
+  address: string;
+  sub_area?: string;
+  city?: string;
+  district?: string;
+  state?: string;
+  pincode?: string;
+}
+
 interface MapLocationPickerProps {
-  onLocationChange: (location: { lat: number; lng: number; address: string }) => void;
+  onLocationChange: (location: LocationData) => void;
   initialLocation?: string;
 }
 
@@ -58,6 +69,43 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
     fetchApiKey();
   }, []);
 
+  // Helper function to parse address components from Google Places result
+  const parseAddressComponents = (place: google.maps.places.PlaceResult | google.maps.GeocoderResult): LocationData => {
+    const components = place.address_components || [];
+    let sub_area = '';
+    let city = '';
+    let district = '';
+    let state = '';
+    let pincode = '';
+
+    components.forEach((component) => {
+      const types = component.types;
+      
+      if (types.includes('sublocality_level_1') || types.includes('sublocality')) {
+        sub_area = component.long_name;
+      } else if (types.includes('locality')) {
+        city = component.long_name;
+      } else if (types.includes('administrative_area_level_2')) {
+        district = component.long_name;
+      } else if (types.includes('administrative_area_level_1')) {
+        state = component.long_name;
+      } else if (types.includes('postal_code')) {
+        pincode = component.long_name;
+      }
+    });
+
+    return {
+      lat: 0, // Will be set by caller
+      lng: 0, // Will be set by caller
+      address: place.formatted_address || '',
+      sub_area: sub_area || undefined,
+      city: city || undefined,
+      district: district || undefined,
+      state: state || undefined,
+      pincode: pincode || undefined,
+    };
+  };
+
   const initializeMap = async (key: string) => {
     if (!mapRef.current || !key) return;
 
@@ -71,8 +119,8 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
       const google = await loader.load();
       
       const mapInstance = new google.maps.Map(mapRef.current, {
-        center: { lat: 37.7749, lng: -122.4194 }, // Default to San Francisco
-        zoom: 13,
+        center: { lat: 20.5937, lng: 78.9629 }, // Center on India
+        zoom: 5,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
@@ -96,13 +144,12 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
           // Reverse geocode to get address
           geocoder.geocode({ location: position }, (results, status) => {
             if (status === 'OK' && results?.[0]) {
-              const newAddress = results[0].formatted_address;
-              setAddress(newAddress);
-              onLocationChange({
-                lat: position.lat(),
-                lng: position.lng(),
-                address: newAddress
-              });
+              const addressData = parseAddressComponents(results[0]);
+              addressData.lat = position.lat();
+              addressData.lng = position.lng();
+              
+              setAddress(addressData.address);
+              onLocationChange(addressData);
             }
           });
         }
@@ -114,13 +161,12 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
         if (position) {
           geocoder.geocode({ location: position }, (results, status) => {
             if (status === 'OK' && results?.[0]) {
-              const newAddress = results[0].formatted_address;
-              setAddress(newAddress);
-              onLocationChange({
-                lat: position.lat(),
-                lng: position.lng(),
-                address: newAddress
-              });
+              const addressData = parseAddressComponents(results[0]);
+              addressData.lat = position.lat();
+              addressData.lng = position.lng();
+              
+              setAddress(addressData.address);
+              onLocationChange(addressData);
             }
           });
         }
@@ -130,13 +176,14 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
       setMarker(markerInstance);
       setIsMapLoaded(true);
 
-      // Initialize Google Places Autocomplete
+      // Initialize Google Places Autocomplete (restricted to India)
       if (addressInputRef.current) {
         const autocompleteInstance = new google.maps.places.Autocomplete(
           addressInputRef.current,
           {
             types: ['address'],
-            fields: ['formatted_address', 'geometry', 'name']
+            componentRestrictions: { country: 'IN' }, // Restrict to India
+            fields: ['formatted_address', 'geometry', 'name', 'address_components']
           }
         );
 
@@ -145,17 +192,15 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
           
           if (place.geometry?.location) {
             const location = place.geometry.location;
-            const newAddress = place.formatted_address || place.name || address;
+            const addressData = parseAddressComponents(place);
+            addressData.lat = location.lat();
+            addressData.lng = location.lng();
             
             mapInstance.setCenter(location);
             markerInstance.setPosition(location);
-            setAddress(newAddress);
+            setAddress(addressData.address);
             
-            onLocationChange({
-              lat: location.lat(),
-              lng: location.lng(),
-              address: newAddress
-            });
+            onLocationChange(addressData);
           }
         });
 
@@ -167,13 +212,13 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
         geocoder.geocode({ address: initialLocation }, (results, status) => {
           if (status === 'OK' && results?.[0] && results[0].geometry?.location) {
             const location = results[0].geometry.location;
+            const addressData = parseAddressComponents(results[0]);
+            addressData.lat = location.lat();
+            addressData.lng = location.lng();
+            
             mapInstance.setCenter(location);
             markerInstance.setPosition(location);
-            onLocationChange({
-              lat: location.lat(),
-              lng: location.lng(),
-              address: initialLocation
-            });
+            onLocationChange(addressData);
           }
         });
       }
@@ -196,15 +241,14 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
     geocoder.geocode({ address }, (results, status) => {
       if (status === 'OK' && results?.[0] && results[0].geometry?.location) {
         const location = results[0].geometry.location;
+        const addressData = parseAddressComponents(results[0]);
+        addressData.lat = location.lat();
+        addressData.lng = location.lng();
+        
         map.setCenter(location);
         marker.setPosition(location);
-        const newAddress = results[0].formatted_address;
-        setAddress(newAddress);
-        onLocationChange({
-          lat: location.lat(),
-          lng: location.lng(),
-          address: newAddress
-        });
+        setAddress(addressData.address);
+        onLocationChange(addressData);
       }
     });
   };
@@ -281,7 +325,7 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
               </button>
             </div>
             <p className="text-sm text-real-estate-neutral/60">
-              Start typing to see address suggestions from Google Places
+              Start typing to see Indian address suggestions from Google Places
             </p>
           </div>
 

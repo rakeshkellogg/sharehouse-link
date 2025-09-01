@@ -14,7 +14,7 @@ const SearchProperties = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Fetch address suggestions from database
+  // Fetch address suggestions from database (prioritize sub_area, city, pincode)
   const fetchSuggestions = async (query: string) => {
     if (query.length < 2) {
       setSuggestions([]);
@@ -25,21 +25,37 @@ const SearchProperties = () => {
     try {
       const { data, error } = await supabase
         .from('listings')
-        .select('location_address')
+        .select('sub_area, city, pincode, state, location_address')
         .eq('is_public', true)
         .is('deleted_at', null)
-        .ilike('location_address', `%${query}%`)
-        .limit(5);
+        .or(`sub_area.ilike.%${query}%,city.ilike.%${query}%,pincode.ilike.%${query}%,location_address.ilike.%${query}%`)
+        .limit(10);
 
       if (error) {
         console.error('Error fetching suggestions:', error);
         return;
       }
 
-      // Get unique addresses
-      const uniqueAddresses = [...new Set(data?.map(item => item.location_address).filter(Boolean))] as string[];
-      setSuggestions(uniqueAddresses);
-      setShowSuggestions(uniqueAddresses.length > 0);
+      // Create unique suggestions with priority: sub_area > city > pincode > full address
+      const suggestions = new Set<string>();
+      
+      data?.forEach(item => {
+        if (item.sub_area && item.sub_area.toLowerCase().includes(query.toLowerCase())) {
+          suggestions.add(`${item.sub_area}, ${item.city || ''}, ${item.state || ''}`.replace(/, ,/g, ',').replace(/^,|,$/g, ''));
+        }
+        if (item.city && item.city.toLowerCase().includes(query.toLowerCase())) {
+          suggestions.add(`${item.city}, ${item.state || ''}`.replace(/, ,/g, ',').replace(/^,|,$/g, ''));
+        }
+        if (item.pincode && item.pincode.toLowerCase().includes(query.toLowerCase())) {
+          suggestions.add(`${item.pincode} - ${item.city || item.sub_area || ''}`.replace(/ - $/g, ''));
+        }
+        if (item.location_address) {
+          suggestions.add(item.location_address);
+        }
+      });
+
+      setSuggestions(Array.from(suggestions).slice(0, 5));
+      setShowSuggestions(Array.from(suggestions).length > 0);
     } catch (error) {
       console.error('Suggestion fetch error:', error);
     }
@@ -101,9 +117,9 @@ const SearchProperties = () => {
         .eq('is_public', true)
         .is('deleted_at', null);
 
-      // Focus on location search only
+      // Enhanced location search - search across multiple fields
       if (trimmedLocation) {
-        query = query.ilike('location_address', `%${trimmedLocation}%`);
+        query = query.or(`sub_area.ilike.%${trimmedLocation}%,city.ilike.%${trimmedLocation}%,pincode.ilike.%${trimmedLocation}%,state.ilike.%${trimmedLocation}%,location_address.ilike.%${trimmedLocation}%`);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
@@ -169,7 +185,7 @@ const SearchProperties = () => {
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
                   className="pl-10"
-                  placeholder="Enter city, state, or address (e.g., San Francisco, CA)"
+                  placeholder="Enter area, city, pincode, or state (e.g., Koramangala, Bangalore, 560001)"
                 />
                 
                 {/* Suggestions Dropdown */}
@@ -210,23 +226,27 @@ const SearchProperties = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {listings.map((listing) => (
-                  <PropertyCard
-                    key={listing.id}
-                    title={listing.title}
-                    price={`$${listing.price.toLocaleString()}${(listing.transaction_type || 'rent') === 'rent' ? '/month' : ''}`}
-                    location={listing.location_address}
-                    lat={listing.latitude}
-                    lng={listing.longitude}
-                    bedrooms={listing.bedrooms}
-                    bathrooms={listing.bathrooms}
-                    size={listing.size}
-                    description={listing.description}
-                    ownerName={listing.owner_name}
-                    coverImageUrl={listing.cover_image_url}
-                    propertyType={listing.property_type || 'house'}
-                    transactionType={listing.transaction_type || 'rent'}
-                    onClick={() => window.open(`/listing/${listing.id}`, '_self')}
-                  />
+                <PropertyCard
+                  key={listing.id}
+                  title={listing.title}
+                  price={`₹${listing.price?.toLocaleString('en-IN') || 0}${(listing.transaction_type || 'rent') === 'rent' ? '/month' : ''}`}
+                  location={listing.location_address}
+                  lat={listing.latitude}
+                  lng={listing.longitude}
+                  sub_area={listing.sub_area}
+                  city={listing.city}
+                  state={listing.state}
+                  pincode={listing.pincode}
+                  bedrooms={listing.bedrooms}
+                  bathrooms={listing.bathrooms}
+                  size={listing.size}
+                  description={listing.description}
+                  ownerName={listing.owner_name}
+                  coverImageUrl={listing.cover_image_url}
+                  propertyType={listing.property_type || 'house'}
+                  transactionType={listing.transaction_type || 'rent'}
+                  onClick={() => window.open(`/listing/${listing.id}`, '_self')}
+                />
                 ))}
               </div>
             </div>

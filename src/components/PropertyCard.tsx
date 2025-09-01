@@ -13,6 +13,10 @@ interface PropertyCardProps {
   location: string;
   lat?: number;
   lng?: number;
+  sub_area?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
   bedrooms?: string;
   bathrooms?: string;
   size?: string;
@@ -31,6 +35,10 @@ const PropertyCard = ({
   location,
   lat,
   lng,
+  sub_area,
+  city,
+  state,
+  pincode,
   bedrooms,
   bathrooms,
   size,
@@ -43,6 +51,18 @@ const PropertyCard = ({
   onClick
 }: PropertyCardProps) => {
   const { toast } = useToast();
+
+  // Format location for Indian addresses
+  const formatLocationDisplay = () => {
+    if (sub_area && city && state) {
+      return `${sub_area}, ${city}, ${state}${pincode ? ` - ${pincode}` : ''}`;
+    } else if (city && state) {
+      return `${city}, ${state}${pincode ? ` - ${pincode}` : ''}`;
+    } else if (city) {
+      return city;
+    }
+    return location; // Fallback to original location
+  };
 
   const handleShareLocation = async () => {
     const success = await shareLocation({
@@ -119,7 +139,7 @@ const PropertyCard = ({
           </h2>
           <div className="flex items-center text-real-estate-neutral/70 mb-3 md:mb-2 text-base md:text-sm">
             <MapPin className="w-5 h-5 md:w-4 md:h-4 mr-1" />
-            <span>{location}</span>
+            <span>{formatLocationDisplay()}</span>
           </div>
         </div>
 
