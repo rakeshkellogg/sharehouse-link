@@ -31,37 +31,6 @@ export const ImagePicker = ({
   const [uploadedUrls, setUploadedUrls] = useState<string[]>(initialMediaUrls);
   const [coverUrl, setCoverUrl] = useState(initialCoverUrl);
 
-  // Storage bucket health check (read-only)
-  const testStorageConnection = async () => {
-    console.log('🔍 Testing storage connection (read-only)...');
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('👤 Auth session:', session ? 'Active' : 'None');
-
-      // Try listing objects in the public bucket (no admin perms required)
-      const { data, error } = await supabase.storage
-        .from('listing-photos')
-        .list('', { limit: 1 });
-
-      if (error) {
-        console.error('❌ Storage list error:', error);
-        const status = (error as any).statusCode ?? (error as any).status ?? 'unknown';
-        let description = 'Unable to access listing-photos bucket.';
-        if (status === 404) description = 'Bucket "listing-photos" not found. Please ensure it exists and is public.';
-        if (status === 401 || status === 403) description = 'Permission denied. Ensure you are logged in and storage RLS allows read.';
-        toast({ title: 'Storage Error', description, variant: 'destructive' });
-        return false;
-      }
-
-      console.log('✅ listing-photos bucket accessible. Sample contents:', data);
-      toast({ title: 'Storage OK', description: 'listing-photos bucket is accessible.' });
-      return true;
-    } catch (err) {
-      console.error('💥 Storage connection test failed:', err);
-      toast({ title: 'Storage Error', description: 'Unexpected error when checking storage. See console for details.', variant: 'destructive' });
-      return false;
-    }
-  };
 
   // Enhanced upload process with debugging
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,13 +52,6 @@ export const ImagePicker = ({
     console.log('🔄 Starting upload process...');
 
     try {
-      // Test storage connection first
-      console.log('🧪 Testing storage connection...');
-      const storageReady = await testStorageConnection();
-      if (!storageReady) {
-        throw new Error('Storage connection failed');
-      }
-
       console.log('🗜️ Compressing images...');
       const compressedImages = await Promise.all(
         files.map(async (file, index) => {
@@ -258,15 +220,6 @@ export const ImagePicker = ({
         Property Photos (up to 4)
       </Label>
       
-      {/* Test Storage Connection Button */}
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={testStorageConnection}
-        className="w-full h-10 mb-2"
-      >
-        🔍 Test Storage Connection
-      </Button>
 
       {/* Upload Button */}
       <Button

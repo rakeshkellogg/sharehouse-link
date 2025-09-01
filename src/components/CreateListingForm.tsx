@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, IndianRupee, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink, Clipboard } from "lucide-react";
+import { MapPin, IndianRupee, Home, Bath, Bed, Ruler, Link, Copy, Share2, ExternalLink, Clipboard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -172,8 +172,7 @@ const CreateListingForm = () => {
 
       // Calculate size in sq ft if provided
       const sizeAmount = Number(formData.sizeAmount);
-      const sizeSqft = (sizeAmount && sizeAmount > 0) ? toSqft(sizeAmount, formData.sizeUnit) : null;
-      const sizeDisplay = sizeSqft ? `${formatIN(sizeSqft)} sq ft` : null;
+      const sizeDisplay = (sizeAmount && sizeAmount > 0) ? `${formatIN(sizeAmount)} sq ft` : null;
 
       // Generate sub_area_slug for searching
       const subAreaSlug = formData.sub_area 
@@ -273,18 +272,25 @@ const CreateListingForm = () => {
   const handleImagesChange = async (coverUrl: string, mediaUrls: string[]) => {
     setFormData(prev => ({
       ...prev,
-      coverImageUrl: coverUrl,
-      mediaLinks: mediaUrls.join('\n')
+      coverImageUrl: coverUrl
+      // Don't update mediaLinks - keep it for user's additional links only
     }));
 
     // If we have a listing ID (after form submission), update the listing with image URLs
     if (shareDialog.listingId && (coverUrl || mediaUrls.length > 0)) {
       try {
+        // Combine photo URLs with user's additional media links
+        const userMediaLinks = formData.mediaLinks
+          .split('\n')
+          .map(link => link.trim())
+          .filter(link => link.length > 0 && !mediaUrls.includes(link));
+        const combinedMediaLinks = [...mediaUrls, ...userMediaLinks];
+
         const { error } = await supabase
           .from('listings')
           .update({
             cover_image_url: coverUrl || null,
-            media_links: [...mediaUrls, ...formData.mediaLinks.split('\n').filter(link => link.trim() && !mediaUrls.includes(link))]
+            media_links: combinedMediaLinks
           })
           .eq('id', shareDialog.listingId);
 
@@ -392,7 +398,17 @@ const CreateListingForm = () => {
   return (
     <div className="min-h-screen bg-real-estate-light py-8 md:py-12">
       <div className="container mx-auto px-4 max-w-2xl">
-        <div className="text-center mb-6 md:mb-8">
+        <div className="text-center mb-6 md:mb-8 relative">
+          <div className="absolute top-0 right-0">
+            <Button
+              variant="outline"
+              onClick={() => window.location.href = '/'}
+              className="h-10 px-4"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Go to Home
+            </Button>
+          </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-real-estate-neutral mb-4">
             Create Your Property Listing
           </h1>
@@ -539,58 +555,26 @@ const CreateListingForm = () => {
                 </div>
                 <div className="space-y-4">
                   <Label className="flex items-center gap-1 text-base md:text-sm">
-                    <Square className="w-4 h-4" />
+                    <Ruler className="w-4 h-4" />
                     Area / Size
                   </Label>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm text-muted-foreground">Amount</Label>
-                      <Input
-                        inputMode="decimal"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="e.g. 2.5"
-                        value={formData.sizeAmount}
-                        onChange={(e) => handleInputChange("sizeAmount", e.target.value)}
-                        className="h-12 text-base"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm text-muted-foreground">Unit</Label>
-                      <Select 
-                        value={formData.sizeUnit} 
-                        onValueChange={(value: SizeUnit) => handleInputChange("sizeUnit", value)}
-                      >
-                        <SelectTrigger className="h-12 text-base">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {/* Core units */}
-                          <SelectItem value="sq_ft">{UNIT_LABEL.sq_ft}</SelectItem>
-                          <SelectItem value="sq_yd">{UNIT_LABEL.sq_yd}</SelectItem>
-                          <SelectItem value="sq_m">{UNIT_LABEL.sq_m}</SelectItem>
-                          <SelectItem value="acre">{UNIT_LABEL.acre}</SelectItem>
-                          <SelectItem value="hectare">{UNIT_LABEL.hectare}</SelectItem>
-                          {/* India-local units */}
-                          <SelectItem value="cent">{UNIT_LABEL.cent}</SelectItem>
-                          <SelectItem value="guntha">{UNIT_LABEL.guntha}</SelectItem>
-                          <SelectItem value="marla">{UNIT_LABEL.marla}</SelectItem>
-                          <SelectItem value="kanal">{UNIT_LABEL.kanal}</SelectItem>
-                          <SelectItem value="ground">{UNIT_LABEL.ground}</SelectItem>
-                          <SelectItem value="cottah_wb">{UNIT_LABEL.cottah_wb}</SelectItem>
-                          <SelectItem value="bigha_wb">{UNIT_LABEL.bigha_wb}</SelectItem>
-                          <SelectItem value="bigha_up">{UNIT_LABEL.bigha_up}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="space-y-2">
+                    <Input
+                      inputMode="decimal"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="e.g. 1200 (sq ft)"
+                      value={formData.sizeAmount}
+                      onChange={(e) => handleInputChange("sizeAmount", e.target.value)}
+                      className="h-12 text-base"
+                    />
                   </div>
 
                   {formData.sizeAmount && Number(formData.sizeAmount) > 0 && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800 font-medium">
-                      Preview: {formData.sizeAmount} {UNIT_LABEL[formData.sizeUnit]} ({formatIN(toSqft(Number(formData.sizeAmount), formData.sizeUnit))} sq ft)
+                      Preview: {formData.sizeAmount} sq ft
                     </div>
                   )}
                 </div>
