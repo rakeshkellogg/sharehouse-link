@@ -6,6 +6,7 @@ import { ArrowLeft, Search, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import PropertyCard from "@/components/PropertyCard";
+import { formatListingPrice } from "@/lib/priceUtils";
 
 const SearchProperties = () => {
   const [searchLocation, setSearchLocation] = useState("");
@@ -229,7 +230,13 @@ const SearchProperties = () => {
                 <PropertyCard
                   key={listing.id}
                   title={listing.title}
-                  price={`₹${listing.price?.toLocaleString('en-IN') || 0}${(listing.transaction_type || 'rent') === 'rent' ? '/month' : ''}`}
+                  price={formatListingPrice({
+                    price: listing.price,
+                    price_rupees: listing.price_rupees,
+                    price_amount_raw: listing.price_amount_raw,
+                    price_unit: listing.price_unit,
+                    transaction_type: listing.transaction_type
+                  })}
                   location={listing.location_address}
                   lat={listing.latitude}
                   lng={listing.longitude}

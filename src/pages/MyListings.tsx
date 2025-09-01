@@ -10,7 +10,7 @@ import {
   ExternalLink, 
   Eye,
   Calendar,
-  DollarSign,
+  IndianRupee,
   MapPin,
   Edit3,
   Trash2,
@@ -20,6 +20,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { formatListingPrice } from "@/lib/priceUtils";
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -36,6 +37,10 @@ interface Listing {
   id: string;
   title: string;
   price: number;
+  price_rupees?: number;
+  price_amount_raw?: number;
+  price_unit?: string;
+  transaction_type?: string;
   bedrooms: string | null;
   bathrooms: string | null;
   size: string | null;
@@ -71,7 +76,7 @@ const MyListings = () => {
       try {
         const { data, error } = await supabase
           .from('listings')
-          .select('id, title, price, bedrooms, bathrooms, size, location_address, is_public, created_at')
+          .select('id, title, price, price_rupees, price_amount_raw, price_unit, transaction_type, bedrooms, bathrooms, size, location_address, is_public, created_at')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
@@ -97,14 +102,6 @@ const MyListings = () => {
     fetchMyListings();
   }, [user, toast]);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
 
   const copyShareLink = async (listingId: string) => {
     const shareUrl = `${window.location.origin}/listing/${listingId}`;
@@ -275,11 +272,14 @@ const MyListings = () => {
                   <CardContent className="space-y-4">
                     {/* Price */}
                     <div className="flex items-center text-xl md:text-2xl font-bold text-real-estate-primary">
-                      <DollarSign className="w-5 h-5 mr-1" />
-                      {formatPrice(listing.price)}
-                      <span className="text-sm font-normal text-real-estate-neutral/70 ml-1">
-                        /month
-                      </span>
+                      <IndianRupee className="w-5 h-5 mr-1" />
+                      {formatListingPrice({
+                        price: listing.price,
+                        price_rupees: listing.price_rupees,
+                        price_amount_raw: listing.price_amount_raw,
+                        price_unit: listing.price_unit,
+                        transaction_type: listing.transaction_type
+                      })}
                     </div>
 
                     {/* Property Details */}
