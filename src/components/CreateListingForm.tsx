@@ -172,7 +172,8 @@ const CreateListingForm = () => {
 
       // Calculate size in sq ft if provided
       const sizeAmount = Number(formData.sizeAmount);
-      const sizeDisplay = (sizeAmount && sizeAmount > 0) ? `${formatIN(sizeAmount)} sq ft` : null;
+      const sizeSqft = (sizeAmount && sizeAmount > 0) ? toSqft(sizeAmount, formData.sizeUnit) : null;
+      const sizeDisplay = sizeSqft ? `${formatIN(sizeSqft)} sq ft` : null;
 
       // Generate sub_area_slug for searching
       const subAreaSlug = formData.sub_area 
@@ -559,22 +560,54 @@ const CreateListingForm = () => {
                     Area / Size
                   </Label>
                   
-                  <div className="space-y-2">
-                    <Input
-                      inputMode="decimal"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="e.g. 1200 (sq ft)"
-                      value={formData.sizeAmount}
-                      onChange={(e) => handleInputChange("sizeAmount", e.target.value)}
-                      className="h-12 text-base"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">Amount</Label>
+                      <Input
+                        inputMode="decimal"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="e.g. 2.5"
+                        value={formData.sizeAmount}
+                        onChange={(e) => handleInputChange("sizeAmount", e.target.value)}
+                        className="h-12 text-base"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">Unit</Label>
+                      <Select 
+                        value={formData.sizeUnit} 
+                        onValueChange={(value: SizeUnit) => handleInputChange("sizeUnit", value)}
+                      >
+                        <SelectTrigger className="h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Core units */}
+                          <SelectItem value="sq_ft">{UNIT_LABEL.sq_ft}</SelectItem>
+                          <SelectItem value="sq_yd">{UNIT_LABEL.sq_yd}</SelectItem>
+                          <SelectItem value="sq_m">{UNIT_LABEL.sq_m}</SelectItem>
+                          <SelectItem value="acre">{UNIT_LABEL.acre}</SelectItem>
+                          <SelectItem value="hectare">{UNIT_LABEL.hectare}</SelectItem>
+                          {/* India-local units */}
+                          <SelectItem value="cent">{UNIT_LABEL.cent}</SelectItem>
+                          <SelectItem value="guntha">{UNIT_LABEL.guntha}</SelectItem>
+                          <SelectItem value="marla">{UNIT_LABEL.marla}</SelectItem>
+                          <SelectItem value="kanal">{UNIT_LABEL.kanal}</SelectItem>
+                          <SelectItem value="ground">{UNIT_LABEL.ground}</SelectItem>
+                          <SelectItem value="cottah_wb">{UNIT_LABEL.cottah_wb}</SelectItem>
+                          <SelectItem value="bigha_wb">{UNIT_LABEL.bigha_wb}</SelectItem>
+                          <SelectItem value="bigha_up">{UNIT_LABEL.bigha_up}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   {formData.sizeAmount && Number(formData.sizeAmount) > 0 && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800 font-medium">
-                      Preview: {formData.sizeAmount} sq ft
+                      Preview: {formData.sizeAmount} {UNIT_LABEL[formData.sizeUnit]} ({formatIN(toSqft(Number(formData.sizeAmount), formData.sizeUnit))} sq ft)
                     </div>
                   )}
                 </div>
