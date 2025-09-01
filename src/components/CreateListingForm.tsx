@@ -34,6 +34,48 @@ const humanShort = (rupees: number) =>
   : rupees >= 1_000   ? `₹${Math.round(rupees / 1_000)} thousand`
   : `₹${rupees}`;
 
+// India-specific size/area types and helpers
+type SizeUnit =
+  | "sq_ft" | "sq_yd" | "sq_m"
+  | "acre" | "hectare" | "cent" | "guntha"
+  | "marla" | "kanal" | "ground"
+  | "cottah_wb" | "bigha_wb" | "bigha_up";
+
+const UNIT_TO_SQFT: Record<SizeUnit, number> = {
+  sq_ft: 1,
+  sq_yd: 9,
+  sq_m: 10.7639,
+  acre: 43560,
+  hectare: 107639.104,
+  cent: 435.6,
+  guntha: 1089,
+  marla: 272.25,         // note: varies by region
+  kanal: 5445,           // 20 marla
+  ground: 2400,          // Chennai
+  cottah_wb: 720,        // West Bengal
+  bigha_wb: 14400,       // WB/Assam
+  bigha_up: 27000,       // UP/Uttarakhand (common convention)
+};
+
+const UNIT_LABEL: Record<SizeUnit, string> = {
+  sq_ft: "sq ft",
+  sq_yd: "sq yd (gaj)",
+  sq_m: "sq m",
+  acre: "acre",
+  hectare: "hectare",
+  cent: "cent",
+  guntha: "guntha",
+  marla: "marla",
+  kanal: "kanal",
+  ground: "ground",
+  cottah_wb: "cottah (WB)",
+  bigha_wb: "bigha (WB/Assam)",
+  bigha_up: "bigha (UP/UK)",
+};
+
+const toSqft = (amount: number, unit: SizeUnit) =>
+  Math.round((Number.isFinite(amount) ? amount : 0) * UNIT_TO_SQFT[unit]);
+
 const CreateListingForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -49,6 +91,8 @@ const CreateListingForm = () => {
     title: "",
     priceAmount: "",
     priceUnit: "lakh" as PriceUnit,
+    sizeAmount: "",
+    sizeUnit: "sq_ft" as SizeUnit,
     description: "",
     bedrooms: "",
     bathrooms: "",
@@ -121,6 +165,11 @@ const CreateListingForm = () => {
       }
       const priceValue = computePriceRupees(priceAmount, formData.priceUnit);
 
+      // Calculate size in sq ft if provided
+      const sizeAmount = Number(formData.sizeAmount);
+      const sizeSqft = (sizeAmount && sizeAmount > 0) ? toSqft(sizeAmount, formData.sizeUnit) : null;
+      const sizeDisplay = sizeSqft ? `${formatIN(sizeSqft)} sq ft` : null;
+
       // First create the listing without images to get an ID
       const initialListingData = {
         user_id: user.id,
@@ -128,7 +177,7 @@ const CreateListingForm = () => {
         price: priceValue,
         bedrooms: formData.bedrooms || null,
         bathrooms: formData.bathrooms || null,
-        size: formData.size || null,
+        size: sizeDisplay,
         description: formData.description || null,
         location_address: formData.location || null,
         latitude: formData.locationCoords.lat || null,
@@ -458,17 +507,62 @@ const CreateListingForm = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <Label className="flex items-center gap-1 text-base md:text-sm">
                     <Square className="w-4 h-4" />
-                    Size (sq ft)
+                    Area / Size
                   </Label>
-                  <Input
-                    placeholder="1,200"
-                    value={formData.size}
-                    onChange={(e) => handleInputChange("size", e.target.value)}
-                    className="h-12 text-base"
-                  />
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">Amount</Label>
+                      <Input
+                        inputMode="decimal"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="e.g. 2.5"
+                        value={formData.sizeAmount}
+                        onChange={(e) => handleInputChange("sizeAmount", e.target.value)}
+                        className="h-12 text-base"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">Unit</Label>
+                      <Select 
+                        value={formData.sizeUnit} 
+                        onValueChange={(value: SizeUnit) => handleInputChange("sizeUnit", value)}
+                      >
+                        <SelectTrigger className="h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* Core units */}
+                          <SelectItem value="sq_ft">{UNIT_LABEL.sq_ft}</SelectItem>
+                          <SelectItem value="sq_yd">{UNIT_LABEL.sq_yd}</SelectItem>
+                          <SelectItem value="sq_m">{UNIT_LABEL.sq_m}</SelectItem>
+                          <SelectItem value="acre">{UNIT_LABEL.acre}</SelectItem>
+                          <SelectItem value="hectare">{UNIT_LABEL.hectare}</SelectItem>
+                          {/* India-local units */}
+                          <SelectItem value="cent">{UNIT_LABEL.cent}</SelectItem>
+                          <SelectItem value="guntha">{UNIT_LABEL.guntha}</SelectItem>
+                          <SelectItem value="marla">{UNIT_LABEL.marla}</SelectItem>
+                          <SelectItem value="kanal">{UNIT_LABEL.kanal}</SelectItem>
+                          <SelectItem value="ground">{UNIT_LABEL.ground}</SelectItem>
+                          <SelectItem value="cottah_wb">{UNIT_LABEL.cottah_wb}</SelectItem>
+                          <SelectItem value="bigha_wb">{UNIT_LABEL.bigha_wb}</SelectItem>
+                          <SelectItem value="bigha_up">{UNIT_LABEL.bigha_up}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {formData.sizeAmount && Number(formData.sizeAmount) > 0 && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800 font-medium">
+                      Preview: {formData.sizeAmount} {UNIT_LABEL[formData.sizeUnit]} ({formatIN(toSqft(Number(formData.sizeAmount), formData.sizeUnit))} sq ft)
+                    </div>
+                  )}
                 </div>
               </div>
 
