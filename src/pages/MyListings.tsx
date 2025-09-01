@@ -10,7 +10,6 @@ import {
   ExternalLink, 
   Eye,
   Calendar,
-  IndianRupee,
   MapPin,
   Edit3,
   Trash2,
@@ -54,24 +53,12 @@ const MyListings = () => {
   const { toast } = useToast();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showDebug, setShowDebug] = useState(false);
-
-  // Debug logging
-  console.log('🔍 DEBUG: MyListings component rendered');
-  console.log('🔍 DEBUG: User object:', user);
-  console.log('🔍 DEBUG: User ID:', user?.id);
-  console.log('🔍 DEBUG: Loading state:', loading);
-  console.log('🔍 DEBUG: Listings count:', listings.length);
 
   useEffect(() => {
     const fetchMyListings = async () => {
       if (!user) {
-        console.log('🔍 DEBUG: No user, skipping fetch');
         return;
       }
-
-      console.log('🔍 DEBUG: Fetching listings for user:', user.id);
-      console.log('🔍 DEBUG: User object:', user);
 
       try {
         const { data, error } = await supabase
@@ -80,21 +67,17 @@ const MyListings = () => {
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
-        console.log('🔍 DEBUG: Supabase response:', { data, error });
-        
         if (error) throw error;
         
-        console.log('🔍 DEBUG: Set listings:', data?.length || 0, 'items');
         setListings(data || []);
       } catch (error) {
-        console.error('🔍 DEBUG: Error fetching listings:', error);
+        console.error('Error fetching listings:', error);
         toast({
           title: "Error Loading Listings",
           description: "Failed to load your listings. Please try again.",
           variant: "destructive"
         });
       } finally {
-        console.log('🔍 DEBUG: Fetch complete, setting loading to false');
         setLoading(false);
       }
     };
@@ -205,36 +188,6 @@ const MyListings = () => {
           </div>
         </div>
 
-        {/* Debug Panel */}
-        <Card className="mb-6 border-yellow-400 bg-yellow-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg text-yellow-800">🔍 Debug Panel</CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowDebug(!showDebug)}
-                className="border-yellow-400 text-yellow-800 hover:bg-yellow-100"
-              >
-                {showDebug ? 'Hide Debug' : 'Show Debug'}
-              </Button>
-            </div>
-          </CardHeader>
-          {showDebug && (
-            <CardContent className="text-sm text-yellow-800 space-y-2">
-              <div><strong>User ID:</strong> {user?.id || 'Not authenticated'}</div>
-              <div><strong>Listings Count:</strong> {listings.length}</div>
-              <div><strong>Loading:</strong> {loading ? 'Yes' : 'No'}</div>
-              <div><strong>Route:</strong> /my-listings</div>
-              <div className="border-t pt-2 mt-2">
-                <strong>User Object:</strong>
-                <pre className="text-xs mt-1 bg-yellow-100 p-2 rounded overflow-auto max-h-32">
-                  {JSON.stringify(user, null, 2)}
-                </pre>
-              </div>
-            </CardContent>
-          )}
-        </Card>
 
         {/* Listings Grid */}
         {listings.length === 0 ? (
@@ -255,9 +208,7 @@ const MyListings = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing) => {
-              console.log('🔍 DEBUG: Rendering listing:', listing.id, listing.title);
-              return (
+            {listings.map((listing) => (
                 <Card key={listing.id} className="bg-gradient-card shadow-card border-0 hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
@@ -271,8 +222,7 @@ const MyListings = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Price */}
-                    <div className="flex items-center text-xl md:text-2xl font-bold text-real-estate-primary">
-                      <IndianRupee className="w-5 h-5 mr-1" />
+                    <div className="text-xl md:text-2xl font-bold text-real-estate-primary">
                       {formatListingPrice({
                         price: listing.price,
                         price_rupees: listing.price_rupees,
@@ -380,8 +330,7 @@ const MyListings = () => {
                     </div>
                   </CardContent>
                 </Card>
-              );
-            })}
+              ))}
           </div>
         )}
       </div>
