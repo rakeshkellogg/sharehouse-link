@@ -399,21 +399,21 @@ const CreateListingForm = () => {
   return (
     <div className="min-h-screen bg-real-estate-light py-8 md:py-12">
       <div className="container mx-auto px-4 max-w-2xl">
-        <div className="text-center mb-6 md:mb-8 relative">
-          <div className="absolute top-0 right-0">
-            <Button
-              variant="outline"
-              onClick={() => window.location.href = '/'}
-              className="h-10 px-4"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Go to Home
-            </Button>
+        <div className="flex justify-between items-start mb-6 md:mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-real-estate-neutral mb-4">
+              Create Your Property Listing
+            </h1>
+            <p className="text-base md:text-lg lg:text-xl text-real-estate-neutral/70">Fill out the details below to create a shareable listing</p>
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-real-estate-neutral mb-4">
-            Create Your Property Listing
-          </h1>
-          <p className="text-base md:text-lg lg:text-xl text-real-estate-neutral/70">Fill out the details below to create a shareable listing</p>
+          <Button
+            variant="outline"
+            onClick={() => window.location.href = '/'}
+            className="h-10 px-4 ml-4"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
         </div>
 
         <Card className="bg-gradient-card shadow-card border-0">
