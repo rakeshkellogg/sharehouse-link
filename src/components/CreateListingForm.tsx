@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, DollarSign, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink, Clipboard } from "lucide-react";
+import { MapPin, IndianRupee, Home, Bath, Bed, Square, Link, Copy, Share2, ExternalLink, Clipboard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,6 +14,25 @@ import MapLocationPicker from "./MapLocationPicker";
 import { ImagePicker } from "./ImagePicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+// India-specific pricing types and helpers
+type PriceUnit = "thousand" | "lakh" | "crore";
+
+const PRICE_FACTOR: Record<PriceUnit, number> = {
+  thousand: 1_000,
+  lakh: 100_000,
+  crore: 10_000_000,
+};
+
+const computePriceRupees = (amount: number, unit: PriceUnit) =>
+  Math.round((Number.isFinite(amount) ? amount : 0) * PRICE_FACTOR[unit]);
+
+const formatIN = (n: number) => (Number.isFinite(n) ? n.toLocaleString("en-IN") : "");
+const humanShort = (rupees: number) =>
+  rupees >= 10_000_000 ? `₹${(rupees / 10_000_000).toFixed(1)} crore`
+  : rupees >= 100_000 ? `₹${(rupees / 100_000).toFixed(2)} lakh`
+  : rupees >= 1_000   ? `₹${Math.round(rupees / 1_000)} thousand`
+  : `₹${rupees}`;
 
 const CreateListingForm = () => {
   const { toast } = useToast();
@@ -28,7 +47,8 @@ const CreateListingForm = () => {
   
   const [formData, setFormData] = useState({
     title: "",
-    price: "",
+    priceAmount: "",
+    priceUnit: "lakh" as PriceUnit,
     description: "",
     bedrooms: "",
     bathrooms: "",
@@ -76,7 +96,7 @@ const CreateListingForm = () => {
       return;
     }
 
-    if (!formData.title || !formData.price || !formData.ownerName) {
+    if (!formData.title || !formData.priceAmount || !formData.ownerName) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -94,11 +114,12 @@ const CreateListingForm = () => {
         .map(link => link.trim())
         .filter(link => link.length > 0);
 
-      // Parse price to integer (remove any non-numeric characters except for digits)
-      const priceValue = parseInt(formData.price.replace(/[^\d]/g, ''));
-      if (isNaN(priceValue)) {
+      // Calculate price in rupees using the new system
+      const priceAmount = Number(formData.priceAmount);
+      if (isNaN(priceAmount) || priceAmount <= 0) {
         throw new Error("Please enter a valid price");
       }
+      const priceValue = computePriceRupees(priceAmount, formData.priceUnit);
 
       // First create the listing without images to get an ID
       const initialListingData = {
@@ -349,19 +370,51 @@ const CreateListingForm = () => {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="price" className="flex items-center gap-1 text-base md:text-sm">
-                    <DollarSign className="w-4 h-4" />
+                <div className="space-y-4">
+                  <Label className="flex items-center gap-1 text-base md:text-sm">
+                    <IndianRupee className="w-4 h-4" />
                     Price *
                   </Label>
-                  <Input
-                    id="price"
-                    placeholder="$2,500/month"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    className="h-12 text-base"
-                    required
-                  />
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">Amount</Label>
+                      <Input
+                        inputMode="decimal"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="1.2"
+                        value={formData.priceAmount}
+                        onChange={(e) => handleInputChange("priceAmount", e.target.value)}
+                        className="h-12 text-base"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">Unit</Label>
+                      <Select 
+                        value={formData.priceUnit} 
+                        onValueChange={(value: PriceUnit) => handleInputChange("priceUnit", value)}
+                      >
+                        <SelectTrigger className="h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="thousand">Thousand</SelectItem>
+                          <SelectItem value="lakh">Lakh</SelectItem>
+                          <SelectItem value="crore">Crore</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {formData.priceAmount && Number(formData.priceAmount) > 0 && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800 font-medium">
+                      Preview: ₹{formatIN(computePriceRupees(Number(formData.priceAmount), formData.priceUnit))} ({humanShort(computePriceRupees(Number(formData.priceAmount), formData.priceUnit))}){formData.transactionType === "rent" ? " /month" : ""}
+                    </div>
+                  )}
                 </div>
               </div>
 
