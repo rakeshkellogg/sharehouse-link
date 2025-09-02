@@ -15,9 +15,12 @@ import ListingDetail from "./pages/ListingDetail";
 import MyListings from "./pages/MyListings";
 import Inbox from "./pages/Inbox";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
+import UsernameOnboarding from "./pages/UsernameOnboarding";
 import SavedListings from "@/pages/SavedListings";
 import SearchProperties from "@/pages/SearchProperties";
 import NotFound from "./pages/NotFound";
+import NotificationListener from "@/components/NotificationListener";
 
 const queryClient = new QueryClient();
 
@@ -28,10 +31,17 @@ const App: React.FC = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <NotificationListener />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/onboarding/username" element={
+                <ProtectedRoute>
+                  <UsernameOnboarding />
+                </ProtectedRoute>
+              } />
               <Route path="/create" element={
                 <ProtectedRoute>
                   <CreateListing />
