@@ -1,1 +1,7 @@
 project_id = "gajqxhqrijnlgtlaljrf"
+
+[functions.get-maps-api-key]
+verify_jwt = true
+
+[functions.send-message-notification]
+verify_jwt = true

@@ -79,16 +79,35 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
     setIsSending(true);
 
     try {
-      const { error } = await supabase
+      // Send the message to database
+      const { data: messageData, error } = await supabase
         .from('messages')
         .insert([{
           listing_id: listingId,
           sender_user_id: user.id,
           owner_user_id: ownerUserId,
           body: message.trim()
-        }]);
+        }])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Send email notification in background (don't wait for it)
+      // The edge function will handle getting the owner's email
+      supabase.functions.invoke('send-message-notification', {
+        body: {
+          messageId: messageData.id,
+          listingTitle,
+          senderName: user.user_metadata?.full_name || user.email || 'Someone',
+          messageBody: message.trim(),
+          ownerUserId,
+          listingId
+        }
+      }).catch(emailError => {
+        console.error('Failed to send email notification:', emailError);
+        // Don't show error to user since message was sent successfully
+      });
 
       toast({
         title: "Message Sent",
