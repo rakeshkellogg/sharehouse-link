@@ -24,6 +24,9 @@ const ProfileChecker: React.FC<ProfileCheckerProps> = ({ children }) => {
         return;
       }
 
+      // Add a small delay to avoid race condition after username creation
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       try {
         const { data: profile, error } = await supabase
           .from('profiles')

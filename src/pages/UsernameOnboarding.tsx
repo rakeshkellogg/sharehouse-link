@@ -82,9 +82,9 @@ const UsernameOnboarding = () => {
         description: "Your username has been successfully set.",
       });
       
-      // Redirect to original destination or home
+      // Redirect to original destination or home with a page reload
       const from = location.state?.from || '/';
-      navigate(from);
+      window.location.href = from;
       
     } catch (error: any) {
       toast({
