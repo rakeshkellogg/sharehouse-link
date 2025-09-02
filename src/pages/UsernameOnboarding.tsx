@@ -49,15 +49,15 @@ const UsernameOnboarding = () => {
       // Check if username is available
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
-        .select('username')
+        .select('username, user_id')
         .eq('username', username)
-        .single();
+        .maybeSingle();
       
-      if (checkError && checkError.code !== 'PGRST116') {
+      if (checkError) {
         throw new Error('Failed to check username availability');
       }
       
-      if (existingProfile) {
+      if (existingProfile && existingProfile.user_id !== user.id) {
         toast({
           title: "Username Taken",
           description: "This username is already taken. Please choose another one.",
@@ -66,11 +66,10 @@ const UsernameOnboarding = () => {
         return;
       }
       
-      // Update the user's profile with the username
+      // Create or update the user's profile with the username
       const { error } = await supabase
         .from('profiles')
-        .update({ username })
-        .eq('user_id', user.id);
+        .upsert({ user_id: user.id, username }, { onConflict: 'user_id' });
       
       if (error) {
         throw new Error(error.message);
