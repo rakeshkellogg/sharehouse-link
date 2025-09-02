@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { User, CheckCircle, XCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const UsernameOnboarding = () => {
   const { user } = useAuth();
@@ -45,13 +46,41 @@ const UsernameOnboarding = () => {
     setIsSubmitting(true);
     
     try {
-      // TODO: Implement username saving once profiles table is created
+      // Check if username is available
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username)
+        .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw new Error('Failed to check username availability');
+      }
+      
+      if (existingProfile) {
+        toast({
+          title: "Username Taken",
+          description: "This username is already taken. Please choose another one.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Update the user's profile with the username
+      const { error } = await supabase
+        .from('profiles')
+        .update({ username })
+        .eq('user_id', user.id);
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
       toast({
-        title: "Coming Soon!",
-        description: "Username setup will be available once the database is ready.",
+        title: "Username Set!",
+        description: "Your username has been successfully set.",
       });
       
-      // For now, redirect to home
       navigate('/');
       
     } catch (error: any) {
@@ -116,12 +145,6 @@ const UsernameOnboarding = () => {
                 {isSubmitting ? "Setting Up..." : "Complete Setup"}
               </Button>
             </form>
-            
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Note:</strong> Username functionality will be available once the database migration is complete.
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

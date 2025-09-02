@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ProfileChecker from "@/components/ProfileChecker";
 import Index from "./pages/Index";
 import CreateListing from "./pages/CreateListing";
 import EditListing from "./pages/EditListing";
@@ -33,45 +34,47 @@ const App: React.FC = () => {
           <Sonner />
           <NotificationListener />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/onboarding/username" element={
+            <ProfileChecker>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/onboarding/username" element={
+                  <ProtectedRoute>
+                    <UsernameOnboarding />
+                  </ProtectedRoute>
+                } />
+                <Route path="/create" element={
+                  <ProtectedRoute>
+                    <CreateListing />
+                  </ProtectedRoute>
+                } />
+              <Route path="/edit/:id" element={
                 <ProtectedRoute>
-                  <UsernameOnboarding />
+                  <EditListing />
                 </ProtectedRoute>
               } />
-              <Route path="/create" element={
+              <Route path="/my-listings" element={
+                  <ProtectedRoute>
+                    <MyListings />
+                  </ProtectedRoute>
+                } />
+              <Route path="/inbox" element={
                 <ProtectedRoute>
-                  <CreateListing />
+                  <Inbox />
                 </ProtectedRoute>
               } />
-            <Route path="/edit/:id" element={
-              <ProtectedRoute>
-                <EditListing />
-              </ProtectedRoute>
-            } />
-            <Route path="/my-listings" element={
+              <Route path="/saved" element={
                 <ProtectedRoute>
-                  <MyListings />
+                  <SavedListings />
                 </ProtectedRoute>
               } />
-            <Route path="/inbox" element={
-              <ProtectedRoute>
-                <Inbox />
-              </ProtectedRoute>
-            } />
-            <Route path="/saved" element={
-              <ProtectedRoute>
-                <SavedListings />
-              </ProtectedRoute>
-            } />
-            <Route path="/search" element={<SearchProperties />} />
-            <Route path="/listing/:id" element={<ListingDetail />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+              <Route path="/search" element={<SearchProperties />} />
+              <Route path="/listing/:id" element={<ListingDetail />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ProfileChecker>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
