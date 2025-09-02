@@ -14,9 +14,9 @@ const ProfileChecker: React.FC<ProfileCheckerProps> = ({ children }) => {
   const [profileChecked, setProfileChecked] = useState(false);
 
   useEffect(() => {
-    const checkOrCreateProfile = async () => {
+    const checkProfile = async () => {
       if (!user || loading) return;
-
+      
       // Skip profile check for certain routes
       const skipRoutes = ['/auth', '/onboarding/username', '/reset-password'];
       if (skipRoutes.includes(location.pathname)) {
@@ -25,49 +25,30 @@ const ProfileChecker: React.FC<ProfileCheckerProps> = ({ children }) => {
       }
 
       try {
-        // Try to get the user's profile
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('id, username, display_name')
+          .select('username')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .single();
 
-        if (error) {
-          console.error('Error fetching profile:', error);
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error checking profile:', error);
         }
 
-        let finalProfile = profile;
-
-        // If no profile exists (e.g., trigger didn't run), create one client-side
-        if (!finalProfile) {
-          const displayNameFallback = user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : '');
-          const { data: upserted, error: upsertError } = await supabase
-            .from('profiles')
-            .upsert({ user_id: user.id, display_name: displayNameFallback }, { onConflict: 'user_id' })
-            .select('id, username, display_name')
-            .maybeSingle();
-
-          if (upsertError) {
-            console.error('Error creating profile:', upsertError);
-          } else {
-            finalProfile = upserted || null;
-          }
-        }
-
-        // If user doesn't have a username yet, redirect to onboarding
-        if (!finalProfile?.username) {
+        // If user doesn't have a username, redirect to onboarding
+        if (!profile?.username) {
           navigate('/onboarding/username');
           return;
         }
 
         setProfileChecked(true);
-      } catch (err) {
-        console.error('Error in profile check flow:', err);
+      } catch (error) {
+        console.error('Error checking profile:', error);
         setProfileChecked(true);
       }
     };
 
-    checkOrCreateProfile();
+    checkProfile();
   }, [user, loading, location.pathname, navigate]);
 
   if (loading || (user && !profileChecked)) {
