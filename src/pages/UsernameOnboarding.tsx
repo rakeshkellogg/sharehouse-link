@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { User, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 const UsernameOnboarding = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [username, setUsername] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,7 +82,9 @@ const UsernameOnboarding = () => {
         description: "Your username has been successfully set.",
       });
       
-      navigate('/');
+      // Redirect to original destination or home
+      const from = location.state?.from || '/';
+      navigate(from);
       
     } catch (error: any) {
       toast({

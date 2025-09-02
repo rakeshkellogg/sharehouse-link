@@ -37,7 +37,9 @@ const ProfileChecker: React.FC<ProfileCheckerProps> = ({ children }) => {
 
         // If user doesn't have a username, redirect to onboarding
         if (!profile?.username) {
-          navigate('/onboarding/username');
+          navigate('/onboarding/username', { 
+            state: { from: location.pathname + location.search } 
+          });
           return;
         }
 
