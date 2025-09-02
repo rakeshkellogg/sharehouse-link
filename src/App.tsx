@@ -34,47 +34,59 @@ const App: React.FC = () => {
           <Sonner />
           <NotificationListener />
           <BrowserRouter>
-            <ProfileChecker>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/onboarding/username" element={
-                  <ProtectedRoute>
-                    <UsernameOnboarding />
-                  </ProtectedRoute>
-                } />
-                <Route path="/create" element={
-                  <ProtectedRoute>
+            <Routes>
+              {/* Public routes - no authentication required */}
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/search" element={<SearchProperties />} />
+              <Route path="/listing/:id" element={<ListingDetail />} />
+              
+              {/* Protected routes - require authentication and username */}
+              <Route path="/onboarding/username" element={
+                <ProtectedRoute>
+                  <UsernameOnboarding />
+                </ProtectedRoute>
+              } />
+              <Route path="/create" element={
+                <ProtectedRoute>
+                  <ProfileChecker>
                     <CreateListing />
-                  </ProtectedRoute>
-                } />
+                  </ProfileChecker>
+                </ProtectedRoute>
+              } />
               <Route path="/edit/:id" element={
                 <ProtectedRoute>
-                  <EditListing />
+                  <ProfileChecker>
+                    <EditListing />
+                  </ProfileChecker>
                 </ProtectedRoute>
               } />
               <Route path="/my-listings" element={
-                  <ProtectedRoute>
+                <ProtectedRoute>
+                  <ProfileChecker>
                     <MyListings />
-                  </ProtectedRoute>
-                } />
+                  </ProfileChecker>
+                </ProtectedRoute>
+              } />
               <Route path="/inbox" element={
                 <ProtectedRoute>
-                  <Inbox />
+                  <ProfileChecker>
+                    <Inbox />
+                  </ProfileChecker>
                 </ProtectedRoute>
               } />
               <Route path="/saved" element={
                 <ProtectedRoute>
-                  <SavedListings />
+                  <ProfileChecker>
+                    <SavedListings />
+                  </ProfileChecker>
                 </ProtectedRoute>
               } />
-              <Route path="/search" element={<SearchProperties />} />
-              <Route path="/listing/:id" element={<ListingDetail />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </ProfileChecker>
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
