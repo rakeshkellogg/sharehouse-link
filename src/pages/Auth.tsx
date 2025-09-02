@@ -1,16 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { Home, LogIn } from 'lucide-react';
+import { Home, LogIn, Mail, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Auth = () => {
-  const { user, signInWithGoogle, loading } = useAuth();
+  const { user, signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -32,6 +39,72 @@ const Auth = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    const { error } = await signInWithEmail(email, password);
+    
+    if (error) {
+      toast({
+        title: "Sign In Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Signed in successfully!",
+      });
+    }
+    
+    setIsSubmitting(false);
+  };
+
+  const handleEmailSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    const { error } = await signUpWithEmail(email, password);
+    
+    if (error) {
+      toast({
+        title: "Sign Up Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Check Your Email",
+        description: "We sent you a confirmation link to complete your registration.",
+      });
+    }
+    
+    setIsSubmitting(false);
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    const { error } = await resetPassword(resetEmail);
+    
+    if (error) {
+      toast({
+        title: "Reset Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Reset Link Sent",
+        description: "Check your email for password reset instructions.",
+      });
+    }
+    
+    setIsSubmitting(false);
   };
 
   if (loading) {
