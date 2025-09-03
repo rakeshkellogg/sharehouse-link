@@ -2,9 +2,22 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Resend } from "npm:resend@2.0.0"
 
+// Secure CORS headers - restrict to specific origins in production
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': '*', // TODO: Restrict to specific domain in production
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// HTML escaping function to prevent XSS attacks
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'))
@@ -62,6 +75,37 @@ serve(async (req) => {
       listingId 
     }: NotificationRequest = await req.json()
 
+    // Server-side validation for security
+    if (!messageBody || messageBody.length > 500) {
+      return new Response(
+        JSON.stringify({ error: 'Message body is required and must be under 500 characters' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    if (!listingTitle || listingTitle.length > 200) {
+      return new Response(
+        JSON.stringify({ error: 'Listing title is required and must be under 200 characters' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    if (!senderName || senderName.length > 100) {
+      return new Response(
+        JSON.stringify({ error: 'Sender name is required and must be under 100 characters' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
     console.log('Sending notification for message:', messageId)
 
     // Get the owner's email using admin client
@@ -78,20 +122,24 @@ serve(async (req) => {
       )
     }
 
-    // Send email notification
+    // Send email notification with properly escaped content
+    const escapedListingTitle = escapeHtml(listingTitle);
+    const escapedSenderName = escapeHtml(senderName);
+    const escapedMessageBody = escapeHtml(messageBody);
+
     const emailResponse = await resend.emails.send({
       from: 'Property Listings <onboarding@resend.dev>',
       to: [ownerUser.email],
-      subject: `New message about: ${listingTitle}`,
+      subject: `New message about: ${escapedListingTitle}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">You have a new message!</h2>
           <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #333; margin-top: 0;">Property: ${listingTitle}</h3>
-            <p><strong>From:</strong> ${senderName}</p>
+            <h3 style="color: #333; margin-top: 0;">Property: ${escapedListingTitle}</h3>
+            <p><strong>From:</strong> ${escapedSenderName}</p>
             <p><strong>Message:</strong></p>
-            <p style="background-color: white; padding: 15px; border-radius: 4px; border-left: 4px solid #007bff;">
-              ${messageBody}
+            <p style="background-color: white; padding: 15px; border-radius: 4px; border-left: 4px solid #007bff; white-space: pre-wrap;">
+              ${escapedMessageBody}
             </p>
           </div>
           <div style="text-align: center; margin: 30px 0;">
