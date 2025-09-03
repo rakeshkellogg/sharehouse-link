@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +56,7 @@ const ListingDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +108,39 @@ const ListingDetail = () => {
     fetchListing();
   }, [id, user]);
 
+  // Check for pending save action after authentication
+  useEffect(() => {
+    const handlePendingSave = async () => {
+      if (user && listing) {
+        const pendingAction = sessionStorage.getItem('pendingListingSave');
+        if (pendingAction === listing.id) {
+          sessionStorage.removeItem('pendingListingSave');
+          // Auto-save the listing
+          try {
+            const { error } = await supabase
+              .from('saved_listings')
+              .insert({
+                user_id: user.id,
+                listing_id: listing.id
+              });
+
+            if (!error) {
+              setIsSaved(true);
+              toast({
+                title: "Listing Saved",
+                description: "Property has been added to your saved listings.",
+              });
+            }
+          } catch (error) {
+            console.error('Error auto-saving listing:', error);
+          }
+        }
+      }
+    };
+
+    handlePendingSave();
+  }, [user, listing, toast]);
+
   const formatPrice = (listing: Listing) => {
     // Use the structured price data if available (newer listings)
     if (listing.price_rupees && listing.price_unit) {
@@ -119,11 +153,12 @@ const ListingDetail = () => {
 
   const handleSaveListing = async () => {
     if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to save listings.",
-        variant: "destructive"
-      });
+      // Store save intent and redirect to auth
+      if (listing) {
+        sessionStorage.setItem('pendingListingSave', listing.id);
+        sessionStorage.setItem('returnTo', window.location.pathname);
+      }
+      navigate('/auth');
       return;
     }
 
@@ -226,47 +261,45 @@ const ListingDetail = () => {
           
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-real-estate-neutral mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-real-estate-neutral mb-2">
                 {listing.title}
               </h1>
               {listing.location_address && (
-                <div className="flex items-center text-real-estate-neutral/70 text-base md:text-lg">
-                  <MapPin className="w-5 h-5 mr-2" />
+                <div className="flex items-center text-real-estate-neutral/70 text-sm md:text-base">
+                  <MapPin className="w-4 h-4 mr-2" />
                   {listing.location_address}
                 </div>
               )}
             </div>
             <div className="text-right">
-              <div className="text-2xl md:text-3xl font-bold text-real-estate-primary flex items-center md:justify-end">
+              <div className="text-xl md:text-2xl font-bold text-real-estate-primary flex items-center md:justify-end">
                 {formatPrice(listing)}
               </div>
               {(listing.transaction_type || 'rent') === 'rent' && (
-                <div className="text-sm md:text-base text-real-estate-neutral/70">per month</div>
+                <div className="text-xs md:text-sm text-real-estate-neutral/70">per month</div>
               )}
               
-              {/* Save Button */}
-              {user && (
-                <Button
-                  onClick={handleSaveListing}
-                  disabled={savingListing}
-                  variant={isSaved ? "default" : "outline"}
-                  className="mt-3 md:mt-2"
-                >
-                  {savingListing ? (
-                    "Saving..."
-                  ) : isSaved ? (
-                    <>
-                      <Heart className="w-4 h-4 mr-2 fill-current" />
-                      Saved
-                    </>
-                  ) : (
-                    <>
-                      <HeartOff className="w-4 h-4 mr-2" />
-                      Save
-                    </>
-                  )}
-                </Button>
-              )}
+              {/* Save Button - Always show */}
+              <Button
+                onClick={handleSaveListing}
+                disabled={savingListing}
+                variant={user && isSaved ? "default" : "outline"}
+                className="mt-3 md:mt-2"
+              >
+                {savingListing ? (
+                  "Saving..."
+                ) : (user && isSaved) ? (
+                  <>
+                    <Heart className="w-4 h-4 mr-2 fill-current" />
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <HeartOff className="w-4 h-4 mr-2" />
+                    {user ? "Save" : "Sign in to Save"}
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </div>
@@ -310,7 +343,7 @@ const ListingDetail = () => {
             {/* Property Features */}
             <Card className="bg-gradient-card shadow-card border-0">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl md:text-2xl font-bold">
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-bold">
                   <Home className="w-5 h-5" />
                   Property Features
                 </CardTitle>
@@ -320,28 +353,28 @@ const ListingDetail = () => {
                   {listing.bedrooms && (
                       <div className="text-center">
                       <div className="flex items-center justify-center mb-2">
-                        <Bed className="w-8 h-8 text-real-estate-primary" />
+                        <Bed className="w-6 h-6 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-2xl md:text-3xl text-real-estate-neutral">{listing.bedrooms}</div>
-                      <div className="text-sm md:text-base text-muted-foreground font-medium">Bedrooms</div>
+                      <div className="font-bold text-xl md:text-2xl text-real-estate-neutral">{listing.bedrooms}</div>
+                      <div className="text-xs md:text-sm text-muted-foreground font-medium">Bedrooms</div>
                     </div>
                   )}
                   {listing.bathrooms && (
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-2">
-                        <Bath className="w-8 h-8 text-real-estate-primary" />
+                        <Bath className="w-6 h-6 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-2xl md:text-3xl text-real-estate-neutral">{listing.bathrooms}</div>
-                      <div className="text-sm md:text-base text-muted-foreground font-medium">Bathrooms</div>
+                      <div className="font-bold text-xl md:text-2xl text-real-estate-neutral">{listing.bathrooms}</div>
+                      <div className="text-xs md:text-sm text-muted-foreground font-medium">Bathrooms</div>
                     </div>
                   )}
                   {listing.size && (
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-2">
-                        <Square className="w-8 h-8 text-real-estate-primary" />
+                        <Square className="w-6 h-6 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-2xl md:text-3xl text-real-estate-neutral">{listing.size}</div>
-                      <div className="text-sm md:text-base text-muted-foreground font-medium">sq ft</div>
+                      <div className="font-bold text-xl md:text-2xl text-real-estate-neutral">{listing.size}</div>
+                      <div className="text-xs md:text-sm text-muted-foreground font-medium">sq ft</div>
                     </div>
                   )}
                 </div>
@@ -352,10 +385,10 @@ const ListingDetail = () => {
             {listing.description && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-xl md:text-2xl font-bold">About This Property</CardTitle>
+                  <CardTitle className="text-lg md:text-xl font-bold">About This Property</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-base md:text-lg text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm md:text-base text-real-estate-neutral/80 leading-relaxed whitespace-pre-wrap">
                     {listing.description}
                   </p>
                 </CardContent>
@@ -366,7 +399,7 @@ const ListingDetail = () => {
             {listing.media_links && listing.media_links.length > 0 && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-xl md:text-2xl font-bold">Photos & Media</CardTitle>
+                  <CardTitle className="text-lg md:text-xl font-bold">Photos & Media</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
@@ -437,20 +470,20 @@ const ListingDetail = () => {
             {listing.owner_name && (
               <Card className="bg-gradient-card shadow-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-xl md:text-2xl font-bold">Contact Owner</CardTitle>
+                  <CardTitle className="text-lg md:text-xl font-bold">Contact Owner</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <div className="font-bold text-lg md:text-xl text-real-estate-neutral mb-1">
+                    <div className="font-bold text-base md:text-lg text-real-estate-neutral mb-1">
                       {listing.owner_name}
                     </div>
-                    <div className="text-sm md:text-base text-real-estate-neutral/70">Property Owner</div>
+                    <div className="text-xs md:text-sm text-real-estate-neutral/70">Property Owner</div>
                   </div>
 
                   <Separator />
 
                   <div className="text-center py-4">
-                    <p className="text-real-estate-neutral/70 mb-4">
+                    <p className="text-xs md:text-sm text-real-estate-neutral/70 mb-4">
                       Contact this owner using the secure messaging system below for privacy protection.
                     </p>
                   </div>

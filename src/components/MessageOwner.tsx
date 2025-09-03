@@ -6,6 +6,7 @@ import { MessageCircle, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface MessageOwnerProps {
   listingId: string;
@@ -16,6 +17,7 @@ interface MessageOwnerProps {
 const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, listingTitle }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
 
@@ -132,12 +134,19 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
       <Card className="bg-gradient-card shadow-card border-0">
         <CardContent className="pt-6">
           <div className="text-center">
-            <MessageCircle className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-            <h3 className="font-bold text-4xl md:text-2xl mb-4">Message the Owner</h3>
-            <p className="text-muted-foreground text-2xl md:text-lg mb-6">
+            <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-bold text-lg md:text-xl mb-2">Message the Owner</h3>
+            <p className="text-muted-foreground text-sm md:text-base mb-4">
               Sign in to send a message to the property owner
             </p>
-            <Button variant="outline" onClick={() => window.location.href = '/auth'} className="text-2xl md:text-lg py-8 px-10">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                sessionStorage.setItem('returnTo', window.location.pathname);
+                navigate('/auth');
+              }} 
+              className="text-sm md:text-base"
+            >
               Sign In to Message
             </Button>
           </div>
@@ -159,21 +168,21 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
   return (
     <Card className="bg-gradient-card shadow-card border-0">
       <CardHeader>
-        <CardTitle className="flex items-center gap-3 text-5xl md:text-3xl font-bold">
-          <MessageCircle className="w-10 h-10" />
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-bold">
+          <MessageCircle className="w-5 h-5" />
           Message Owner
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         <div>
           <Textarea
             placeholder={`Send a message about "${listingTitle}"...`}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="min-h-32 text-2xl md:text-lg"
+            className="min-h-24 text-sm md:text-base"
             disabled={isSending}
           />
-          <div className="flex justify-between items-center mt-3 text-xl md:text-base">
+          <div className="flex justify-between items-center mt-2 text-xs md:text-sm">
             <span className={`${isOverWordLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
               {wordCount}/50 words
             </span>
@@ -182,7 +191,7 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
             </span>
           </div>
           {(isOverWordLimit || isOverCharLimit) && (
-            <p className="text-destructive text-xl md:text-base mt-2">
+            <p className="text-destructive text-xs md:text-sm mt-2">
               {isOverWordLimit && "Message exceeds 50 word limit. "}
               {isOverCharLimit && "Message exceeds 300 character limit."}
             </p>
@@ -192,13 +201,13 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
         <Button
           onClick={handleSendMessage}
           disabled={!canSend || isSending}
-          className="w-full text-3xl md:text-xl py-10"
+          className="w-full text-sm md:text-base"
         >
-          <Send className="w-8 h-8 mr-3" />
+          <Send className="w-4 h-4 mr-2" />
           {isSending ? "Sending..." : "Send Message"}
         </Button>
 
-        <p className="text-xl md:text-base text-muted-foreground">
+        <p className="text-xs md:text-sm text-muted-foreground">
           Keep messages respectful and relevant to the property listing.
         </p>
       </CardContent>

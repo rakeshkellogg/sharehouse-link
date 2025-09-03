@@ -12,6 +12,18 @@ const NotificationListener = () => {
   useEffect(() => {
     if (!user) return;
 
+    // Handle post-auth navigation for saved listings
+    const pendingAction = sessionStorage.getItem('pendingListingSave');
+    const returnTo = sessionStorage.getItem('returnTo');
+    
+    if (pendingAction && returnTo && returnTo.includes('/listing/')) {
+      // Let the ListingDetail component handle the save action
+      // Just navigate back to the listing
+      sessionStorage.removeItem('returnTo');
+      window.location.href = returnTo;
+      return;
+    }
+
     console.log('Setting up notification listener for user:', user.id);
 
     // Create a channel to listen for new messages
