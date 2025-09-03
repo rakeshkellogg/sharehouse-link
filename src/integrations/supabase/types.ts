@@ -173,6 +173,13 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "messages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["id"]
+          },
         ]
       }
       pincode_cache: {
@@ -262,14 +269,131 @@ export type Database = {
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "saved_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "public_listings"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      public_listings: {
+        Row: {
+          bathrooms: string | null
+          bedrooms: string | null
+          city: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          district: string | null
+          google_maps_link: string | null
+          id: string | null
+          is_public: boolean | null
+          latitude: number | null
+          location_address: string | null
+          longitude: number | null
+          media_links: string[] | null
+          pincode: string | null
+          place_id: string | null
+          price: number | null
+          price_amount_raw: number | null
+          price_rupees: number | null
+          price_unit: string | null
+          property_type: string | null
+          size: string | null
+          size_scale: string | null
+          size_unit: string | null
+          size_value_canonical: number | null
+          state: string | null
+          sub_area: string | null
+          sub_area_slug: string | null
+          title: string | null
+          transaction_type: string | null
+          updated_at: string | null
+          user_id: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          bathrooms?: string | null
+          bedrooms?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          district?: string | null
+          google_maps_link?: string | null
+          id?: string | null
+          is_public?: boolean | null
+          latitude?: number | null
+          location_address?: string | null
+          longitude?: number | null
+          media_links?: string[] | null
+          pincode?: string | null
+          place_id?: string | null
+          price?: number | null
+          price_amount_raw?: number | null
+          price_rupees?: number | null
+          price_unit?: string | null
+          property_type?: string | null
+          size?: string | null
+          size_scale?: string | null
+          size_unit?: string | null
+          size_value_canonical?: number | null
+          state?: string | null
+          sub_area?: string | null
+          sub_area_slug?: string | null
+          title?: string | null
+          transaction_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          bathrooms?: string | null
+          bedrooms?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          district?: string | null
+          google_maps_link?: string | null
+          id?: string | null
+          is_public?: boolean | null
+          latitude?: number | null
+          location_address?: string | null
+          longitude?: number | null
+          media_links?: string[] | null
+          pincode?: string | null
+          place_id?: string | null
+          price?: number | null
+          price_amount_raw?: number | null
+          price_rupees?: number | null
+          price_unit?: string | null
+          property_type?: string | null
+          size?: string | null
+          size_scale?: string | null
+          size_unit?: string | null
+          size_value_canonical?: number | null
+          state?: string | null
+          sub_area?: string | null
+          sub_area_slug?: string | null
+          title?: string | null
+          transaction_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      user_can_see_contact_info: {
+        Args: { listing_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
