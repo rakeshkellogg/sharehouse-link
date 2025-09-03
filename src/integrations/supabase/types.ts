@@ -301,7 +301,6 @@ export type Database = {
           title: string | null
           transaction_type: string | null
           updated_at: string | null
-          user_id: string | null
           youtube_url: string | null
         }
         Insert: {
@@ -336,7 +335,6 @@ export type Database = {
           title?: string | null
           transaction_type?: string | null
           updated_at?: string | null
-          user_id?: string | null
           youtube_url?: string | null
         }
         Update: {
@@ -371,7 +369,6 @@ export type Database = {
           title?: string | null
           transaction_type?: string | null
           updated_at?: string | null
-          user_id?: string | null
           youtube_url?: string | null
         }
         Relationships: []
