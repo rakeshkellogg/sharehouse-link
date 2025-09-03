@@ -374,7 +374,7 @@ const ListingDetail = () => {
                         <Square className="w-6 h-6 text-real-estate-primary" />
                       </div>
                       <div className="font-bold text-xl md:text-2xl text-real-estate-neutral">{listing.size}</div>
-                      <div className="text-xs md:text-sm text-muted-foreground font-medium">sq ft</div>
+                      <div className="text-xs md:text-sm text-muted-foreground font-medium">Size</div>
                     </div>
                   )}
                 </div>
@@ -466,30 +466,6 @@ const ListingDetail = () => {
               listingTitle={listing.title}
             />
 
-            {/* Contact Information - Remove phone/WhatsApp functionality */}
-            {listing.owner_name && (
-              <Card className="bg-gradient-card shadow-card border-0">
-                <CardHeader>
-                  <CardTitle className="text-lg md:text-xl font-bold">Contact Owner</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <div className="font-bold text-base md:text-lg text-real-estate-neutral mb-1">
-                      {listing.owner_name}
-                    </div>
-                    <div className="text-xs md:text-sm text-real-estate-neutral/70">Property Owner</div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="text-center py-4">
-                    <p className="text-xs md:text-sm text-real-estate-neutral/70 mb-4">
-                      Contact this owner using the secure messaging system below for privacy protection.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Location */}
             {listing.location_address && (
