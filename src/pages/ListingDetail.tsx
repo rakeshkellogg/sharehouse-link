@@ -46,9 +46,6 @@ interface Listing {
   media_links: string[];
   youtube_url: string | null;
   cover_image_url: string | null;
-  owner_name?: string;
-  owner_phone?: string | null;
-  owner_whatsapp?: string | null;
   created_at: string;
 }
 

@@ -31,9 +31,6 @@ export type Database = {
           location_address: string | null
           longitude: number | null
           media_links: string[]
-          owner_name: string
-          owner_phone: string | null
-          owner_whatsapp: string | null
           pincode: string | null
           place_id: string | null
           price: number
@@ -71,9 +68,6 @@ export type Database = {
           location_address?: string | null
           longitude?: number | null
           media_links?: string[]
-          owner_name: string
-          owner_phone?: string | null
-          owner_whatsapp?: string | null
           pincode?: string | null
           place_id?: string | null
           price: number
@@ -111,9 +105,6 @@ export type Database = {
           location_address?: string | null
           longitude?: number | null
           media_links?: string[]
-          owner_name?: string
-          owner_phone?: string | null
-          owner_whatsapp?: string | null
           pincode?: string | null
           place_id?: string | null
           price?: number
@@ -218,7 +209,6 @@ export type Database = {
           id: string
           updated_at: string
           user_id: string
-          username: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -228,7 +218,6 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id: string
-          username?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -238,7 +227,6 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
-          username?: string | null
         }
         Relationships: []
       }

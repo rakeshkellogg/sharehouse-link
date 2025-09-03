@@ -33,10 +33,7 @@ const EditListing = () => {
     locationCoords: { lat: 0, lng: 0 },
     mediaLinks: "",
     youtubeUrl: "",
-    coverImageUrl: "",
-    ownerName: "",
-    ownerPhone: "",
-    ownerWhatsApp: ""
+    coverImageUrl: ""
   });
 
   useEffect(() => {
@@ -68,10 +65,7 @@ const EditListing = () => {
             },
             mediaLinks: data.media_links?.join('\n') || "",
             youtubeUrl: data.youtube_url || "",
-            coverImageUrl: data.cover_image_url || "",
-            ownerName: data.owner_name || "",
-            ownerPhone: data.owner_phone || "",
-            ownerWhatsApp: data.owner_whatsapp || ""
+            coverImageUrl: data.cover_image_url || ""
           });
         }
       } catch (error) {
@@ -102,7 +96,7 @@ const EditListing = () => {
       return;
     }
 
-    if (!formData.title || !formData.price || !formData.ownerName) {
+    if (!formData.title || !formData.price) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -140,9 +134,6 @@ const EditListing = () => {
         media_links: mediaLinksArray,
         youtube_url: formData.youtubeUrl || null,
         cover_image_url: formData.coverImageUrl || null,
-        owner_name: formData.ownerName,
-        owner_phone: formData.ownerPhone || null,
-        owner_whatsapp: formData.ownerWhatsApp || null,
         updated_at: new Date().toISOString()
       };
 
@@ -416,50 +407,6 @@ const EditListing = () => {
                   onChange={(e) => handleInputChange("mediaLinks", e.target.value)}
                   className="min-h-20"
                 />
-              </div>
-
-              {/* Contact Information */}
-              <div className="border-t pt-6">
-                <h3 className="font-semibold text-real-estate-neutral mb-4">Contact Information</h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="ownerName">Your Name *</Label>
-                    <Input
-                      id="ownerName"
-                      placeholder="John Doe"
-                      value={formData.ownerName}
-                      onChange={(e) => handleInputChange("ownerName", e.target.value)}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="ownerPhone" className="flex items-center gap-1">
-                      <Phone className="w-4 h-4" />
-                      Phone Number
-                    </Label>
-                    <Input
-                      id="ownerPhone"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.ownerPhone}
-                      onChange={(e) => handleInputChange("ownerPhone", e.target.value)}
-                      className="h-12"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="ownerWhatsApp" className="flex items-center gap-1">
-                      <MessageCircle className="w-4 h-4" />
-                      WhatsApp
-                    </Label>
-                    <Input
-                      id="ownerWhatsApp"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.ownerWhatsApp}
-                      onChange={(e) => handleInputChange("ownerWhatsApp", e.target.value)}
-                      className="h-12"
-                    />
-                  </div>
-                </div>
               </div>
 
               {/* Submit Button */}

@@ -107,7 +107,6 @@ const CreateListingForm = () => {
     mediaLinks: "",
     youtubeUrl: "",
     coverImageUrl: "",
-    ownerName: "",
     propertyType: "house",
     transactionType: "sale"
   });
@@ -145,7 +144,7 @@ const CreateListingForm = () => {
       return;
     }
 
-    if (!formData.title || !formData.priceAmount || !formData.ownerName) {
+    if (!formData.title || !formData.priceAmount) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -202,9 +201,6 @@ const CreateListingForm = () => {
         media_links: mediaLinksArray,
         youtube_url: formData.youtubeUrl || null,
         cover_image_url: null, // Will be updated after image upload
-        owner_name: formData.ownerName,
-        owner_phone: null,
-        owner_whatsapp: null,
         property_type: formData.propertyType,
         transaction_type: formData.transactionType,
         is_public: true
@@ -735,25 +731,6 @@ const CreateListingForm = () => {
                   onChange={(e) => handleInputChange("mediaLinks", e.target.value)}
                   className="min-h-20 text-base"
                 />
-              </div>
-
-              {/* Contact Information */}
-              <div className="border-t pt-6">
-                <h3 className="font-semibold text-real-estate-neutral mb-3 md:mb-4 text-lg md:text-base">Contact Information</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="ownerName" className="text-base md:text-sm">Your Name *</Label>
-                  <Input
-                    id="ownerName"
-                    placeholder="John Doe"
-                    value={formData.ownerName}
-                    onChange={(e) => handleInputChange("ownerName", e.target.value)}
-                    className="h-12 text-base"
-                    required
-                  />
-                  <p className="text-sm md:text-xs text-real-estate-neutral/70">
-                    Visitors will contact you through the built-in messaging system for privacy.
-                  </p>
-                </div>
               </div>
 
                {/* Submit Button */}

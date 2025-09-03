@@ -7,7 +7,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import ProfileChecker from "@/components/ProfileChecker";
 import Index from "./pages/Index";
 import CreateListing from "./pages/CreateListing";
 import EditListing from "./pages/EditListing";
@@ -17,7 +16,6 @@ import MyListings from "./pages/MyListings";
 import Inbox from "./pages/Inbox";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
-import UsernameOnboarding from "./pages/UsernameOnboarding";
 import SavedListings from "@/pages/SavedListings";
 import SearchProperties from "@/pages/SearchProperties";
 import NotFound from "./pages/NotFound";
@@ -42,45 +40,30 @@ const App: React.FC = () => {
               <Route path="/search" element={<SearchProperties />} />
               <Route path="/listing/:id" element={<ListingDetail />} />
               
-              {/* Protected routes - require authentication and username */}
-              <Route path="/onboarding/username" element={
-                <ProtectedRoute>
-                  <UsernameOnboarding />
-                </ProtectedRoute>
-              } />
+              {/* Protected routes - require authentication */}
               <Route path="/create" element={
                 <ProtectedRoute>
-                  <ProfileChecker>
-                    <CreateListing />
-                  </ProfileChecker>
+                  <CreateListing />
                 </ProtectedRoute>
               } />
               <Route path="/edit/:id" element={
                 <ProtectedRoute>
-                  <ProfileChecker>
-                    <EditListing />
-                  </ProfileChecker>
+                  <EditListing />
                 </ProtectedRoute>
               } />
               <Route path="/my-listings" element={
                 <ProtectedRoute>
-                  <ProfileChecker>
-                    <MyListings />
-                  </ProfileChecker>
+                  <MyListings />
                 </ProtectedRoute>
               } />
               <Route path="/inbox" element={
                 <ProtectedRoute>
-                  <ProfileChecker>
-                    <Inbox />
-                  </ProfileChecker>
+                  <Inbox />
                 </ProtectedRoute>
               } />
               <Route path="/saved" element={
                 <ProtectedRoute>
-                  <ProfileChecker>
-                    <SavedListings />
-                  </ProfileChecker>
+                  <SavedListings />
                 </ProtectedRoute>
               } />
               
