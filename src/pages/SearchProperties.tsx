@@ -25,10 +25,8 @@ const SearchProperties = () => {
 
     try {
       const { data, error } = await supabase
-        .from('listings')
+        .from('public_listings')
         .select('sub_area, city, pincode, state, location_address')
-        .eq('is_public', true)
-        .is('deleted_at', null)
         .or(`sub_area.ilike.%${query}%,city.ilike.%${query}%,pincode.ilike.%${query}%,location_address.ilike.%${query}%`)
         .limit(10);
 
@@ -248,7 +246,6 @@ const SearchProperties = () => {
                   bathrooms={listing.bathrooms}
                   size={listing.size}
                   description={listing.description}
-                  ownerName={listing.owner_name}
                   coverImageUrl={listing.cover_image_url}
                   propertyType={listing.property_type || 'house'}
                   transactionType={listing.transaction_type || 'rent'}
