@@ -112,11 +112,11 @@ const SearchProperties = () => {
 
     setIsLoading(true);
     try {
+      // Use public_listings view for anonymous users (no owner contact info)
+      // This protects owner privacy while allowing property browsing
       let query = supabase
-        .from('listings')
-        .select('*')
-        .eq('is_public', true)
-        .is('deleted_at', null);
+        .from('public_listings')
+        .select('*');
 
       // Enhanced location search - search across multiple fields
       if (trimmedLocation) {

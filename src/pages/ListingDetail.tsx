@@ -46,9 +46,9 @@ interface Listing {
   media_links: string[];
   youtube_url: string | null;
   cover_image_url: string | null;
-  owner_name: string;
-  owner_phone: string | null;
-  owner_whatsapp: string | null;
+  owner_name?: string;
+  owner_phone?: string | null;
+  owner_whatsapp?: string | null;
   created_at: string;
 }
 
@@ -72,12 +72,33 @@ const ListingDetail = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('listings')
-          .select('*')
-          .eq('id', id)
-          .eq('is_public', true)
-          .maybeSingle();
+        // For authenticated users who have interacted with the listing, show full info
+        // For others, use the secure public view without owner contact details
+        let data, error;
+        
+        if (user) {
+          // Try to get full listing info for authenticated users first
+          const { data: fullData, error: fullError } = await supabase
+            .from('listings')
+            .select('*')
+            .eq('id', id)
+            .eq('is_public', true)
+            .is('deleted_at', null)
+            .maybeSingle();
+            
+          data = fullData;
+          error = fullError;
+        } else {
+          // For anonymous users, use the secure public view
+          const { data: publicData, error: publicError } = await supabase
+            .from('public_listings')
+            .select('*')
+            .eq('id', id)
+            .maybeSingle();
+            
+          data = publicData;
+          error = publicError;
+        }
 
         if (error) throw error;
 

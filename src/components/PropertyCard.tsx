@@ -21,7 +21,7 @@ interface PropertyCardProps {
   bathrooms?: string;
   size?: string;
   description: string;
-  ownerName: string;
+  ownerName?: string;
   coverImageUrl?: string;
   image?: string;
   propertyType?: string;
