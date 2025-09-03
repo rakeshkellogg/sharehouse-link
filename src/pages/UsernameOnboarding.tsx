@@ -48,17 +48,17 @@ const UsernameOnboarding = () => {
     
     try {
       // Check if username is available
-      const { data: existingProfile, error: checkError } = await supabase
+      const { data: usernameMatch, error: usernameCheckError } = await supabase
         .from('profiles')
         .select('username')
         .eq('username', username)
-        .single();
+        .maybeSingle();
       
-      if (checkError && checkError.code !== 'PGRST116') {
+      if (usernameCheckError) {
         throw new Error('Failed to check username availability');
       }
       
-      if (existingProfile) {
+      if (usernameMatch) {
         toast({
           title: "Username Taken",
           description: "This username is already taken. Please choose another one.",
@@ -67,14 +67,32 @@ const UsernameOnboarding = () => {
         return;
       }
       
-      // Update the user's profile with the username
-      const { error } = await supabase
+      // Ensure the user's profile exists, then set the username
+      const { data: userProfile, error: profileFetchError } = await supabase
         .from('profiles')
-        .update({ username })
-        .eq('user_id', user.id);
+        .select('id, username')
+        .eq('user_id', user.id)
+        .maybeSingle();
       
-      if (error) {
-        throw new Error(error.message);
+      if (profileFetchError) {
+        throw new Error('Failed to fetch your profile');
+      }
+      
+      if (!userProfile) {
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({ user_id: user.id, username });
+        if (insertError) {
+          throw new Error(insertError.message);
+        }
+      } else {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ username })
+          .eq('user_id', user.id);
+        if (updateError) {
+          throw new Error(updateError.message);
+        }
       }
       
       toast({
