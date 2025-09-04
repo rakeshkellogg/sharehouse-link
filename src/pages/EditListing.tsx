@@ -394,20 +394,6 @@ const EditListing = () => {
                 </p>
               </div>
 
-              {/* Additional Media Links */}
-              <div className="space-y-2">
-                <Label htmlFor="mediaLinks" className="flex items-center gap-1">
-                  <Link className="w-4 h-4" />
-                  Additional Media Links
-                </Label>
-                <Textarea
-                  id="mediaLinks"
-                  placeholder="Paste additional photo/video links (Instagram, Google Drive, etc.) - one per line"
-                  value={formData.mediaLinks}
-                  onChange={(e) => handleInputChange("mediaLinks", e.target.value)}
-                  className="min-h-20"
-                />
-              </div>
 
               {/* Submit Button */}
               <Button 
