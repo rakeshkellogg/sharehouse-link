@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, IndianRupee, Home, Bath, Bed, Ruler, Link, Copy, Share2, ExternalLink, Clipboard } from "lucide-react";
+import { MapPin, IndianRupee, Home, Bath, Bed, Ruler, Link, Copy, Share2, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -366,31 +366,6 @@ const CreateListingForm = () => {
     window.open('https://www.youtube.com/upload', '_blank');
   };
 
-  const handlePasteFromClipboard = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (text && (text.includes('youtube.com') || text.includes('youtu.be'))) {
-        handleInputChange("youtubeUrl", text);
-        setShowYouTubeHelper(false);
-        toast({
-          title: "YouTube URL Added!",
-          description: "Video link pasted successfully",
-        });
-      } else {
-        toast({
-          title: "No YouTube URL Found",
-          description: "Please copy a YouTube video URL first",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Clipboard Access Failed",
-        description: "Please paste the YouTube URL manually",
-        variant: "destructive"
-      });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-real-estate-light py-8 md:py-12">
@@ -681,45 +656,51 @@ const CreateListingForm = () => {
                 {showYouTubeHelper && !formData.youtubeUrl && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3 md:mb-2">
                     <p className="text-blue-800 font-medium text-sm">✨ Ready to add your YouTube video?</p>
-                    <p className="text-blue-700 text-xs">Copy your new video URL and click "Paste URL" below, or paste it manually.</p>
+                    <p className="text-blue-700 text-xs">Copy your new video URL and paste it in the field below.</p>
                   </div>
                 )}
                 
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <Input
-                    id="youtubeUrl"
-                    placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
-                    value={formData.youtubeUrl}
-                    onChange={(e) => {
-                      handleInputChange("youtubeUrl", e.target.value);
-                      if (e.target.value) setShowYouTubeHelper(false);
-                    }}
-                    className="h-12 flex-1 text-base"
-                  />
+                  <div className="flex-1 relative">
+                    <Input
+                      id="youtubeUrl"
+                      placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                      value={formData.youtubeUrl}
+                      onChange={(e) => {
+                        handleInputChange("youtubeUrl", e.target.value);
+                        if (e.target.value) setShowYouTubeHelper(false);
+                      }}
+                      className={`h-12 flex-1 text-base ${formData.youtubeUrl ? 'border-green-300 bg-green-50' : ''}`}
+                    />
+                    {formData.youtubeUrl && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      </div>
+                    )}
+                  </div>
                   
-                  {showYouTubeHelper && !formData.youtubeUrl ? (
-                    <Button
-                      type="button"
-                      variant="default"
-                      onClick={handlePasteFromClipboard}
-                      className="h-12 px-4 text-base"
-                    >
-                      <Clipboard className="w-4 h-4 mr-1" />
-                      Paste URL
-                    </Button>
-                  ) : (
+                  <div className="flex justify-end items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Or</span>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={handleCreateVideo}
-                      className="h-12 px-4 text-base"
+                      disabled={!!formData.youtubeUrl}
+                      className={`h-12 px-4 text-base ${
+                        formData.youtubeUrl 
+                          ? 'opacity-50 cursor-not-allowed' 
+                          : 'hover:bg-gray-50'
+                      }`}
                     >
                       Create Video
                     </Button>
-                  )}
+                  </div>
                 </div>
                 <p className="text-sm md:text-xs text-real-estate-neutral/70">
-                  Supports YouTube watch, shorts, and youtu.be links. Click "Create Video" to make a new YouTube video.
+                  {formData.youtubeUrl 
+                    ? "✅ YouTube video added! You can paste a different URL or delete this one to create a new video."
+                    : "Supports YouTube watch, shorts, and youtu.be links. Paste a URL or create a new video."
+                  }
                 </p>
               </div>
 
