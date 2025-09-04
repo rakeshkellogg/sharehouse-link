@@ -111,13 +111,49 @@ const MyListings = () => {
 
   const deleteListing = async (listingId: string, title: string) => {
     try {
-      const { error } = await supabase
+      console.log('Delete attempt:', {
+        listingId,
+        userId: user?.id,
+        userEmail: user?.email
+      });
+
+      // First verify ownership
+      const { data: listingData, error: fetchError } = await supabase
         .from('listings')
-        .update({ deleted_at: new Date().toISOString() })
+        .select('id, user_id, title')
+        .eq('id', listingId)
+        .single();
+
+      console.log('Listing ownership check:', {
+        listingData,
+        fetchError
+      });
+
+      if (fetchError) {
+        throw new Error(`Failed to verify listing ownership: ${fetchError.message}`);
+      }
+
+      if (!listingData) {
+        throw new Error('Listing not found');
+      }
+
+      if (listingData.user_id !== user?.id) {
+        throw new Error('You do not have permission to delete this listing');
+      }
+
+      // Perform hard delete (not soft delete)
+      const { data, error } = await supabase
+        .from('listings')
+        .delete()
         .eq('id', listingId)
         .eq('user_id', user?.id)
         .select('id')
         .single();
+
+      console.log('Delete response:', {
+        data,
+        error
+      });
 
       if (error) throw error;
 
@@ -126,7 +162,7 @@ const MyListings = () => {
 
       toast({
         title: "Listing Deleted",
-        description: `"${title}" has been deleted and is no longer public.`,
+        description: `"${title}" has been permanently deleted.`,
       });
     } catch (error) {
       console.error('Error deleting listing:', error);
