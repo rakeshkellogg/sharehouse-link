@@ -625,6 +625,11 @@ const CreateListingForm = () => {
                       placeholder="Paste Google Maps location link here"
                       value={formData.location}
                       onChange={(e) => handleGoogleMapsLink(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                        }
+                      }}
                       className="h-12 text-base"
                     />
                     <p className="text-sm md:text-xs text-real-estate-neutral/70">

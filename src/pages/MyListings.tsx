@@ -65,6 +65,7 @@ const MyListings = () => {
           .from('listings')
           .select('id, title, price, price_rupees, price_amount_raw, price_unit, transaction_type, bedrooms, bathrooms, size, location_address, is_public, created_at')
           .eq('user_id', user.id)
+          .is('deleted_at', null)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -113,7 +114,10 @@ const MyListings = () => {
       const { error } = await supabase
         .from('listings')
         .update({ deleted_at: new Date().toISOString() })
-        .eq('id', listingId);
+        .eq('id', listingId)
+        .eq('user_id', user?.id)
+        .select('id')
+        .single();
 
       if (error) throw error;
 
@@ -128,7 +132,7 @@ const MyListings = () => {
       console.error('Error deleting listing:', error);
       toast({
         title: "Delete Failed",
-        description: "Failed to delete listing. Please try again.",
+        description: error instanceof Error ? `Failed to delete listing: ${error.message}` : "Failed to delete listing. Please try again.",
         variant: "destructive"
       });
     }

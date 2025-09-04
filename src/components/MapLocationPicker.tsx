@@ -313,7 +313,12 @@ const MapLocationPicker = ({ onLocationChange, initialLocation = "" }: MapLocati
                 placeholder="Start typing an address..."
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddressSearch()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddressSearch();
+                  }
+                }}
                 className="flex-1"
               />
               <button
