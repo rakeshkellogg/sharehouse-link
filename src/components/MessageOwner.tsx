@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, Send, Clock, AlertCircle } from "lucide-react";
+import { MessageCircle, Send, Clock, AlertCircle, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -232,27 +232,39 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Rate limit display */}
-        {remainingMessages !== null && (
+        {/* Daily quota information */}
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <Info className="w-3 h-3" />
+            Daily quota: 2 messages per owner per day (resets at midnight)
+          </p>
+          
+          {/* Rate limit status */}
           <div className={`p-3 rounded-lg border ${
-            remainingMessages === 0 
-              ? 'bg-red-50 border-red-200' 
-              : remainingMessages === 1 
-                ? 'bg-yellow-50 border-yellow-200'
-                : 'bg-green-50 border-green-200'
+            isCheckingLimit 
+              ? 'bg-blue-50 border-blue-200'
+              : remainingMessages === 0 
+                ? 'bg-red-50 border-red-200' 
+                : remainingMessages === 1 
+                  ? 'bg-yellow-50 border-yellow-200'
+                  : 'bg-green-50 border-green-200'
           }`}>
             <div className="flex items-center gap-2">
-              {remainingMessages === 0 ? (
+              {isCheckingLimit ? (
+                <Clock className="w-4 h-4 text-blue-600 animate-spin" />
+              ) : remainingMessages === 0 ? (
                 <AlertCircle className="w-4 h-4 text-red-600" />
               ) : (
-                <Clock className="w-4 h-4 text-yellow-600" />
+                <Clock className="w-4 h-4 text-green-600" />
               )}
               <span className="text-sm font-medium">
-                {remainingMessages === 0 
-                  ? 'Daily limit reached (2/2 messages sent today)'
-                  : remainingMessages === 1 
-                    ? '1 message remaining today'
-                    : `${remainingMessages} messages remaining today`
+                {isCheckingLimit 
+                  ? 'Checking daily limit...'
+                  : remainingMessages === 0 
+                    ? 'Daily limit reached (0 remaining)'
+                    : remainingMessages === 1 
+                      ? '1 message remaining today'
+                      : `${remainingMessages} messages remaining today`
                 }
               </span>
             </div>
@@ -262,7 +274,7 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
               </p>
             )}
           </div>
-        )}
+        </div>
 
         <div>
           <Textarea
