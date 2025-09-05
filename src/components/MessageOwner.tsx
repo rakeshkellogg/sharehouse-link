@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useBlockStatus } from "@/hooks/useBlockStatus";
 
 interface MessageOwnerProps {
   listingId: string;
@@ -18,6 +19,7 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isBlocked, isLoading: blockLoading } = useBlockStatus(ownerUserId);
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState<number | null>(null);
@@ -165,8 +167,14 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
       console.error('Error sending message:', error);
       const errorMessage = error instanceof Error ? error.message : "Please try again.";
       
-      // Check if it's a rate limit error
-      if (errorMessage.includes('Rate limit exceeded')) {
+      // Check if it's a block error
+      if (errorMessage.includes('Messaging is blocked')) {
+        toast({
+          title: "Messaging Blocked",
+          description: "You cannot send messages to this user. They may have blocked you or you may have blocked them.",
+          variant: "destructive"
+        });
+      } else if (errorMessage.includes('Rate limit exceeded')) {
         toast({
           title: "Daily Limit Reached",
           description: "You can only send 2 messages per day to each user. Please try again tomorrow.",
@@ -216,12 +224,29 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
     return null; // Don't show messaging component to the owner
   }
 
+  // Show blocked message if users have blocked each other
+  if (isBlocked) {
+    return (
+      <Card className="bg-gradient-card shadow-card border-0">
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-bold text-lg md:text-xl mb-2">Messaging Unavailable</h3>
+            <p className="text-muted-foreground text-sm md:text-base mb-4">
+              You cannot send messages to this user due to blocking restrictions.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const wordCount = getWordCount(message);
   const charCount = getCharCount(message);
   const isOverWordLimit = wordCount > 50;
   const isOverCharLimit = charCount > 300;
   const isAtRateLimit = remainingMessages === 0;
-  const canSend = !isOverWordLimit && !isOverCharLimit && wordCount > 0 && !isAtRateLimit;
+  const canSend = !isOverWordLimit && !isOverCharLimit && wordCount > 0 && !isAtRateLimit && !blockLoading;
 
   return (
     <Card className="bg-gradient-card shadow-card border-0">

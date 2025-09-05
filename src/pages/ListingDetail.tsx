@@ -26,6 +26,8 @@ import MessageOwner from "@/components/MessageOwner";
 import MapDisplay from "@/components/MapDisplay";
 import { ImageCarousel } from "@/components/ImageCarousel";
 import { useAuth } from "@/contexts/AuthContext";
+import ReportDialog from "@/components/ReportDialog";
+import BlockUserButton from "@/components/BlockUserButton";
 
 interface Listing {
   id: string;
@@ -477,6 +479,35 @@ const ListingDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Report/Block Actions - Show for authenticated users who don't own the listing */}
+            {user && user.id !== listing.user_id && (
+              <Card className="bg-gradient-card shadow-card border-0">
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex gap-2">
+                    <ReportDialog 
+                      listingId={listing.id}
+                      triggerText="Report Listing"
+                    />
+                    <ReportDialog 
+                      reportedUserId={listing.user_id}
+                      triggerText="Report Owner"
+                    />
+                  </div>
+                  <BlockUserButton 
+                    targetUserId={listing.user_id}
+                    triggerText="Block Owner"
+                    triggerVariant="destructive"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Use these options to report inappropriate content or block communication with this user.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Message Owner */}
             <MessageOwner 
               listingId={listing.id}

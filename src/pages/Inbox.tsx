@@ -15,6 +15,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import ReportDialog from "@/components/ReportDialog";
+import BlockUserButton from "@/components/BlockUserButton";
 
 interface Message {
   id: string;
@@ -245,6 +247,18 @@ const Inbox = () => {
                       <ExternalLink className="w-4 h-4 mr-1" />
                       View Listing
                     </Button>
+
+                    <ReportDialog 
+                      reportedUserId={message.sender_user_id}
+                      triggerText="Report"
+                      triggerVariant="outline"
+                    />
+                    
+                    <BlockUserButton 
+                      targetUserId={message.sender_user_id}
+                      triggerText="Block"
+                      triggerVariant="destructive"
+                    />
                   </div>
                 </CardContent>
               </Card>
