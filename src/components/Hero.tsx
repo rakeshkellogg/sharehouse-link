@@ -24,10 +24,7 @@ const Hero = () => {
       <nav className="relative z-20 bg-white/10 backdrop-blur-sm border-b border-white/20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <Link to="/" className="text-white text-xl font-bold">
-              ShareHouse
-            </Link>
+            {/* Logo - Removed non-functional ShareHouse button */}
             
             {/* Navigation Links */}
             <div className="flex items-center gap-4">

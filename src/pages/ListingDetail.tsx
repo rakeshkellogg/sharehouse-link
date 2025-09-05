@@ -367,32 +367,32 @@ const ListingDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 gap-6">
+                <div className="grid grid-cols-3 gap-4">
                   {listing.bedrooms && (
                       <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        <Bed className="w-6 h-6 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-1">
+                        <Bed className="w-5 h-5 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-xl md:text-2xl text-real-estate-neutral">{listing.bedrooms}</div>
-                      <div className="text-xs md:text-sm text-muted-foreground font-medium">Bedrooms</div>
+                      <div className="font-bold text-lg md:text-xl text-real-estate-neutral">{listing.bedrooms}</div>
+                      <div className="text-xs text-muted-foreground font-medium">Bedrooms</div>
                     </div>
                   )}
                   {listing.bathrooms && (
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        <Bath className="w-6 h-6 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-1">
+                        <Bath className="w-5 h-5 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-xl md:text-2xl text-real-estate-neutral">{listing.bathrooms}</div>
-                      <div className="text-xs md:text-sm text-muted-foreground font-medium">Bathrooms</div>
+                      <div className="font-bold text-lg md:text-xl text-real-estate-primary">{listing.bathrooms}</div>
+                      <div className="text-xs text-muted-foreground font-medium">Bathrooms</div>
                     </div>
                   )}
                   {listing.size && (
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        <Square className="w-6 h-6 text-real-estate-primary" />
+                      <div className="flex items-center justify-center mb-1">
+                        <Square className="w-5 h-5 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-xl md:text-2xl text-real-estate-neutral">{listing.size}</div>
-                      <div className="text-xs md:text-sm text-muted-foreground font-medium">Size</div>
+                      <div className="font-bold text-lg md:text-xl text-real-estate-neutral">{listing.size}</div>
+                      <div className="text-xs text-muted-foreground font-medium">Size</div>
                     </div>
                   )}
                 </div>
