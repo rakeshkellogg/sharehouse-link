@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, Clock, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,6 +20,8 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [remainingMessages, setRemainingMessages] = useState<number | null>(null);
+  const [isCheckingLimit, setIsCheckingLimit] = useState(false);
 
   const getWordCount = (text: string) => {
     return text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -28,6 +30,37 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
   const getCharCount = (text: string) => {
     return text.length;
   };
+
+  const checkRemainingMessages = async () => {
+    if (!user) return;
+    
+    setIsCheckingLimit(true);
+    try {
+      const { data, error } = await supabase
+        .rpc('get_remaining_messages_today', {
+          sender_id: user.id,
+          recipient_id: ownerUserId
+        });
+
+      if (error) {
+        console.error('Error checking rate limit:', error);
+        setRemainingMessages(null);
+      } else {
+        setRemainingMessages(data);
+      }
+    } catch (error) {
+      console.error('Error checking rate limit:', error);
+      setRemainingMessages(null);
+    } finally {
+      setIsCheckingLimit(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user && user.id !== ownerUserId) {
+      checkRemainingMessages();
+    }
+  }, [user, ownerUserId]);
 
   const handleSendMessage = async () => {
     if (!user) {
@@ -78,6 +111,15 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
       return;
     }
 
+    if (remainingMessages === 0) {
+      toast({
+        title: "Daily Limit Reached",
+        description: "You can only send 2 messages per day to each user. Please try again tomorrow.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSending(true);
 
     try {
@@ -117,13 +159,28 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
       });
 
       setMessage("");
+      // Refresh remaining messages count
+      checkRemainingMessages();
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Failed to Send Message",
-        description: error instanceof Error ? error.message : "Please try again.",
-        variant: "destructive"
-      });
+      const errorMessage = error instanceof Error ? error.message : "Please try again.";
+      
+      // Check if it's a rate limit error
+      if (errorMessage.includes('Rate limit exceeded')) {
+        toast({
+          title: "Daily Limit Reached",
+          description: "You can only send 2 messages per day to each user. Please try again tomorrow.",
+          variant: "destructive"
+        });
+        // Refresh the count to show 0 remaining
+        checkRemainingMessages();
+      } else {
+        toast({
+          title: "Failed to Send Message",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsSending(false);
     }
@@ -163,7 +220,8 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
   const charCount = getCharCount(message);
   const isOverWordLimit = wordCount > 50;
   const isOverCharLimit = charCount > 300;
-  const canSend = !isOverWordLimit && !isOverCharLimit && wordCount > 0;
+  const isAtRateLimit = remainingMessages === 0;
+  const canSend = !isOverWordLimit && !isOverCharLimit && wordCount > 0 && !isAtRateLimit;
 
   return (
     <Card className="bg-gradient-card shadow-card border-0">
@@ -174,6 +232,38 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Rate limit display */}
+        {remainingMessages !== null && (
+          <div className={`p-3 rounded-lg border ${
+            remainingMessages === 0 
+              ? 'bg-red-50 border-red-200' 
+              : remainingMessages === 1 
+                ? 'bg-yellow-50 border-yellow-200'
+                : 'bg-green-50 border-green-200'
+          }`}>
+            <div className="flex items-center gap-2">
+              {remainingMessages === 0 ? (
+                <AlertCircle className="w-4 h-4 text-red-600" />
+              ) : (
+                <Clock className="w-4 h-4 text-yellow-600" />
+              )}
+              <span className="text-sm font-medium">
+                {remainingMessages === 0 
+                  ? 'Daily limit reached (2/2 messages sent today)'
+                  : remainingMessages === 1 
+                    ? '1 message remaining today'
+                    : `${remainingMessages} messages remaining today`
+                }
+              </span>
+            </div>
+            {remainingMessages === 0 && (
+              <p className="text-xs text-red-600 mt-1">
+                You can send more messages tomorrow.
+              </p>
+            )}
+          </div>
+        )}
+
         <div>
           <Textarea
             placeholder={`Send a message about "${listingTitle}"...`}
@@ -200,11 +290,11 @@ const MessageOwner: React.FC<MessageOwnerProps> = ({ listingId, ownerUserId, lis
 
         <Button
           onClick={handleSendMessage}
-          disabled={!canSend || isSending}
+          disabled={!canSend || isSending || isCheckingLimit}
           className="w-full text-sm md:text-base"
         >
           <Send className="w-4 h-4 mr-2" />
-          {isSending ? "Sending..." : "Send Message"}
+          {isSending ? "Sending..." : isCheckingLimit ? "Checking..." : "Send Message"}
         </Button>
 
         <p className="text-xs md:text-sm text-muted-foreground">

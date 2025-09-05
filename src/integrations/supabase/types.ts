@@ -375,6 +375,14 @@ export type Database = {
       }
     }
     Functions: {
+      can_send_message_today: {
+        Args: { recipient_id: string; sender_id: string }
+        Returns: boolean
+      }
+      get_remaining_messages_today: {
+        Args: { recipient_id: string; sender_id: string }
+        Returns: number
+      }
       user_can_see_contact_info: {
         Args: { listing_id: string }
         Returns: boolean
