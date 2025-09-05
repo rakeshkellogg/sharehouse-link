@@ -249,7 +249,7 @@ const MyListings = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {listings.map((listing) => (
-                <Card key={listing.id} className="bg-gradient-card shadow-card border-0 hover:shadow-lg transition-shadow">
+                <Card key={listing.id} className="bg-gradient-card shadow-card border-0 hover:shadow-lg transition-shadow flex flex-col h-full">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-lg md:text-xl line-clamp-2 flex-1 mr-2">
@@ -260,113 +260,119 @@ const MyListings = () => {
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Price */}
-                    <div className="text-xl md:text-2xl font-bold text-real-estate-primary">
-                      {formatListingPrice({
-                        price: listing.price,
-                        price_rupees: listing.price_rupees,
-                        price_amount_raw: listing.price_amount_raw,
-                        price_unit: listing.price_unit,
-                        transaction_type: listing.transaction_type
-                      })}
-                    </div>
-
-                    {/* Property Details */}
-                    <div className="flex gap-4 text-sm md:text-base text-real-estate-neutral/70">
-                      {listing.bedrooms && (
-                        <span>{listing.bedrooms} bed</span>
-                      )}
-                      {listing.bathrooms && (
-                        <span>{listing.bathrooms} bath</span>
-                      )}
-                      {listing.size && (
-                        <span>{listing.size} sq ft</span>
-                      )}
-                    </div>
-
-                    {/* Location */}
-                    {listing.location_address && (
-                      <div className="flex items-start gap-2 text-sm text-real-estate-neutral/70">
-                        <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        <span className="line-clamp-2">{listing.location_address}</span>
+                  <CardContent className="flex flex-col flex-1 space-y-4">
+                    {/* Content Area - grows to fill available space */}
+                    <div className="flex-1 space-y-4">
+                      {/* Price */}
+                      <div className="text-xl md:text-2xl font-bold text-real-estate-primary">
+                        {formatListingPrice({
+                          price: listing.price,
+                          price_rupees: listing.price_rupees,
+                          price_amount_raw: listing.price_amount_raw,
+                          price_unit: listing.price_unit,
+                          transaction_type: listing.transaction_type
+                        })}
                       </div>
-                    )}
 
-                    {/* Created Date */}
-                    <div className="flex items-center text-sm text-real-estate-neutral/70">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Created {new Date(listing.created_at).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
+                      {/* Property Details */}
+                      <div className="flex gap-4 text-sm md:text-base text-real-estate-neutral/70">
+                        {listing.bedrooms && (
+                          <span>{listing.bedrooms} bed</span>
+                        )}
+                        {listing.bathrooms && (
+                          <span>{listing.bathrooms} bath</span>
+                        )}
+                        {listing.size && (
+                          <span>{listing.size} sq ft</span>
+                        )}
+                      </div>
+
+                      {/* Location */}
+                      {listing.location_address && (
+                        <div className="flex items-start gap-2 text-sm text-real-estate-neutral/70">
+                          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span className="line-clamp-2">{listing.location_address}</span>
+                        </div>
+                      )}
+
+                      {/* Created Date */}
+                      <div className="flex items-center text-sm text-real-estate-neutral/70">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Created {new Date(listing.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => copyShareLink(listing.id)}
-                      >
-                        <Copy className="w-4 h-4 mr-1" />
-                        Copy Link
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => openListing(listing.id)}
-                      >
-                        <ExternalLink className="w-4 h-4 mr-1" />
-                        View
-                      </Button>
-                    </div>
-
-                    {/* Edit/Delete Actions */}
-                    <div className="flex gap-2 pt-2 border-t border-real-estate-light mt-2">
-                      <Link to={`/edit/${listing.id}`} className="flex-1">
+                    {/* Fixed Button Area - always at bottom */}
+                    <div className="space-y-2 pt-2 border-t border-real-estate-light">
+                      {/* Copy Link / View Actions */}
+                      <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full bg-white border-real-estate-primary text-real-estate-primary hover:bg-real-estate-primary hover:text-white"
+                          className="flex-1"
+                          onClick={() => copyShareLink(listing.id)}
                         >
-                          <Edit3 className="w-4 h-4 mr-1" />
-                          Edit
+                          <Copy className="w-4 h-4 mr-1" />
+                          Copy Link
                         </Button>
-                      </Link>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => openListing(listing.id)}
+                        >
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                      </div>
+
+                      {/* Edit/Delete Actions */}
+                      <div className="flex gap-2">
+                        <Link to={`/edit/${listing.id}`} className="flex-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="flex-1 bg-white border-red-500 text-red-600 hover:bg-red-500 hover:text-white"
+                            className="w-full bg-white border-real-estate-primary text-real-estate-primary hover:bg-real-estate-primary hover:text-white"
                           >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Delete
+                            <Edit3 className="w-4 h-4 mr-1" />
+                            Edit
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete this listing?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently remove "{listing.title}" from public view. 
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteListing(listing.id, listing.title)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        </Link>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 bg-white border-red-500 text-red-600 hover:bg-red-500 hover:text-white"
                             >
-                              Delete Listing
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete this listing?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently remove "{listing.title}" from public view. 
+                                This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteListing(listing.id, listing.title)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete Listing
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
