@@ -486,34 +486,6 @@ const ListingDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Report/Block Actions - Show for authenticated users who don't own the listing */}
-            {user && user.id !== listing.user_id && (
-              <Card className="bg-gradient-card shadow-card border-0">
-                <CardHeader>
-                  <CardTitle className="text-lg font-bold">Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <ReportDialog 
-                    listingId={listing.id}
-                    triggerText="Report Listing"
-                    triggerVariant="outline"
-                  />
-                  <ReportDialog 
-                    reportedUserId={listing.user_id}
-                    triggerText="Report Owner"
-                    triggerVariant="outline"
-                  />
-                  <BlockUserButton 
-                    targetUserId={listing.user_id}
-                    triggerText="Block Owner"
-                    triggerVariant="destructive"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Use these options to report inappropriate content or block communication with this user.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Message Owner */}
             <MessageOwner 
@@ -550,6 +522,38 @@ const ListingDetail = () => {
             </Card>
           </div>
         </div>
+
+        {/* Action Buttons - Show for authenticated users who don't own the listing */}
+        {user && user.id !== listing.user_id && (
+          <div className="mt-8 pt-6 border-t border-border">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <ReportDialog 
+                  listingId={listing.id}
+                  triggerText="Report Listing"
+                  triggerVariant="outline"
+                />
+              </div>
+              <div className="flex-1">
+                <ReportDialog 
+                  reportedUserId={listing.user_id}
+                  triggerText="Report Owner"
+                  triggerVariant="outline"
+                />
+              </div>
+              <div className="flex-1">
+                <BlockUserButton 
+                  targetUserId={listing.user_id}
+                  triggerText="Block Owner"
+                  triggerVariant="destructive"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 text-center">
+              Use these options to report inappropriate content or block communication with this user.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
