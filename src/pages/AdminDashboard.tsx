@@ -1,10 +1,15 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Users, MessageSquare, BarChart3, Settings, Download, Mail } from 'lucide-react';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Navigate } from 'react-router-dom';
+import AdminUserManagement from '@/components/admin/AdminUserManagement';
+import AdminContentModeration from '@/components/admin/AdminContentModeration';
+import AdminAnalytics from '@/components/admin/AdminAnalytics';
+import AdminDataExport from '@/components/admin/AdminDataExport';
+import AdminCommunication from '@/components/admin/AdminCommunication';
+import AdminSettings from '@/components/admin/AdminSettings';
 
 const AdminDashboard: React.FC = () => {
   const { isAdmin, isLoading } = useIsAdmin();
@@ -59,149 +64,26 @@ const AdminDashboard: React.FC = () => {
             </TabsList>
 
             <TabsContent value="monitoring">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Users className="w-5 h-5" />
-                      User Management
-                    </CardTitle>
-                    <CardDescription className="text-white/70">
-                      Manage user accounts and moderation
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-white/90">
-                    <p>Features coming soon:</p>
-                    <ul className="list-disc list-inside mt-2 space-y-1">
-                      <li>View flagged users</li>
-                      <li>Activate/Deactivate accounts</li>
-                      <li>View blocked users</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5" />
-                      Content Moderation
-                    </CardTitle>
-                    <CardDescription className="text-white/70">
-                      Moderate listings and messages
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-white/90">
-                    <p>Features coming soon:</p>
-                    <ul className="list-disc list-inside mt-2 space-y-1">
-                      <li>Review reported content</li>
-                      <li>Delete inappropriate listings</li>
-                      <li>Remove inappropriate videos</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white">Reports & Flags</CardTitle>
-                    <CardDescription className="text-white/70">
-                      Review user reports and flags
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-white/90">
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Open Reports:</span>
-                        <Badge variant="destructive">0</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Under Review:</span>
-                        <Badge variant="outline">0</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="space-y-8">
+                <AdminUserManagement />
+                <AdminContentModeration />
               </div>
             </TabsContent>
 
             <TabsContent value="analytics">
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white">Platform Analytics</CardTitle>
-                  <CardDescription className="text-white/70">
-                    View platform metrics and usage statistics
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-white/90">
-                  <p>Analytics dashboard coming soon with:</p>
-                  <ul className="list-disc list-inside mt-4 space-y-2">
-                    <li>Daily/Weekly/Monthly new user registrations</li>
-                    <li>New listings created over time</li>
-                    <li>Active chat conversations</li>
-                    <li>User engagement metrics</li>
-                    <li>Popular property types and locations</li>
-                  </ul>
-                </CardContent>
-              </Card>
+              <AdminAnalytics />
             </TabsContent>
 
             <TabsContent value="data">
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white">Data Export</CardTitle>
-                  <CardDescription className="text-white/70">
-                    Export platform data for analysis
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-white/90">
-                  <p>Data export features coming soon:</p>
-                  <ul className="list-disc list-inside mt-4 space-y-2">
-                    <li>Full database export (users, listings, messages)</li>
-                    <li>CSV and JSON format options</li>
-                    <li>Scheduled exports</li>
-                    <li>Filtered exports by date range</li>
-                  </ul>
-                </CardContent>
-              </Card>
+              <AdminDataExport />
             </TabsContent>
 
             <TabsContent value="communication">
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white">Platform Communication</CardTitle>
-                  <CardDescription className="text-white/70">
-                    Communicate with your users
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-white/90">
-                  <p>Communication features coming soon:</p>
-                  <ul className="list-disc list-inside mt-4 space-y-2">
-                    <li>Site-wide announcements</li>
-                    <li>Email newsletters to all users</li>
-                    <li>Broadcast important updates</li>
-                    <li>Maintenance notifications</li>
-                  </ul>
-                </CardContent>
-              </Card>
+              <AdminCommunication />
             </TabsContent>
 
             <TabsContent value="settings">
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white">Platform Settings</CardTitle>
-                  <CardDescription className="text-white/70">
-                    Configure platform-wide settings
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-white/90">
-                  <p>Settings panel coming soon:</p>
-                  <ul className="list-disc list-inside mt-4 space-y-2">
-                    <li>Message rate limits (currently: 2 per day per user)</li>
-                    <li>Maintenance mode toggle</li>
-                    <li>Feature flags and toggles</li>
-                    <li>User registration controls</li>
-                  </ul>
-                </CardContent>
-              </Card>
+              <AdminSettings />
             </TabsContent>
           </Tabs>
         </div>
