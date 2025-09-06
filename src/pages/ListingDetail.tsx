@@ -88,14 +88,11 @@ const ListingDetail = () => {
           data = fullData;
           error = fullError;
         } else {
-          // For anonymous users, use the secure public view
+          // For anonymous users, use the secure RPC function
           const { data: publicData, error: publicError } = await supabase
-            .from('public_listings')
-            .select('*')
-            .eq('id', id)
-            .maybeSingle();
+            .rpc('get_public_listing', { listing_id: id });
             
-          data = publicData;
+          data = publicData?.[0] || null; // RPC returns an array, so take first item
           error = publicError;
         }
 
