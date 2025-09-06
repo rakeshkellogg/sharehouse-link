@@ -32,6 +32,24 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       listings: {
         Row: {
           bathrooms: string | null
@@ -225,6 +243,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          suspended_at: string | null
           updated_at: string
           user_id: string
         }
@@ -234,6 +253,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          suspended_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -243,6 +263,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          suspended_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -414,9 +435,25 @@ export type Database = {
       }
     }
     Functions: {
+      admin_set_listing: {
+        Args: {
+          p_is_public?: boolean
+          p_listing_id: string
+          p_soft_delete?: boolean
+        }
+        Returns: undefined
+      }
+      admin_set_user_suspension: {
+        Args: { p_suspend: boolean; p_user_id: string }
+        Returns: undefined
+      }
       can_send_message_today: {
         Args: { recipient_id: string; sender_id: string }
         Returns: boolean
+      }
+      get_admin_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       get_public_listing: {
         Args: { listing_id: string }
@@ -464,6 +501,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      read_settings: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       search_public_listings: {
         Args: { search_location?: string }
         Returns: {
@@ -479,6 +520,10 @@ export type Database = {
       user_can_see_contact_info: {
         Args: { listing_id: string }
         Returns: boolean
+      }
+      write_setting: {
+        Args: { k: string; v: Json }
+        Returns: undefined
       }
     }
     Enums: {
