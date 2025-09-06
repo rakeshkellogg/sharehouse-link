@@ -59,31 +59,50 @@ const AdminDataExport: React.FC = () => {
   };
 
   const exportUsers = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
+      
       let query = supabase
         .from('profiles')
-        .select('user_id, display_name, avatar_url, bio, created_at, updated_at')
+        .select('user_id, display_name, created_at, suspended_at')
         .order('created_at', { ascending: false });
+
+      if (exportLimit) {
+        query = query.limit(parseInt(exportLimit));
+      }
 
       if (startDate) {
         query = query.gte('created_at', startDate);
       }
+
       if (endDate) {
         query = query.lte('created_at', endDate);
       }
 
-      const { data, error } = await query.limit(parseInt(exportLimit));
-
-      if (error) throw error;
-
-      generateCSV(data || [], 'users_export');
+      const { data, error } = await query.csv();
+      
+      if (error) {
+        throw error;
+      }
+      
+      const blob = new Blob([data as string], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'users-export.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export Complete",
+        description: "Users data has been exported successfully.",
+      });
     } catch (error) {
-      console.error('Error exporting users:', error);
+      console.error('Export error:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "Failed to export users data"
+        description: "Failed to export users data.",
       });
     } finally {
       setLoading(false);
@@ -91,31 +110,50 @@ const AdminDataExport: React.FC = () => {
   };
 
   const exportListings = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
+      
       let query = supabase
         .from('listings')
-        .select('id, title, city, state, district, price, price_unit, property_type, transaction_type, is_public, created_at, deleted_at')
+        .select('id, title, city, state, price, is_public, created_at, deleted_at')
         .order('created_at', { ascending: false });
+
+      if (exportLimit) {
+        query = query.limit(parseInt(exportLimit));
+      }
 
       if (startDate) {
         query = query.gte('created_at', startDate);
       }
+
       if (endDate) {
         query = query.lte('created_at', endDate);
       }
 
-      const { data, error } = await query.limit(parseInt(exportLimit));
-
-      if (error) throw error;
-
-      generateCSV(data || [], 'listings_export');
+      const { data, error } = await query.csv();
+      
+      if (error) {
+        throw error;
+      }
+      
+      const blob = new Blob([data as string], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'listings-export.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export Complete",
+        description: "Listings data has been exported successfully.",
+      });
     } catch (error) {
-      console.error('Error exporting listings:', error);
+      console.error('Export error:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "Failed to export listings data"
+        description: "Failed to export listings data.",
       });
     } finally {
       setLoading(false);
@@ -123,37 +161,50 @@ const AdminDataExport: React.FC = () => {
   };
 
   const exportMessages = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
+      
       let query = supabase
         .from('messages')
-        .select('id, listing_id, sender_user_id, owner_user_id, body, created_at, read_at')
+        .select('id, listing_id, sender_user_id, owner_user_id, created_at, read_at')
         .order('created_at', { ascending: false });
+
+      if (exportLimit) {
+        query = query.limit(parseInt(exportLimit));
+      }
 
       if (startDate) {
         query = query.gte('created_at', startDate);
       }
+
       if (endDate) {
         query = query.lte('created_at', endDate);
       }
 
-      const { data, error } = await query.limit(parseInt(exportLimit));
-
-      if (error) throw error;
-
-      // Remove sensitive message content for privacy
-      const sanitizedData = (data || []).map(msg => ({
-        ...msg,
-        body: `[Message content - ${msg.body.length} characters]`
-      }));
-
-      generateCSV(sanitizedData, 'messages_export');
+      const { data, error } = await query.csv();
+      
+      if (error) {
+        throw error;
+      }
+      
+      const blob = new Blob([data as string], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'messages-export.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export Complete",
+        description: "Messages data has been exported successfully.",
+      });
     } catch (error) {
-      console.error('Error exporting messages:', error);
+      console.error('Export error:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "Failed to export messages data"
+        description: "Failed to export messages data.",
       });
     } finally {
       setLoading(false);

@@ -17,6 +17,7 @@ interface Profile {
   display_name: string;
   created_at: string;
   avatar_url?: string;
+  suspended_at?: string;
 }
 
 const AdminUserManagement: React.FC = () => {
@@ -33,23 +34,54 @@ const AdminUserManagement: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
+        .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
+
       setProfiles(data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: "Failed to fetch users"
+        description: "Failed to fetch users",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSuspendUser = async (userId: string, suspend: boolean) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_user_suspension', {
+        p_user_id: userId,
+        p_suspend: suspend
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: `User ${suspend ? 'suspended' : 'unsuspended'} successfully`,
+      });
+
+      // Refresh the users list
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating user suspension:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update user status",
+        variant: "destructive",
+      });
     }
   };
 
@@ -129,8 +161,8 @@ const AdminUserManagement: React.FC = () => {
                       {formatDate(profile.created_at)}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-green-400 border-green-400">
-                        Active
+                      <Badge variant={profile.suspended_at ? "destructive" : "secondary"}>
+                        {profile.suspended_at ? "Suspended" : "Active"}
                       </Badge>
                     </TableCell>
                     <TableCell className="space-x-2">
@@ -171,10 +203,38 @@ const AdminUserManagement: React.FC = () => {
                                   {new Date(selectedUser.created_at).toLocaleString()}
                                 </div>
                               </div>
+                              {selectedUser.suspended_at && (
+                                <div>
+                                  <Label>Suspended At</Label>
+                                  <div className="text-sm text-muted-foreground">
+                                    {new Date(selectedUser.suspended_at).toLocaleString()}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </DialogContent>
                       </Dialog>
+                      
+                      {profile.suspended_at ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSuspendUser(profile.user_id, false)}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          Unsuspend
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSuspendUser(profile.user_id, true)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          Suspend
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

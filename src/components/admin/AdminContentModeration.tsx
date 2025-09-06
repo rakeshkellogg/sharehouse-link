@@ -59,27 +59,23 @@ const AdminContentModeration: React.FC = () => {
 
   const toggleListingVisibility = async (listingId: string, isCurrentlyPublic: boolean) => {
     try {
-      const { error } = await supabase
-        .from('listings')
-        .update({ is_public: !isCurrentlyPublic })
-        .eq('id', listingId);
+      const { error } = await supabase.rpc('admin_set_listing', {
+        p_listing_id: listingId,
+        p_is_public: !isCurrentlyPublic
+      });
 
-      if (error) throw error;
-
-      setListings(prev =>
-        prev.map(listing =>
-          listing.id === listingId
-            ? { ...listing, is_public: !isCurrentlyPublic }
-            : listing
-        )
-      );
+      if (error) {
+        throw error;
+      }
 
       toast({
         title: "Success",
-        description: `Listing ${!isCurrentlyPublic ? 'made public' : 'hidden'}`
+        description: `Listing ${!isCurrentlyPublic ? 'published' : 'hidden'} successfully`,
       });
+
+      fetchListings();
     } catch (error) {
-      console.error('Error updating listing:', error);
+      console.error('Error toggling listing visibility:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -90,31 +86,54 @@ const AdminContentModeration: React.FC = () => {
 
   const softDeleteListing = async (listingId: string) => {
     try {
-      const { error } = await supabase
-        .from('listings')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', listingId);
+      const { error } = await supabase.rpc('admin_set_listing', {
+        p_listing_id: listingId,
+        p_soft_delete: true
+      });
 
-      if (error) throw error;
-
-      setListings(prev =>
-        prev.map(listing =>
-          listing.id === listingId
-            ? { ...listing, deleted_at: new Date().toISOString() }
-            : listing
-        )
-      );
+      if (error) {
+        throw error;
+      }
 
       toast({
         title: "Success",
-        description: "Listing has been soft deleted"
+        description: "Listing deleted successfully"
       });
+
+      fetchListings();
     } catch (error) {
       console.error('Error deleting listing:', error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to delete listing"
+      });
+    }
+  };
+
+  const restoreListing = async (listingId: string) => {
+    try {
+      const { error } = await supabase.rpc('admin_set_listing', {
+        p_listing_id: listingId,
+        p_soft_delete: false
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Listing restored successfully"
+      });
+
+      fetchListings();
+    } catch (error) {
+      console.error('Error restoring listing:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to restore listing"
       });
     }
   };
@@ -246,7 +265,16 @@ const AdminContentModeration: React.FC = () => {
                       </Button>
                     )}
 
-                    {!listing.deleted_at && (
+                    {listing.deleted_at ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => restoreListing(listing.id)}
+                        className="text-green-600 hover:text-green-700"
+                      >
+                        Restore
+                      </Button>
+                    ) : (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button size="sm" variant="outline">
@@ -257,7 +285,7 @@ const AdminContentModeration: React.FC = () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete Listing</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete this listing? This action cannot be undone.
+                              Are you sure you want to delete this listing? This action can be undone by restoring the listing.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

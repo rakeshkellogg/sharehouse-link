@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Settings, Shield, MessageCircle, Wrench, Save, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AppConfig {
   maintenance_mode: boolean;
@@ -26,16 +27,35 @@ const AdminSettings: React.FC = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const { toast } = useToast();
 
-  // Mock - replace with actual Supabase queries to app_config table
   useEffect(() => {
     fetchConfig();
   }, []);
 
   const fetchConfig = async () => {
-    // Mock data fetch - replace with:
-    // const { data } = await supabase.from('app_config').select('*');
-    // Process the key-value pairs into config object
-    setLoading(false);
+    try {
+      const { data, error } = await supabase.rpc('read_settings');
+      
+      if (error) {
+        throw error;
+      }
+
+      // Cast the data to expected type
+      const settings = data as any;
+
+      setConfig({
+        maintenance_mode: settings?.maintenance_mode === 'true' || settings?.maintenance_mode === true,
+        max_messages_per_day: parseInt(settings?.message_rate_per_day || '50'),
+        allow_new_registrations: settings?.allow_new_registrations === 'true' || settings?.allow_new_registrations === true,
+        require_email_verification: settings?.require_email_verification === 'true' || settings?.require_email_verification === true,
+      });
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch settings"
+      });
+    }
   };
 
   const updateConfig = (key: keyof AppConfig, value: any) => {
@@ -46,18 +66,19 @@ const AdminSettings: React.FC = () => {
   const saveSettings = async () => {
     setLoading(true);
     try {
-      // Mock save - replace with actual Supabase upserts:
-      // await supabase.from('app_config').upsert([
-      //   { key: 'maintenance_mode', value: config.maintenance_mode },
-      //   { key: 'max_messages_per_day', value: config.max_messages_per_day },
-      //   etc.
-      // ]);
-
+      // Save each setting using the secure RPC
+      await Promise.all([
+        supabase.rpc('write_setting', { k: 'maintenance_mode', v: config.maintenance_mode }),
+        supabase.rpc('write_setting', { k: 'message_rate_per_day', v: config.max_messages_per_day }),
+        supabase.rpc('write_setting', { k: 'allow_new_registrations', v: config.allow_new_registrations }),
+        supabase.rpc('write_setting', { k: 'require_email_verification', v: config.require_email_verification })
+      ]);
+      
+      setHasChanges(false);
       toast({
         title: "Settings Saved",
         description: "Platform settings have been updated successfully"
       });
-      setHasChanges(false);
     } catch (error) {
       console.error('Error saving settings:', error);
       toast({
