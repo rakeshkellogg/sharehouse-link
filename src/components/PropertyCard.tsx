@@ -155,7 +155,7 @@ const PropertyCard = ({
             {bathrooms && (
               <div className="flex items-center gap-2 md:gap-1 text-real-estate-neutral/70">
                 <Bath className="w-5 h-5 md:w-4 md:h-4" />
-                <span className="text-base md:text-sm font-medium">{bathrooms} bath</span>
+                <span className="text-base md:text-sm font-medium text-real-estate-neutral">{bathrooms} bath</span>
               </div>
             )}
             {size && (

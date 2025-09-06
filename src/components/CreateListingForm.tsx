@@ -424,6 +424,18 @@ const CreateListingForm = () => {
                 </div>
               </div>
 
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-base md:text-sm">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe your property... (amenities, features, nearby attractions)"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  className="min-h-24 text-base"
+                />
+              </div>
+
               {/* Title and Price */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -623,17 +635,6 @@ const CreateListingForm = () => {
                 </Tabs>
               </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-base md:text-sm">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe your property... (amenities, features, nearby attractions)"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
-                  className="min-h-24 text-base"
-                />
-              </div>
 
                {/* Photo Upload - Show message if listing is created */}
                {shareDialog.listingId && (

@@ -281,6 +281,13 @@ const ListingDetail = () => {
           
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
+              {/* Transaction Type Badge */}
+              <div className="mb-3">
+                <Badge className="text-sm font-semibold">
+                  {(listing.transaction_type || 'rent') === 'rent' ? 'For Rent' : 'For Sale'}
+                </Badge>
+              </div>
+              
               <h1 className="text-2xl md:text-3xl font-bold text-real-estate-neutral mb-2">
                 {listing.title}
               </h1>
@@ -384,7 +391,7 @@ const ListingDetail = () => {
                       <div className="flex items-center justify-center mb-1">
                         <Bath className="w-5 h-5 text-real-estate-primary" />
                       </div>
-                      <div className="font-bold text-lg md:text-xl text-real-estate-primary">{listing.bathrooms}</div>
+                      <div className="font-bold text-lg md:text-xl text-real-estate-neutral">{listing.bathrooms}</div>
                       <div className="text-xs text-muted-foreground font-medium">Bathrooms</div>
                     </div>
                   )}
@@ -486,16 +493,16 @@ const ListingDetail = () => {
                   <CardTitle className="text-lg font-bold">Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex gap-2">
-                    <ReportDialog 
-                      listingId={listing.id}
-                      triggerText="Report Listing"
-                    />
-                    <ReportDialog 
-                      reportedUserId={listing.user_id}
-                      triggerText="Report Owner"
-                    />
-                  </div>
+                  <ReportDialog 
+                    listingId={listing.id}
+                    triggerText="Report Listing"
+                    triggerVariant="outline"
+                  />
+                  <ReportDialog 
+                    reportedUserId={listing.user_id}
+                    triggerText="Report Owner"
+                    triggerVariant="outline"
+                  />
                   <BlockUserButton 
                     targetUserId={listing.user_id}
                     triggerText="Block Owner"
