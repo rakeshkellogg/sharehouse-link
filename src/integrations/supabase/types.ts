@@ -383,6 +383,18 @@ export type Database = {
         Args: { recipient_id: string; sender_id: string }
         Returns: number
       }
+      search_public_listings: {
+        Args: { search_location?: string }
+        Returns: {
+          city: string
+          district: string
+          id: string
+          location_address: string
+          state: string
+          sub_area: string
+          title: string
+        }[]
+      }
       user_can_see_contact_info: {
         Args: { listing_id: string }
         Returns: boolean

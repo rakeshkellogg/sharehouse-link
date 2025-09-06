@@ -25,28 +25,22 @@ const SearchProperties = () => {
 
     try {
       const { data, error } = await supabase
-        .from('public_listings')
-        .select('sub_area, city, pincode, state, location_address')
-        .or(`sub_area.ilike.%${query}%,city.ilike.%${query}%,pincode.ilike.%${query}%,location_address.ilike.%${query}%`)
-        .limit(10);
+        .rpc('search_public_listings', { search_location: query });
 
       if (error) {
         console.error('Error fetching suggestions:', error);
         return;
       }
 
-      // Create unique suggestions with priority: sub_area > city > pincode > full address
+      // Create unique suggestions with priority: sub_area > city > location_address
       const suggestions = new Set<string>();
       
-      data?.forEach(item => {
+      data?.forEach((item: any) => {
         if (item.sub_area && item.sub_area.toLowerCase().includes(query.toLowerCase())) {
           suggestions.add(`${item.sub_area}, ${item.city || ''}, ${item.state || ''}`.replace(/, ,/g, ',').replace(/^,|,$/g, ''));
         }
         if (item.city && item.city.toLowerCase().includes(query.toLowerCase())) {
           suggestions.add(`${item.city}, ${item.state || ''}`.replace(/, ,/g, ',').replace(/^,|,$/g, ''));
-        }
-        if (item.pincode && item.pincode.toLowerCase().includes(query.toLowerCase())) {
-          suggestions.add(`${item.pincode} - ${item.city || item.sub_area || ''}`.replace(/ - $/g, ''));
         }
         if (item.location_address) {
           suggestions.add(item.location_address);
@@ -110,26 +104,37 @@ const SearchProperties = () => {
 
     setIsLoading(true);
     try {
-      // Use public_listings view for anonymous users (no owner contact info)
-      // This protects owner privacy while allowing property browsing
-      let query = supabase
-        .from('public_listings')
-        .select('*');
+      // Use secure function to get public listings, then fetch full details
+      const { data: searchResults, error: searchError } = await supabase
+        .rpc('search_public_listings', { search_location: trimmedLocation });
 
-      // Enhanced location search - search across multiple fields
-      if (trimmedLocation) {
-        query = query.or(`sub_area.ilike.%${trimmedLocation}%,city.ilike.%${trimmedLocation}%,pincode.ilike.%${trimmedLocation}%,state.ilike.%${trimmedLocation}%,location_address.ilike.%${trimmedLocation}%`);
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error searching listings:', error);
+      if (searchError) {
+        console.error('Error searching listings:', searchError);
         setListings([]);
         return;
       }
 
-      setListings(data || []);
+      // Get full listing details for the search results
+      if (searchResults && searchResults.length > 0) {
+        const listingIds = searchResults.map((item: any) => item.id);
+        const { data: fullListings, error: listingsError } = await supabase
+          .from('listings')
+          .select('*')
+          .in('id', listingIds)
+          .eq('is_public', true)
+          .is('deleted_at', null)
+          .order('created_at', { ascending: false });
+
+        if (listingsError) {
+          console.error('Error fetching full listings:', listingsError);
+          setListings([]);
+          return;
+        }
+
+        setListings(fullListings || []);
+      } else {
+        setListings([]);
+      }
     } catch (error) {
       console.error('Search error:', error);
       setListings([]);
