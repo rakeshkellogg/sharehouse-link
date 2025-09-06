@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Home, Users, Share2, MessageCircle, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthButton from "@/components/AuthButton";
+import AdminButton from "@/components/AdminButton";
 import { useAuth } from "@/contexts/AuthContext";
 import heroImage from "@/assets/hero-real-estate.jpg";
 
@@ -37,6 +38,9 @@ const Hero = () => {
                   </Button>
                 </Link>
               )}
+              
+              {/* Admin Button */}
+              <AdminButton />
               
               {/* Auth Button */}
               <AuthButton />

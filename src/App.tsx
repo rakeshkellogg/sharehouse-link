@@ -18,6 +18,7 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import SavedListings from "@/pages/SavedListings";
 import SearchProperties from "@/pages/SearchProperties";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import NotificationListener from "@/components/NotificationListener";
 
@@ -64,6 +65,11 @@ const App: React.FC = () => {
               <Route path="/saved" element={
                 <ProtectedRoute>
                   <SavedListings />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
               
