@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isSuspended: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error: any }>;
   signUpWithEmail: (email: string, password: string) => Promise<{ error: any }>;
@@ -31,6 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSuspended, setIsSuspended] = useState(false);
 
   // Function to check if a user is suspended
   const checkUserSuspension = async (userId: string): Promise<boolean> => {
@@ -59,15 +61,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       async (event, session) => {
         if (session?.user) {
           // Check if user is suspended
-          const isSuspended = await checkUserSuspension(session.user.id);
-          if (isSuspended) {
-            // Sign out suspended user
-            await supabase.auth.signOut();
+          const userSuspended = await checkUserSuspension(session.user.id);
+          setIsSuspended(userSuspended);
+          if (userSuspended) {
+            // Don't sign out suspended users, just mark them as suspended
+            // They can still see the sign in button but can't access content
             setSession(null);
             setUser(null);
             setLoading(false);
             return;
           }
+        } else {
+          setIsSuspended(false);
         }
         setSession(session);
         setUser(session?.user ?? null);
@@ -79,15 +84,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         // Check if user is suspended
-        const isSuspended = await checkUserSuspension(session.user.id);
-        if (isSuspended) {
-          // Sign out suspended user
-          await supabase.auth.signOut();
+        const userSuspended = await checkUserSuspension(session.user.id);
+        setIsSuspended(userSuspended);
+        if (userSuspended) {
+          // Don't sign out suspended users, just mark them as suspended
           setSession(null);
           setUser(null);
           setLoading(false);
           return;
         }
+      } else {
+        setIsSuspended(false);
       }
       setSession(session);
       setUser(session?.user ?? null);
@@ -121,13 +128,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     if (data?.user) {
       // Check if user is suspended after successful login
-      const isSuspended = await checkUserSuspension(data.user.id);
-      if (isSuspended) {
-        // Sign out suspended user
+      const userSuspended = await checkUserSuspension(data.user.id);
+      if (userSuspended) {
+        // Sign out suspended user and show error
         await supabase.auth.signOut();
+        setIsSuspended(true);
         return { 
           error: { 
-            message: "Your account has been suspended. Please contact support." 
+            message: "Your account is not available. Please contact support." 
           } 
         };
       }
@@ -172,6 +180,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     session,
     loading,
+    isSuspended,
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,
