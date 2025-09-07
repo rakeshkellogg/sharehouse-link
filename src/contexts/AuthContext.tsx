@@ -6,6 +6,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isSuspended: boolean;
+  suspensionLoading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error: any }>;
   signUpWithEmail: (email: string, password: string) => Promise<{ error: any }>;
@@ -31,6 +33,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSuspended, setIsSuspended] = useState(false);
+  const [suspensionLoading, setSuspensionLoading] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -51,6 +55,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Check suspension status when user changes
+  useEffect(() => {
+    const checkSuspensionStatus = async () => {
+      if (!user) {
+        setIsSuspended(false);
+        setSuspensionLoading(false);
+        return;
+      }
+
+      setSuspensionLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('suspended_at')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error checking suspension status:', error);
+          setIsSuspended(false);
+        } else {
+          setIsSuspended(!!data?.suspended_at);
+        }
+      } catch (error) {
+        console.error('Error checking suspension status:', error);
+        setIsSuspended(false);
+      } finally {
+        setSuspensionLoading(false);
+      }
+    };
+
+    checkSuspensionStatus();
+  }, [user]);
 
   const signInWithGoogle = async () => {
     const redirectUrl = `${window.location.origin}/`;
@@ -113,6 +151,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     session,
     loading,
+    isSuspended,
+    suspensionLoading,
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,

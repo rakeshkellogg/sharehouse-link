@@ -6,11 +6,11 @@ import { Bell, MessageCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const NotificationListener = () => {
-  const { user } = useAuth();
+  const { user, isSuspended } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || isSuspended) return;
 
     // Handle post-auth navigation for saved listings
     const pendingAction = sessionStorage.getItem('pendingListingSave');

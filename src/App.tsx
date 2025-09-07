@@ -21,6 +21,7 @@ import SearchProperties from "@/pages/SearchProperties";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import NotificationListener from "@/components/NotificationListener";
+import SuspendedGate from "@/components/SuspendedGate";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +34,8 @@ const App: React.FC = () => {
           <Sonner />
           <NotificationListener />
           <BrowserRouter>
-            <Routes>
+            <SuspendedGate>
+              <Routes>
               {/* Public routes - no authentication required */}
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -75,7 +77,8 @@ const App: React.FC = () => {
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
-            </Routes>
+              </Routes>
+            </SuspendedGate>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
