@@ -9,6 +9,11 @@ const NotificationListener = () => {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Early return if no user to prevent unnecessary effects
+  if (!user) {
+    return null;
+  }
+
   useEffect(() => {
     if (!user) return;
 

@@ -34,6 +34,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isSuspended, setIsSuspended] = useState(false);
 
+  console.log('AuthContext state:', { user: !!user, loading, isSuspended });
+
   // Function to check if a user is suspended
   const checkUserSuspension = async (userId: string): Promise<boolean> => {
     try {
