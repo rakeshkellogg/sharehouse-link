@@ -14,7 +14,7 @@ import { LogIn, LogOut, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const AuthButton = () => {
-  const { user, signOut, loading, isSuspended } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -39,7 +39,7 @@ const AuthButton = () => {
     );
   }
 
-  if (!user || isSuspended) {
+  if (!user) {
     return (
       <Link to="/auth">
         <Button className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero">
