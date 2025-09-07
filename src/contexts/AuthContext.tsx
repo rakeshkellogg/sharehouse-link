@@ -32,43 +32,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Function to check if a user is suspended
-  const checkUserSuspension = async (userId: string): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('suspended_at')
-        .eq('user_id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error checking user suspension:', error);
-        return false; // If we can't check, allow access
-      }
-
-      return data?.suspended_at !== null;
-    } catch (error) {
-      console.error('Error checking user suspension:', error);
-      return false; // If we can't check, allow access
-    }
-  };
-
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          // Check if user is suspended
-          const isSuspended = await checkUserSuspension(session.user.id);
-          if (isSuspended) {
-            // Sign out suspended user
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-            setLoading(false);
-            return;
-          }
-        }
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -76,19 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        // Check if user is suspended
-        const isSuspended = await checkUserSuspension(session.user.id);
-        if (isSuspended) {
-          // Sign out suspended user
-          await supabase.auth.signOut();
-          setSession(null);
-          setUser(null);
-          setLoading(false);
-          return;
-        }
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -114,24 +69,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signInWithEmail = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    
-    if (data?.user) {
-      // Check if user is suspended after successful login
-      const isSuspended = await checkUserSuspension(data.user.id);
-      if (isSuspended) {
-        // Sign out suspended user
-        await supabase.auth.signOut();
-        return { 
-          error: { 
-            message: "Your account has been suspended. Please contact support." 
-          } 
-        };
-      }
-    }
     
     return { error };
   };
