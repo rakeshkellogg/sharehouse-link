@@ -501,6 +501,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_user_suspended: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       read_settings: {
         Args: Record<PropertyKey, never>
         Returns: Json
