@@ -114,16 +114,11 @@ const SearchProperties = () => {
         return;
       }
 
-      // Get full listing details for the search results
+      // Get full listing details for the search results using secure RPC
       if (searchResults && searchResults.length > 0) {
         const listingIds = searchResults.map((item: any) => item.id);
         const { data: fullListings, error: listingsError } = await supabase
-          .from('listings')
-          .select('*')
-          .in('id', listingIds)
-          .eq('is_public', true)
-          .is('deleted_at', null)
-          .order('created_at', { ascending: false });
+          .rpc('get_public_listings_by_ids', { listing_ids: listingIds });
 
         if (listingsError) {
           console.error('Error fetching full listings:', listingsError);

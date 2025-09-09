@@ -540,6 +540,59 @@ export type Database = {
           youtube_url: string
         }[]
       }
+      get_public_listing_details: {
+        Args: { listing_id: string }
+        Returns: {
+          bathrooms: string
+          bedrooms: string
+          city: string
+          cover_image_url: string
+          created_at: string
+          description: string
+          district: string
+          google_maps_link: string
+          id: string
+          is_public: boolean
+          latitude: number
+          location_address: string
+          longitude: number
+          media_links: string[]
+          pincode: string
+          price: number
+          price_rupees: number
+          price_unit: string
+          property_type: string
+          size: string
+          size_unit: string
+          state: string
+          sub_area: string
+          title: string
+          transaction_type: string
+          youtube_url: string
+        }[]
+      }
+      get_public_listings_by_ids: {
+        Args: { listing_ids: string[] }
+        Returns: {
+          bathrooms: string
+          bedrooms: string
+          city: string
+          cover_image_url: string
+          created_at: string
+          district: string
+          id: string
+          price: number
+          price_rupees: number
+          price_unit: string
+          property_type: string
+          size: string
+          size_unit: string
+          state: string
+          sub_area: string
+          title: string
+          transaction_type: string
+        }[]
+      }
       get_remaining_messages_today: {
         Args: { recipient_id: string; sender_id: string }
         Returns: number

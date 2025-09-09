@@ -90,7 +90,7 @@ const ListingDetail = () => {
         } else {
           // For anonymous users, use the secure RPC function
           const { data: publicData, error: publicError } = await supabase
-            .rpc('get_public_listing', { listing_id: id });
+            .rpc('get_public_listing_details', { listing_id: id });
             
           data = publicData?.[0] || null; // RPC returns an array, so take first item
           error = publicError;
