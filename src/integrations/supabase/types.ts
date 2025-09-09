@@ -501,6 +501,10 @@ export type Database = {
         Args: { p_suspend: boolean; p_user_id: string }
         Returns: undefined
       }
+      bootstrap_admin_from_email: {
+        Args: { admin_email: string }
+        Returns: undefined
+      }
       can_send_message_today: {
         Args: { recipient_id: string; sender_id: string }
         Returns: boolean
@@ -602,6 +606,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_email_in_admin_list: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       is_super_admin: {
