@@ -5,6 +5,7 @@ import { Home, Users, Share2, MessageCircle, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthButton from "@/components/AuthButton";
 import AdminButton from "@/components/AdminButton";
+import InstallAppButton from "@/components/InstallAppButton";
 import { useAuth } from "@/contexts/AuthContext";
 import heroImage from "@/assets/hero-real-estate.jpg";
 
@@ -29,6 +30,9 @@ const Hero = () => {
             
             {/* Navigation Links */}
             <div className="flex items-center gap-4">
+              {/* Install App Button */}
+              <InstallAppButton />
+              
               {/* My Listings Button for Authenticated Users */}
               {user && (
                 <Link to="/my-listings">
