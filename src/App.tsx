@@ -23,13 +23,11 @@ import NotFound from "./pages/NotFound";
 import NotificationListener from "@/components/NotificationListener";
 import SuspendedGate from "@/components/SuspendedGate";
 import UpdatePrompt from "@/components/UpdatePrompt";
-import { useOfflineSync } from "@/hooks/useOfflineSync";
+import OfflineSync from "@/components/OfflineSync";
 
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
-  useOfflineSync();
-  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -37,6 +35,7 @@ const App: React.FC = () => {
           <Toaster />
           <Sonner />
           <UpdatePrompt />
+          <OfflineSync />
           <NotificationListener />
           <BrowserRouter>
             <SuspendedGate>
