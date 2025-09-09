@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Users, Search, UserCheck, UserX, Eye } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,6 +25,7 @@ const AdminUserManagement: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [deactivationReason, setDeactivationReason] = useState('');
   const { toast } = useToast();
@@ -85,10 +87,16 @@ const AdminUserManagement: React.FC = () => {
     }
   };
 
-  const filteredProfiles = profiles.filter(profile =>
-    profile.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.user_id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProfiles = profiles.filter(profile => {
+    const matchesSearch = profile.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      profile.user_id.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' ||
+      (statusFilter === 'active' && !profile.suspended_at) ||
+      (statusFilter === 'suspended' && profile.suspended_at);
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
@@ -132,6 +140,16 @@ const AdminUserManagement: React.FC = () => {
                 className="pl-10"
               />
             </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+              </SelectContent>
+            </Select>
             <Button onClick={fetchUsers} variant="outline">
               Refresh
             </Button>

@@ -29,11 +29,14 @@ const AdminContentModeration: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [reportFilter, setReportFilter] = useState('all');
+  const [reportedListingIds, setReportedListingIds] = useState<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchListings();
-  }, []);
+    fetchReportedListings();
+  }, [])
 
   const fetchListings = async () => {
     try {
@@ -54,6 +57,22 @@ const AdminContentModeration: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReportedListings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('reports')
+        .select('listing_id')
+        .eq('status', 'pending');
+
+      if (error) throw error;
+      
+      const uniqueListingIds = [...new Set((data || []).map(report => report.listing_id))];
+      setReportedListingIds(uniqueListingIds);
+    } catch (error) {
+      console.error('Error fetching reported listings:', error);
     }
   };
 
@@ -148,7 +167,11 @@ const AdminContentModeration: React.FC = () => {
       (statusFilter === 'hidden' && !listing.is_public && !listing.deleted_at) ||
       (statusFilter === 'deleted' && listing.deleted_at);
 
-    return matchesSearch && matchesStatus;
+    const matchesReport = reportFilter === 'all' ||
+      (reportFilter === 'reported' && reportedListingIds.includes(listing.id)) ||
+      (reportFilter === 'not-reported' && !reportedListingIds.includes(listing.id));
+
+    return matchesSearch && matchesStatus && matchesReport;
   });
 
   const getStatusBadge = (listing: Listing) => {
@@ -203,7 +226,17 @@ const AdminContentModeration: React.FC = () => {
               <SelectItem value="deleted">Deleted</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={fetchListings} variant="outline">
+          <Select value={reportFilter} onValueChange={setReportFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Reports</SelectItem>
+              <SelectItem value="reported">Reported</SelectItem>
+              <SelectItem value="not-reported">Not Reported</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={() => { fetchListings(); fetchReportedListings(); }} variant="outline">
             Refresh
           </Button>
         </div>
