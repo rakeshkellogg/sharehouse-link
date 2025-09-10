@@ -58,11 +58,21 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
       return;
     }
 
+    // Validate that either user or listing is being reported
+    if (!reportedUserId && !listingId) {
+      toast({
+        title: "Invalid Report",
+        description: "Must specify either a user or listing to report.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const { error } = await supabase
-        .from('reports' as any)
+        .from('reports')
         .insert({
           reporter_user_id: user.id,
           reported_user_id: reportedUserId || null,
@@ -72,7 +82,10 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
           details: details.trim() || null
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Report submission error:', error);
+        throw error;
+      }
 
       toast({
         title: "Report Submitted",

@@ -15,11 +15,13 @@ export const useBlockStatus = (targetUserId: string) => {
       }
 
       try {
+        // Use normalized pair checking with the new schema
         const { data, error } = await supabase
-          .from('user_blocks' as any)
+          .from('user_blocks')
           .select('id')
-          .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
-          .or(`user_a.eq.${targetUserId},user_b.eq.${targetUserId}`)
+          .eq('user_a', user.id < targetUserId ? user.id : targetUserId)
+          .eq('user_b', user.id < targetUserId ? targetUserId : user.id)
+          .is('removed_at', null)
           .maybeSingle();
 
         if (error) throw error;

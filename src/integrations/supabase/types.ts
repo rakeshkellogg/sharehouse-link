@@ -271,11 +271,14 @@ export type Database = {
       }
       reports: {
         Row: {
+          category: string
           created_at: string
           description: string | null
+          details: string | null
           id: string
-          listing_id: string
+          listing_id: string | null
           reason: string
+          reported_user_id: string | null
           reporter_user_id: string
           reviewed_at: string | null
           reviewed_by: string | null
@@ -283,11 +286,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category: string
           created_at?: string
           description?: string | null
+          details?: string | null
           id?: string
-          listing_id: string
+          listing_id?: string | null
           reason: string
+          reported_user_id?: string | null
           reporter_user_id: string
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -295,11 +301,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: string
           created_at?: string
           description?: string | null
+          details?: string | null
           id?: string
-          listing_id?: string
+          listing_id?: string | null
           reason?: string
+          reported_user_id?: string | null
           reporter_user_id?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -358,6 +367,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_blocks: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          reason: string | null
+          removed_at: string | null
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          reason?: string | null
+          removed_at?: string | null
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          reason?: string | null
+          removed_at?: string | null
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -606,6 +645,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_blocked: {
+        Args: { a: string; b: string }
         Returns: boolean
       }
       is_email_in_admin_list: {
