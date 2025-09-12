@@ -1,4 +1,4 @@
-
+import React from "react";
 import { Zap, Share2, Users, MessageCircle, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthButton from "@/components/AuthButton";
@@ -131,7 +131,7 @@ const Hero = () => {
   );
 };
 
-function FeatureCard({
+const FeatureCard = ({
   icon,
   title,
   desc,
@@ -139,7 +139,7 @@ function FeatureCard({
   icon: React.ReactNode;
   title: string;
   desc: string;
-}) {
+}) => {
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <div className="flex items-center justify-center h-9 w-9 rounded-full bg-teal-50 text-teal-700">
@@ -149,6 +149,6 @@ function FeatureCard({
       <p className="mt-1 text-sm text-slate-600">{desc}</p>
     </div>
   );
-}
+};
 
 export default Hero;
