@@ -16,7 +16,7 @@ const Hero = () => {
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
       {/* Background Image with Overlay */}
       <div 
-        className="absolute inset-0 bg-cover bg-right bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-right md:bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         <div className="hero-overlay" />
