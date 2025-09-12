@@ -7,7 +7,7 @@ import AuthButton from "@/components/AuthButton";
 import AdminButton from "@/components/AdminButton";
 import InstallAppButton from "@/components/InstallAppButton";
 import { useAuth } from "@/contexts/AuthContext";
-import heroImage from "@/assets/hero-real-estate.jpg";
+import heroImage from "@/assets/hero-city-skyline.jpg";
 
 const Hero = () => {
   const { user } = useAuth();
