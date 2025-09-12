@@ -13,19 +13,18 @@ const Hero = () => {
   const { user } = useAuth();
 
   return (
-    <section 
-      className="relative min-h-[640px] md:min-h-[720px] lg:min-h-[820px] overflow-hidden"
-      style={{
-        backgroundImage: `url(${heroImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center top",
-      }}
-    >
+    <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      />
+      
       {/* Gradient overlay for text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/25" />
 
       {/* Navigation Bar */}
-      <nav className="relative z-20 bg-white/10 backdrop-blur-sm border-b border-white/20">
+      <nav className="relative z-30 bg-white/10 backdrop-blur-sm border-b border-white/20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo space */}
@@ -33,10 +32,8 @@ const Hero = () => {
             
             {/* Navigation Links */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* Install App Button */}
               <InstallAppButton />
               
-              {/* My Listings Button for Authenticated Users */}
               {user && (
                 <Link to="/my-listings">
                   <Button className="bg-white text-real-estate-primary hover:bg-white/90 shadow-hero text-sm sm:text-base">
@@ -47,10 +44,7 @@ const Hero = () => {
                 </Link>
               )}
               
-              {/* Admin Button */}
               <AdminButton />
-              
-              {/* Auth Button */}
               <AuthButton />
             </div>
           </div>
@@ -58,75 +52,77 @@ const Hero = () => {
       </nav>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Top spacer */}
-        <div className="pt-8 sm:pt-12 md:pt-16 lg:pt-20" />
+      <div className="relative z-20 flex flex-col min-h-screen">
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl w-full">
+            <div className="max-w-4xl">
+              {/* Main Heading */}
+              <h1 className="text-white font-extrabold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-7xl leading-tight drop-shadow-lg">
+                Your property live in{" "}
+                <span className="whitespace-nowrap">2 minutes</span>{" "}
+                — free, fast, everywhere.
+              </h1>
+              
+              <p className="mt-4 sm:mt-5 text-white/90 text-base sm:text-lg md:text-xl lg:text-2xl leading-snug drop-shadow-md max-w-3xl">
+                Post once. Share on WhatsApp, Facebook & beyond.
+              </p>
 
-        <div className="max-w-4xl">
-          {/* Main Heading */}
-          <h1 className="text-white font-extrabold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-7xl leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
-            Your property live in{" "}
-            <span className="whitespace-nowrap">2 minutes</span>{" "}
-            — free, fast, everywhere.
-          </h1>
-          
-          <p className="mt-4 sm:mt-5 text-white/90 text-base sm:text-lg md:text-xl lg:text-2xl leading-snug drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]">
-            Post once. Share on WhatsApp, Facebook & beyond.
-          </p>
+              {/* CTA Buttons */}
+              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Link 
+                  to="/create"
+                  className="inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg transition-colors"
+                >
+                  Create Your First Listing
+                </Link>
+                <Link 
+                  to="/search"
+                  className="inline-flex items-center justify-center rounded-xl bg-white hover:bg-white/90 text-gray-900 h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg transition-colors"
+                >
+                  Search Properties
+                </Link>
+              </div>
 
-          {/* CTA Buttons */}
-          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <Link 
-              to="/create"
-              className="inline-flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg shadow-black/20 transition-colors"
-            >
-              Create Your First Listing
-            </Link>
-            <Link 
-              to="/search"
-              className="inline-flex items-center justify-center rounded-xl bg-white hover:bg-white/90 text-slate-900 h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg shadow-black/10 transition-colors"
-            >
-              Search Properties
-            </Link>
+              {/* Free checkmark line */}
+              <div className="mt-4 sm:mt-5 flex items-center gap-2 text-white/95">
+                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
+                <span className="text-sm sm:text-base lg:text-lg font-medium">
+                  100% free, no middlemen
+                </span>
+              </div>
+            </div>
+
+            {/* Feature cards */}
+            <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-6xl">
+              <FeatureCard
+                icon={<Zap className="h-5 w-5 sm:h-6 sm:w-6" />}
+                title="Quick Setup"
+                description="Post in under 2 minutes."
+              />
+              <FeatureCard
+                icon={<Share2 className="h-5 w-5 sm:h-6 sm:w-6" />}
+                title="Share Anywhere"
+                description="One click to WhatsApp & Facebook groups"
+              />
+              <FeatureCard
+                icon={<Handshake className="h-5 w-5 sm:h-6 sm:w-6" />}
+                title="Direct Contact"
+                description="No brokers, no middlemen"
+              />
+              <FeatureCard
+                icon={<MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />}
+                title="Peer-to-Peer"
+                description="Chat directly with buyers & renters."
+              />
+            </div>
           </div>
-
-          {/* Free checkmark line */}
-          <div className="mt-4 sm:mt-5 flex items-center gap-2 text-white/95">
-            <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
-            <span className="text-sm sm:text-base lg:text-lg font-medium">
-              100% free, no middlemen
-            </span>
-          </div>
-        </div>
-
-        {/* Feature cards */}
-        <div className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-6xl">
-          <FeatureCard
-            icon={<Zap className="h-5 w-5 sm:h-6 sm:w-6" />}
-            title="Quick Setup"
-            description="Post in under 2 minutes."
-          />
-          <FeatureCard
-            icon={<Share2 className="h-5 w-5 sm:h-6 sm:w-6" />}
-            title="Share Anywhere"
-            description="One click to WhatsApp & Facebook groups"
-          />
-          <FeatureCard
-            icon={<Handshake className="h-5 w-5 sm:h-6 sm:w-6" />}
-            title="Direct Contact"
-            description="No brokers, no middlemen"
-          />
-          <FeatureCard
-            icon={<MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />}
-            title="Peer-to-Peer"
-            description="Chat directly with buyers & renters."
-          />
         </div>
 
         {/* Bottom spacer */}
-        <div className="pb-8 sm:pb-12 md:pb-16 lg:pb-20" />
+        <div className="h-8 sm:h-12 md:h-16 lg:h-20"></div>
       </div>
-    </section>
+    </div>
   );
 };
 
