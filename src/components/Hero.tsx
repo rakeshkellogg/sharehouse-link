@@ -7,17 +7,20 @@ import AuthButton from "@/components/AuthButton";
 import AdminButton from "@/components/AdminButton";
 import InstallAppButton from "@/components/InstallAppButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import heroImage from "@/assets/hero-city-skyline.jpg";
+import heroMobileImage from "@/assets/hero-mobile.jpg";
 
 const Hero = () => {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-right md:bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        style={{ backgroundImage: `url(${isMobile ? heroMobileImage : heroImage})` }}
       >
         <div className="hero-overlay" />
       </div>
