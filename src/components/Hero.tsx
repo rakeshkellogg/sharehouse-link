@@ -58,13 +58,13 @@ const Hero = () => {
         <div className="text-center max-w-4xl mx-auto">
           {/* Main Heading */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
-            List. Share. Connect.
+            Your property live in
             <br />
-            <span className="text-white/90 font-semibold">Real estate made simple.</span>
+            <span className="text-white/90 font-semibold">2 minutes — free, fast, everywhere.</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Create beautiful property listings in under 2 minutes and share them across Facebook, WhatsApp, and beyond.
+            Post once. Share on WhatsApp, Facebook & beyond.
           </p>
 
           {/* CTA Buttons */}
