@@ -55,7 +55,7 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
-        <div className="text-center max-w-4xl mx-auto">
+        <div className="text-left max-w-4xl">
           {/* Main Heading */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
             Your property live in
@@ -63,12 +63,12 @@ const Hero = () => {
             <span className="text-white/90 font-semibold">2 minutes — free, fast, everywhere.</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl leading-relaxed">
             Post once. Share on WhatsApp, Facebook & beyond.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-3 mb-24">
             <Link to="/create">
               <button className="btn btn-white btn-xl">Create Your First Listing</button>
             </Link>
@@ -78,7 +78,7 @@ const Hero = () => {
           </div>
 
           {/* Feature Cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl">
             <Card className="card-z p-6">
               <div className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 bg-gradient-hero rounded-full flex items-center justify-center mb-4">
