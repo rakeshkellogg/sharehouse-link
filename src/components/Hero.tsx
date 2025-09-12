@@ -16,12 +16,16 @@ const Hero = () => {
     <div className="relative min-h-screen w-full overflow-hidden">
       {/* Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        className="absolute inset-0 bg-no-repeat"
+        style={{ 
+          backgroundImage: `url(${heroImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "80% center",
+        }}
       />
       
       {/* Gradient overlay for text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/25" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/45 backdrop-blur-[1.5px] sm:backdrop-blur-[2px]" />
 
       {/* Navigation Bar */}
       <nav className="relative z-30 bg-white/10 backdrop-blur-sm border-b border-white/20">
@@ -72,13 +76,13 @@ const Hero = () => {
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link 
                   to="/create"
-                  className="inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg transition-colors"
+                  className="inline-flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg shadow-black/20 transition-colors"
                 >
                   Create Your First Listing
                 </Link>
                 <Link 
                   to="/search"
-                  className="inline-flex items-center justify-center rounded-xl bg-white hover:bg-white/90 text-gray-900 h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg transition-colors"
+                  className="inline-flex items-center justify-center rounded-xl bg-white hover:bg-white/90 text-foreground h-12 sm:h-14 px-5 sm:px-6 text-base sm:text-lg font-semibold shadow-lg shadow-black/10 transition-colors"
                 >
                   Search Properties
                 </Link>
