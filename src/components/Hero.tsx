@@ -125,7 +125,7 @@ const Hero = () => {
 
             <div className="flex flex-col sm:flex-row gap-3 mb-20">
               <Link to="/create">
-                <button className="btn btn-white btn-xl">Create Your First Listing</button>
+                <button className="btn btn-white btn-xl">Create Listing</button>
               </Link>
               <Link to="/search">
                 <button className="btn btn-white btn-xl">Search Properties</button>
