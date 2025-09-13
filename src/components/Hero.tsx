@@ -79,7 +79,7 @@ const Hero = () => {
             </div>
 
             {/* Features at bottom */}
-            <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
+            <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto mt-24">
               <Card className="p-3">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
