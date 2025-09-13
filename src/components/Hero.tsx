@@ -65,10 +65,10 @@ const Hero = () => {
             </div>
 
             {/* CTAs – half-width buttons aligned left */}
-            <div className="max-w-[28rem] mx-auto flex flex-col gap-3 items-start">
+            <div className="max-w-[28rem] mx-auto flex flex-col gap-3 items-start mb-16">
               <Link to="/create">
                 <button className="w-48 rounded-full py-3 px-6 bg-white text-slate-900 font-semibold shadow-lg hover:bg-white/90 transition">
-                  Create Your First Listing
+                  Create Listing
                 </button>
               </Link>
               <Link to="/search">
