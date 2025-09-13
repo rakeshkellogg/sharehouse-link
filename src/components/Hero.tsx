@@ -10,7 +10,7 @@ import PhoneMockup from "@/components/PhoneMockup";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroDesktopBg from "@/assets/hero-city-skyline.jpg";
-import heroMobileBg from "@/assets/hero-real-estate.jpg";
+import heroMobileBg from "@/assets/hero-mobile.jpg";
 
 const Hero = () => {
   const { user } = useAuth();
@@ -78,43 +78,35 @@ const Hero = () => {
               </Link>
             </div>
 
-            {/* Features + Phone */}
-            <div className="flex items-start justify-between gap-4 max-w-[72rem] mx-auto">
-              {/* Left column features (narrow) */}
-              <div className="flex-1 space-y-3 max-w-[140px]">
-                <Card className="p-3">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
-                      <Home className="w-4 h-4 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-slate-900 mb-1 text-sm">Quick Setup</h3>
-                    <p className="text-xs text-slate-600">Create listings in under 2 minutes</p>
+            {/* Features only */}
+            <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
+              <Card className="p-3">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
+                    <Home className="w-4 h-4 text-white" />
                   </div>
-                </Card>
-                <Card className="p-3">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
-                      <Share2 className="w-4 h-4 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-slate-900 mb-1 text-sm">Share Anywhere</h3>
-                    <p className="text-xs text-slate-600">Perfect for social platforms</p>
+                  <h3 className="font-semibold text-slate-900 mb-1 text-sm">Quick Setup</h3>
+                  <p className="text-xs text-slate-600">Create listings in under 2 minutes</p>
+                </div>
+              </Card>
+              <Card className="p-3">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
+                    <Share2 className="w-4 h-4 text-white" />
                   </div>
-                </Card>
-                <Card className="p-3">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
-                      <MessageCircle className="w-4 h-4 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-slate-900 mb-1 text-sm">Direct Contact</h3>
-                    <p className="text-xs text-slate-600">WhatsApp buttons built in</p>
+                  <h3 className="font-semibold text-slate-900 mb-1 text-sm">Share Anywhere</h3>
+                  <p className="text-xs text-slate-600">Perfect for social platforms</p>
+                </div>
+              </Card>
+              <Card className="p-3">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full flex items-center justify-center mb-2">
+                    <MessageCircle className="w-4 h-4 text-white" />
                   </div>
-                </Card>
-              </div>
-
-              {/* Single phone mockup (only one!) */}
-              <div className="flex-shrink-0 w-[300px] sm:w-[320px]">
-                <PhoneMockup />
-              </div>
+                  <h3 className="font-semibold text-slate-900 mb-1 text-sm">Direct Contact</h3>
+                  <p className="text-xs text-slate-600">WhatsApp buttons built in</p>
+                </div>
+              </Card>
             </div>
           </div>
         ) : (
