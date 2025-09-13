@@ -64,21 +64,21 @@ const Hero = () => {
               </p>
             </div>
 
-            {/* CTAs – white pill buttons */}
-            <div className="max-w-[28rem] mx-auto flex flex-col gap-3">
+            {/* CTAs – half-width buttons aligned left */}
+            <div className="max-w-[28rem] mx-auto flex flex-col gap-3 items-start">
               <Link to="/create">
-                <button className="w-full rounded-full py-3 px-6 bg-white text-slate-900 font-semibold shadow-lg hover:bg-white/90 transition">
+                <button className="w-48 rounded-full py-3 px-6 bg-white text-slate-900 font-semibold shadow-lg hover:bg-white/90 transition">
                   Create Your First Listing
                 </button>
               </Link>
               <Link to="/search">
-                <button className="w-full rounded-full py-3 px-6 bg-white text-slate-900 font-semibold shadow-lg hover:bg-white/90 transition">
+                <button className="w-48 rounded-full py-3 px-6 bg-white text-slate-900 font-semibold shadow-lg hover:bg-white/90 transition">
                   Search Properties
                 </button>
               </Link>
             </div>
 
-            {/* Features only */}
+            {/* Features at bottom */}
             <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
               <Card className="p-3">
                 <div className="flex flex-col items-center text-center">
