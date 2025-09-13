@@ -77,10 +77,14 @@ const Hero = () => {
               {/* CTA Buttons */}
               <div className="flex flex-col gap-3 mb-8">
                 <Link to="/create">
-                  <button className="btn btn-white btn-lg w-full">Create Your First Listing</button>
+                  <button className="w-full py-3 px-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold rounded-lg hover:bg-white/20 transition-all duration-300">
+                    Create Your First Listing
+                  </button>
                 </Link>
                 <Link to="/search">
-                  <button className="btn btn-white btn-lg w-full">Search Properties</button>
+                  <button className="w-full py-3 px-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold rounded-lg hover:bg-white/20 transition-all duration-300">
+                    Search Properties
+                  </button>
                 </Link>
               </div>
             </div>
